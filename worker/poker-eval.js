@@ -1,4 +1,5 @@
 export const RANKS='23456789TJQKA';
+export const HAND_NAMES=['HIGH CARD','ONE PAIR','TWO PAIR','THREE OF A KIND','STRAIGHT','FLUSH','FULL HOUSE','FOUR OF A KIND','STRAIGHT FLUSH'];
 
 export function evaluate(cards){
   const rs=cards.map(c=>RANKS.indexOf(c[0])+2).sort((a,b)=>b-a),suits={};
@@ -23,6 +24,11 @@ export function evaluate(cards){
   if(pairs.length>=2){const a=pairs[0][1],b=pairs[1][1];return[2,a,b,...rs.filter(r=>r!==a&&r!==b).slice(0,1)]}
   if(pairs.length)return[1,pairs[0][1],...rs.filter(r=>r!==pairs[0][1]).slice(0,3)];
   return[0,...uniq.filter(x=>x!==1).slice(0,5)];
+}
+
+export function handStrengthLabel(cards){
+  if(!Array.isArray(cards)||cards.filter(Boolean).length<2)return'';
+  return HAND_NAMES[evaluate(cards.filter(Boolean))[0]]||'';
 }
 
 export function compare(a,b){

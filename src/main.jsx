@@ -1,12 +1,12 @@
 import React from'react';
 import{createRoot}from'react-dom/client';
 import App from'./App.jsx';
-import TournamentConfig,{selectedBlindStructure}from'./TournamentConfig.jsx';
+import TournamentConfig from'./TournamentConfig.jsx';
 import ActionLogPanel from'./ActionLogPanel.jsx';
 import{installTableStateBus}from'./table-state-bus.js';
+import{installApiRuntime}from'./api-runtime.js';
 import'./table-feel.css';
 import'./tournament-config.css';
 installTableStateBus();
-const nativeFetch=window.fetch.bind(window);
-window.fetch=(input,init={})=>{const url=typeof input==='string'?input:input?.url||'';if(url==='/api/tables'&&String(init?.method||'GET').toUpperCase()==='POST'&&init?.body){try{const body=JSON.parse(init.body);init={...init,body:JSON.stringify({...body,blindStructure:selectedBlindStructure()})}}catch{}}return nativeFetch(input,init)};
+installApiRuntime();
 createRoot(document.getElementById('root')).render(<><App/><TournamentConfig/><ActionLogPanel/></>);

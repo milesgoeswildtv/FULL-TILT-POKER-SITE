@@ -1,0 +1,3 @@
+export function raiseIsOpen(currentBet,minRaise,actedAtBet){return actedAtBet==null||currentBet-actedAtBet>=minRaise}
+export function legalBettingState({currentBet,minRaise,playerBet,playerChips,actedAtBet}){const open=raiseIsOpen(currentBet,minRaise,actedAtBet),total=playerBet+playerChips;return{toCall:Math.max(0,currentBet-playerBet),canRaise:open&&total>currentBet,canAllIn:total<=currentBet||open}}
+export function applyRaiseState({currentBet,minRaise,target,isAllIn=false}){if(target<=currentBet)throw Error('Raise must exceed current bet.');const raiseSize=target-currentBet;if(raiseSize<minRaise&&!isAllIn)throw Error(`Minimum raise is to ${currentBet+minRaise}.`);return{currentBet:target,minRaise:raiseSize>=minRaise?raiseSize:minRaise,fullRaise:raiseSize>=minRaise}}

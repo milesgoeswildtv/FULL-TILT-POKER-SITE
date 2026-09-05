@@ -1,18 +1,20 @@
 import'./fx.css';
-let audioCtx=null,last={hand:null,board:0,pot:0,folded:new Set,allin:new Set,street:''},muted=localStorage.getItem('ftp_sound')!=='on';
+let audioCtx=null,last={hand:null,board:0,pot:0,folded:new Set,allin:new Set,street:''},muted=localStorage.getItem('ftp_sound')!=='on',frame=0;
 function ctx(){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;audioCtx??=new C();return audioCtx}
 function tone(freq,duration=.06,type='sine',gain=.03,delay=0){if(muted)return;const c=ctx();if(!c)return;if(c.state==='suspended')c.resume().catch(()=>{});if(c.state!=='running')return;const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(gain,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g).connect(c.destination);o.start(t);o.stop(t+duration+.03)}
 function cue(name){if(name==='deal'){tone(520,.045,'triangle',.022);tone(660,.045,'triangle',.02,.05)}else if(name==='card'){tone(430,.045,'triangle',.023);tone(540,.04,'triangle',.018,.04)}else if(name==='chips'){tone(920,.025,'square',.009);tone(1180,.025,'square',.007,.022)}else if(name==='fold')tone(170,.07,'triangle',.015);else if(name==='allin'){tone(220,.11,'sawtooth',.014);tone(330,.13,'sawtooth',.012,.08)}else if(name==='showdown'){tone(392,.1,'triangle',.022);tone(523,.14,'triangle',.021,.1);tone(659,.2,'triangle',.02,.2)}else if(name==='win'){tone(523,.13,'triangle',.025);tone(659,.16,'triangle',.023,.11);tone(784,.25,'triangle',.022,.23)}}
-function pulse(el,cls){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),700)}
+function pulse(el,cls,ms=700,delay=0){if(!el)return;el.classList.remove(cls);void el.offsetWidth;if(delay)el.style.setProperty('--fx-delay',`${delay}ms`);el.classList.add(cls);setTimeout(()=>{el.classList.remove(cls);if(delay)el.style.removeProperty('--fx-delay')},ms+delay+80)}
+function pulseAll(nodes,cls,step=65,ms=700){[...nodes].forEach((el,i)=>pulse(el,cls,ms,i*step))}
 function ensureToggle(){const top=document.querySelector('.topbar');if(!top||top.querySelector('.soundToggle'))return;const b=document.createElement('button');b.className='ghost soundToggle';const draw=()=>{b.textContent=muted?'🔇 Sound':'🔊 Sound'};draw();b.onclick=()=>{muted=!muted;localStorage.setItem('ftp_sound',muted?'off':'on');if(!muted){const c=ctx();c?.resume?.();cue('card')}draw()};top.appendChild(b)}
-function scan(){ensureToggle();const handText=document.querySelector('.topbar b')?.textContent||'',hand=handText.match(/HAND #(\d+)/)?.[1]||null,board=document.querySelectorAll('.board .card').length,potEl=document.querySelector('.pot'),pot=Number((potEl?.textContent||'').replace(/\D/g,''))||0,street=document.querySelector('.infoStrip span:nth-child(3) b')?.textContent||'';
- if(last.hand!==null&&hand&&hand!==last.hand){cue('deal');document.querySelectorAll('.hole .card').forEach((c,i)=>{c.classList.add('fxDeal');c.style.setProperty('--fx-delay',`${i*70}ms`)})}
- if(board>last.board){cue('card');[...document.querySelectorAll('.board .card')].slice(last.board).forEach((c,i)=>{c.classList.add('fxBoardDeal');c.style.setProperty('--fx-delay',`${i*65}ms`)})}
- if(pot>last.pot&&last.pot!==0){cue('chips');pulse(potEl,'fxPotPulse')}
- const folded=new Set,allin=new Set;document.querySelectorAll('.seat').forEach((s,i)=>{const key=s.querySelector('b')?.textContent||String(i);if(s.classList.contains('folded'))folded.add(key);if(s.textContent.includes('ALL IN'))allin.add(key);if(!last.folded.has(key)&&folded.has(key)){cue('fold');pulse(s,'fxFold')}if(!last.allin.has(key)&&allin.has(key)){cue('allin');pulse(s,'fxAllIn')}});
- if(last.street&&street==='SHOWDOWN'&&last.street!=='SHOWDOWN'){cue('showdown');document.querySelectorAll('.showdownFelt .seat:not(.folded)').forEach(s=>s.classList.add('fxShowdown'))}
+function scan(){frame=0;ensureToggle();const handText=document.querySelector('.topbar b')?.textContent||'',hand=handText.match(/HAND #(\d+)/)?.[1]||null,board=document.querySelectorAll('.board .card').length,potEl=document.querySelector('.pot'),pot=Number((potEl?.textContent||'').replace(/\D/g,''))||0,street=document.querySelector('.infoStrip span:nth-child(3) b')?.textContent||'';
+ if(last.hand!==null&&hand&&hand!==last.hand){cue('deal');pulseAll(document.querySelectorAll('.hole .card'),'fxDeal',70,720)}
+ if(board>last.board){cue('card');pulseAll([...document.querySelectorAll('.board .card')].slice(last.board),'fxBoardDeal',65,720)}
+ if(pot>last.pot&&last.pot!==0){cue('chips');pulse(potEl,'fxPotPulse',620)}
+ const folded=new Set,allin=new Set;document.querySelectorAll('.seat').forEach((s,i)=>{const key=s.querySelector('b')?.textContent||String(i);if(s.classList.contains('folded'))folded.add(key);if(s.textContent.includes('ALL IN'))allin.add(key);if(!last.folded.has(key)&&folded.has(key)){cue('fold');pulse(s,'fxFold',620)}if(!last.allin.has(key)&&allin.has(key)){cue('allin');pulse(s,'fxAllIn',760)}});
+ if(last.street&&street==='SHOWDOWN'&&last.street!=='SHOWDOWN'){cue('showdown');pulseAll(document.querySelectorAll('.showdownFelt .seat:not(.folded)'),'fxShowdown',55,1050)}
  if(last.street&&street==='FINISHED'&&last.street!=='FINISHED')cue('win');
  last={hand:hand||last.hand,board,pot,folded,allin,street:street||last.street}}
-const observer=new MutationObserver(()=>requestAnimationFrame(scan));
+function scheduleScan(){if(frame)return;frame=requestAnimationFrame(scan)}
+const observer=new MutationObserver(scheduleScan);
 function start(){observer.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});scan()}
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',start,{once:true});else start();

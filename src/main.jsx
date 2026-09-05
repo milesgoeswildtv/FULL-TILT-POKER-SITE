@@ -5,7 +5,7 @@ import TournamentConfig from'./TournamentConfig.jsx';
 import ActionLogPanel from'./ActionLogPanel.jsx';
 import{installTableStateBus}from'./table-state-bus.js';
 import{installApiRuntime}from'./api-runtime.js';
-import'./table-feel.css';
+import'./fx-runtime.js';
 import'./tournament-config.css';
 installTableStateBus();
 installApiRuntime();

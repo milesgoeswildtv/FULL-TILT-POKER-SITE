@@ -1,5 +1,9 @@
 import React from'react';
 import{createRoot}from'react-dom/client';
 import App from'./App.jsx';
-import'./fx-runtime.js';
-createRoot(document.getElementById('root')).render(<App/>);
+import TournamentConfig,{selectedBlindStructure}from'./TournamentConfig.jsx';
+import'./table-feel.css';
+import'./tournament-config.css';
+const nativeFetch=window.fetch.bind(window);
+window.fetch=(input,init={})=>{const url=typeof input==='string'?input:input?.url||'';if(url==='/api/tables'&&String(init?.method||'GET').toUpperCase()==='POST'&&init?.body){try{const body=JSON.parse(init.body);init={...init,body:JSON.stringify({...body,blindStructure:selectedBlindStructure()})}}catch{}}return nativeFetch(input,init)};
+createRoot(document.getElementById('root')).render(<><App/><TournamentConfig/></>);

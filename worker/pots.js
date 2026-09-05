@@ -11,7 +11,7 @@ export function settleSidePots(players,board,dealerIndex=0){
   const share=Math.floor(amount/winners.length),rem=amount-share*winners.length;
   const order=[...winners].sort((a,b)=>((players.indexOf(a)-dealerIndex+players.length)%players.length)-((players.indexOf(b)-dealerIndex+players.length)%players.length));
   order.forEach((p,i)=>awards.set(p.id,(awards.get(p.id)||0)+share+(i<rem?1:0)));
-  total+=amount;pots.push({amount,winners:winners.map(p=>p.name),winnerIds:winners.map(p=>p.id),participantIds:participants.map(p=>p.id)});
+  total+=amount;pots.push({amount,winners:order.map(p=>p.name),winnerIds:order.map(p=>p.id),participantIds:participants.map(p=>p.id)});
  }
  const contributed=contributors.reduce((n,p)=>n+p.contributed,0);
  if(total!==contributed)throw Error(`Pot accounting invariant failed: allocated ${total}, contributed ${contributed}.`);

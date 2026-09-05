@@ -1,0 +1,7 @@
+import test from'node:test';import assert from'node:assert/strict';import{settleShowdown,visibleCards}from'../worker/showdown.js';
+const board=['2♠','3♦','4♣','5♥','9♠'];
+test('showdown refuses any live-pot mismatch before awards are applied',()=>{const players=[{id:'a',name:'A',cards:['A♠','K♠'],folded:false,contributed:50},{id:'b',name:'B',cards:['Q♠','J♠'],folded:false,contributed:50}];assert.throws(()=>settleShowdown({players,board,dealerIndex:0,pot:101}),/Pot accounting invariant failed/)});
+test('showdown settlement conserves exact live pot',()=>{const players=[{id:'a',name:'A',cards:['A♠','K♠'],folded:false,contributed:50},{id:'b',name:'B',cards:['Q♠','J♠'],folded:false,contributed:50}];const r=settleShowdown({players,board,dealerIndex:0,pot:100});assert.equal(r.total,100);assert.equal([...r.awards.values()].reduce((a,b)=>a+b,0),100)});
+test('uncontested winner stays hidden from spectators at showdown',()=>{const p={id:'a',token:'secret',cards:['A♠','K♠']};assert.deepEqual(visibleCards({player:p,viewerToken:'rail',street:'showdown',lastResult:{revealed:[]}}),['',''])});
+test('explicitly revealed player is visible at showdown',()=>{const p={id:'a',token:'secret',cards:['A♠','K♠']};assert.deepEqual(visibleCards({player:p,viewerToken:'rail',street:'showdown',lastResult:{revealed:[{playerId:'a'}]}}),['A♠','K♠'])});
+test('player always sees their own cards',()=>{const p={id:'a',token:'secret',cards:['A♠','K♠']};assert.deepEqual(visibleCards({player:p,viewerToken:'secret',street:'turn',lastResult:null}),['A♠','K♠'])});

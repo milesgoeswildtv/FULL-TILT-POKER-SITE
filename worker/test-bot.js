@@ -1,0 +1,4 @@
+import{secureInt}from'./fairness.js';
+export const TEST_BOT_NAMES=['Muck Rat','River Goblin','Call Station','Tilt Gremlin','Chip Eater','Bad Beat Bob','Pocket Trash','Shove Monkey'];
+export function chooseTestBotAction({toCall=0,canRaise=false,canAllIn=false,raiseTo=0,chips=0}){const roll=secureInt(100);if(toCall<=0){if(canRaise&&roll<18)return{type:'raise',amount:raiseTo};if(canAllIn&&roll===99)return{type:'allin'};return{type:'check'}}if(toCall>=chips)return roll<12?{type:'fold'}:{type:'call'};if(roll<18)return{type:'fold'};if(canRaise&&roll>=88)return{type:'raise',amount:raiseTo};if(canAllIn&&roll===87)return{type:'allin'};return{type:'call'}}
+export function nextTestBotName(players=[]){const used=new Set(players.map(p=>p.name));return TEST_BOT_NAMES.find(n=>!used.has(n))||`Test Bot ${players.filter(p=>p.testBot).length+1}`}

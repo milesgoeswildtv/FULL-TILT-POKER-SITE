@@ -1,5 +1,6 @@
 import React from'react';
 import'./mobile-table.css';
+import'./desktop-table.css';
 import{Card,ordinal}from'./TablePanels.jsx';
 function mobileGeometry(index,players,me){const n=Math.max(1,players.length),hero=Math.max(0,me?players.findIndex(p=>p.id===me.id):0),rel=(index-hero+n)%n,theta=(90+rel*(360/n))*Math.PI/180;const sx=50+42*Math.cos(theta),sy=50+44*Math.sin(theta),bx=50+29*Math.cos(theta),by=50+31*Math.sin(theta);return{'--mobile-seat-x':`${sx.toFixed(2)}%`,'--mobile-seat-y':`${sy.toFixed(2)}%`,'--mobile-bet-x':`${bx.toFixed(2)}%`,'--mobile-bet-y':`${by.toFixed(2)}%`}}
 export function TableTopbar({code,state,realtime,blindLeft,next,copied,onCopy,onExit}){return <><div className="topbar"><button className="ghost" onClick={onExit}>← Lobby</button><div><b>TABLE {code} • HAND #{state.handNumber||0}</b><span>Blinds {state.smallBlind}/{state.bigBlind} • Level {state.blindLevel+1} • next {next[0]}/{next[1]} in {blindLeft} • {state.spectatorCount||0} watching • {realtime==='live'?'LIVE':'RECONNECTING…'}</span></div><button className="ghost" onClick={onCopy}>{copied?'Copied ✓':'Copy Invite'}</button></div></>}

@@ -2,21 +2,25 @@ const root='/assets';
 
 export const assets={
   default:{
-    logo:`${root}/default/full-tilt-primary-logo.png`,
+    logoDesktop:`${root}/default/desktop-logo.png`,
+    logoMobile:`${root}/default/mobile-logo.png`,
+    mascotCrow:`${root}/default/the-crow.png`,
+    mascotHare:`${root}/default/the-hare.png`,
     avatarFrame:`${root}/default/default-avatar-frame.png`,
-    feltDesktop:`${root}/default/default-poker-felt-desktop.png`,
-    feltMobile:`${root}/default/default-poker-felt-mobile.png`,
-    lobbyDesktop:`${root}/default/lobby-background-desktop.png`,
-    lobbyMobile:`${root}/default/lobby-background-mobile.png`,
-    pot:`${root}/default/default-pot-chip-stack.png`,
-    plaques:{idle:`${root}/default/default-player-plaque-idle.png`,active:`${root}/default/default-player-plaque-active.png`,folded:`${root}/default/default-player-plaque-folded.png`,allIn:`${root}/default/default-player-plaque-all-in.png`},
+    feltDesktop:`${root}/default/desktop-felt.png`,
+    feltMobile:`${root}/default/mobile-felt-portrait.png`,
+    lobbyDesktop:`${root}/default/desktop-background.png`,
+    lobbyMobile:`${root}/default/mobile-background.png`,
+    pot:`${root}/default/default-pot-chips.png`,
+    starterCardBack:`${root}/default/starter-card-back.png`,
+    plaques:{idle:`${root}/default/default-player-plaque.png`,active:`${root}/default/default-player-plaque-active.png`,folded:`${root}/default/default-player-plaque-folded.png`,allIn:`${root}/default/default-player-plaque-all-in.png`},
     chips:{black:`${root}/default/default-chip-black.png`,blue:`${root}/default/default-chip-blue.png`,green:`${root}/default/default-chip-green.png`,purple:`${root}/default/default-chip-purple.png`,red:`${root}/default/default-chip-red.png`},
-    ui:{actionLog:`${root}/default/action-log.png`,chat:`${root}/default/chat-panel.png`,handHistory:`${root}/default/hand-history.png`,invite:`${root}/default/invite-table-code.png`,spectator:`${root}/default/spectator.png`,showdown:`${root}/default/showdown.png`,tournamentWinner:`${root}/default/tournament-winner.png`,topBar:`${root}/default/top-bar.png`,infoStrip:`${root}/default/info-strip.png`,tournamentStats:`${root}/default/tournament-stats.png`,blindStructure:`${root}/default/blind-structure.png`,hud:`${root}/default/hud.png`,bettingControls:`${root}/default/betting-controls.png`}
+    ui:{actionLog:`${root}/default/action-log.png`,chat:`${root}/default/chat-panel.png`,handHistory:`${root}/default/hand-history.png`,invite:`${root}/default/invite-table-code.png`,spectator:`${root}/default/spectator-ui.png`,showdown:`${root}/default/showdown-ui.png`,tournamentWinner:`${root}/default/tournament-winner-ui.png`,topBar:`${root}/default/top-bar.png`,infoStrip:`${root}/default/info-strip.png`,tournamentStats:`${root}/default/tournament-stats.png`}
   },
   cosmetics:{
-    constellation:`${root}/constellation`,
-    deadMansHand:`${root}/dead-mans-hand`,
-    regalia:`${root}/regalia`
+    constellation:{root:`${root}/constellation`,avatarFrame:`${root}/constellation/constellation-avatar-frame.png`,cardBack:`${root}/constellation/card-back-constellation.png`},
+    deadMansHand:{root:`${root}/dead-mans-hand`,avatarFrame:`${root}/dead-mans-hand/dead-mans-hand-avatar-frame.png`,cardBack:`${root}/dead-mans-hand/card-back-skull.png`},
+    regalia:{root:`${root}/regalia`}
   },
   cardBacks:`${root}/card-backs`
 };

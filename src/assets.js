@@ -21,29 +21,17 @@ export const assets={
     ui:{actionLog:`${root}/default/action-log.png`,chat:`${root}/default/chat-panel.png`,handHistory:`${root}/default/hand-history.png`,invite:`${root}/default/invite-table-code.png`,spectator:`${root}/default/spectator-ui.png`,showdown:`${root}/default/showdown-ui.png`,tournamentWinner:`${root}/default/tournament-winner-ui.png`,topBar:`${root}/default/top-bar.png`,infoStrip:`${root}/default/info-strip.png`,tournamentStats:`${root}/default/tournament-stats.png`}
   },
   cosmetics:{
-    constellation:{
-      label:'Constellation',
-      avatarFrame:`${root}/constellation/constellation-avatar-frame.png`,
-      cardBack:`${root}/constellation/card-back-constellation.png`,
-      plaques:plaqueSet(`${root}/constellation`,'constellation','fold'),
-      chips:chipSet(`${root}/constellation`,'constellation')
-    },
-    deadMansHand:{
-      label:"Dead Man's Hand",
-      avatarFrame:`${root}/dead-mans-hand/dead-mans-hand-avatar-frame.png`,
-      cardBack:`${root}/dead-mans-hand/card-back-skull.png`,
-      plaques:plaqueSet(`${root}/dead-mans-hand`,'dead-mans-hand'),
-      chips:chipSet(`${root}/dead-mans-hand`,'dead-mans-hand')
-    },
-    regalia:{
-      label:'Regalia',
-      avatarFrame:`${root}/regalia/regalia-avatar-frame.png`,
-      cardBack:`${root}/regalia/regalia-card-back.png`,
-      plaques:plaqueSet(`${root}/regalia`,'regalia'),
-      chips:chipSet(`${root}/regalia`,'regalia')
-    }
+    constellation:{label:'Constellation',avatarFrame:`${root}/constellation/constellation-avatar-frame.png`,cardBack:`${root}/constellation/card-back-constellation.png`,plaques:plaqueSet(`${root}/constellation`,'constellation','fold'),chips:chipSet(`${root}/constellation`,'constellation')},
+    deadMansHand:{label:"Dead Man's Hand",avatarFrame:`${root}/dead-mans-hand/dead-mans-hand-avatar-frame.png`,cardBack:`${root}/dead-mans-hand/card-back-skull.png`,plaques:plaqueSet(`${root}/dead-mans-hand`,'dead-mans-hand'),chips:chipSet(`${root}/dead-mans-hand`,'dead-mans-hand')},
+    regalia:{label:'Regalia',avatarFrame:`${root}/regalia/regalia-avatar-frame.png`,cardBack:`${root}/regalia/regalia-card-back.png`,plaques:plaqueSet(`${root}/regalia`,'regalia'),chips:chipSet(`${root}/regalia`,'regalia')}
   },
   cardBacks:`${root}/card-backs`
 };
 
-export function plaqueFor(player,set=assets.default.plaques){if(player?.folded)return set.folded;if(player?.chips===0&&!player?.eliminated)return set.allIn;if(player?.turn)return set.active;return set.idle}
+export const cosmeticOptions=[{key:'default',label:'Full Tilt'},{key:'constellation',label:'Constellation'},{key:'deadMansHand',label:"Dead Man's Hand"},{key:'regalia',label:'Regalia'}];
+export function normalizeCosmetic(value){return cosmeticOptions.some(x=>x.key===value)?value:'default'}
+export function skinFor(player){const key=normalizeCosmetic(player?.cosmetic);return key==='default'?{label:'Full Tilt',avatarFrame:assets.default.avatarFrame,cardBack:assets.default.starterCardBack,plaques:assets.default.plaques,chips:assets.default.chips}:assets.cosmetics[key]}
+export function plaqueFor(player){const set=skinFor(player).plaques;if(player?.folded)return set.folded;if(player?.chips===0&&!player?.eliminated)return set.allIn;if(player?.turn)return set.active;return set.idle}
+export function avatarFrameFor(player){return skinFor(player).avatarFrame}
+export function cardBackFor(player){return skinFor(player).cardBack}
+export function chipFor(player,color='purple'){return skinFor(player).chips?.[color]||assets.default.chips[color]||assets.default.chips.purple}

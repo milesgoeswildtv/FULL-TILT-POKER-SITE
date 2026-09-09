@@ -18,5 +18,5 @@ export function applyTournamentBlinds(tableData,snapshot){
 }
 
 export function tournamentTableReport(tableData){
- return{handNumber:tableData?.handNumber||0,status:tableData?.street==='finished'?'finished':tableData?.paused?'paused':'running',players:(tableData?.players||[]).map(p=>({id:p.tournamentPlayerId||p.id,chips:Math.max(0,Math.trunc(Number(p.chips)||0)),eliminated:!!p.eliminated,finishPlace:Number.isInteger(p.finishPlace)?p.finishPlace:null}))};
+ return{handNumber:tableData?.handNumber||0,status:tableData?.street==='finished'?'finished':tableData?.paused?'paused':'running',players:(tableData?.players||[]).map(p=>({id:p.tournamentPlayerId||p.id,name:p.name,chips:Math.max(0,Math.trunc(Number(p.chips)||0)),eliminated:!!p.eliminated,finishPlace:Number.isInteger(p.finishPlace)?p.finishPlace:null}))};
 }

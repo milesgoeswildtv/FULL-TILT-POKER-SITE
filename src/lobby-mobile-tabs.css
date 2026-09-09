@@ -1,0 +1,13 @@
+.mobileLobbyTabs{display:none}
+@media(max-width:760px){
+  .mobileLobbyTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 10px;padding:4px;border:1px solid #4a375188;border-radius:13px;background:#0a0710e8;box-shadow:0 10px 26px #0007;position:sticky;top:6px;z-index:35;backdrop-filter:blur(16px)}
+  .mobileLobbyTabs button{height:38px;border:1px solid transparent;border-radius:9px;background:transparent;color:#887d8d;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+  .mobileLobbyTabs button.active{border-color:#8d6a2f;background:linear-gradient(180deg,#34260f,#20170b);color:#f2d16d;box-shadow:inset 0 0 18px #d4a53a14,0 4px 10px #0006}
+  .lobbyActions .lobbyCard{display:none}
+  .lobbyActions .lobbyCard.mobileActive{display:block;animation:lobbyCardIn .16s ease-out}
+  .lobbyActions{display:block}
+  .mobileJoinCard .lobbyRules{margin-top:14px}
+  .mobileCreateCard .lobbyCreate{margin-bottom:0!important}
+}
+@keyframes lobbyCardIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.lobbyActions .lobbyCard.mobileActive{animation:none}}

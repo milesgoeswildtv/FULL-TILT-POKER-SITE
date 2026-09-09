@@ -14,6 +14,20 @@ export class TournamentCoordinator{
  constructor(state,env){this.state=state;this.env=env;this.data=null}
  async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null}
  async save(){await this.state.storage.put(KEY,this.data)}
+ table(tableNumber){return this.data?.tables.find(t=>t.tableNumber===Number(tableNumber))||null}
+ player(id){return this.data?.players.find(p=>p.id===id)||null}
+ tableSnapshot(tableNumber,now=Date.now()){
+  const table=this.table(tableNumber);if(!table)throw Error('Tournament table not found.');
+  const players=table.playerIds.map(id=>this.player(id)).filter(Boolean).map(p=>({id:p.id,name:p.name,chips:p.chips,eliminated:!!p.eliminated,finishPlace:p.finishPlace,moveCount:p.moveCount,tableNumber:p.tableNumber,seat:p.seat}));
+  return{tournamentCode:this.data.code,tableNumber:table.tableNumber,status:this.data.status,players,clock:tournamentClockState(this.data.clock,now),handBlinds:blindsForNewHand(this.data.clock,now)};
+ }
+ reportTable(tableNumber,report){
+  const table=this.table(tableNumber);if(!table)throw Error('Tournament table not found.');
+  if(!Array.isArray(report?.players))throw Error('Table report players required.');
+  const allowed=new Set(table.playerIds);
+  for(const row of report.players){if(!allowed.has(row.id))throw Error('Table reported a player not assigned to it.');const p=this.player(row.id);if(!p)throw Error('Tournament player not found.');const chips=Math.max(0,Math.trunc(Number(row.chips)||0));p.chips=chips;if(row.eliminated||chips===0)p.eliminated=true;if(Number.isInteger(row.finishPlace))p.finishPlace=row.finishPlace}
+  table.lastReportAt=Date.now();table.handNumber=Math.max(0,Math.trunc(Number(report.handNumber)||0));table.status=String(report.status||table.status||'running');
+ }
  async fetch(req){
   await this.load();const u=new URL(req.url);
   if(u.pathname==='/init'&&req.method==='POST'){
@@ -24,7 +38,7 @@ export class TournamentCoordinator{
    const startingChips=Math.max(1,Math.trunc(Number(b.startingChips)||2500));
    const players=names.map((name,i)=>({id:playerId(i),name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null}));
    const seating=initialAssignments(players);for(const a of seating.assignments){const p=players.find(x=>x.id===a.playerId);p.tableNumber=a.tableNumber;p.seat=a.seat}
-   this.data={code:String(b.code||''),status:'lobby',startingChips,players,tables:seating.tables.map(t=>({tableNumber:t.tableNumber,capacity:t.capacity,playerIds:t.players.map(p=>p.playerId),status:'waiting'})),clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null};
+   this.data={code:String(b.code||''),status:'lobby',startingChips,players,tables:seating.tables.map(t=>({tableNumber:t.tableNumber,capacity:t.capacity,playerIds:t.players.map(p=>p.playerId),status:'waiting',handNumber:0,lastReportAt:null})),clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null};
    await this.save();return json(publicState(this.data,Number(b.now)||Date.now()),201)
   }
   if(!this.data)return json({error:'Tournament not found.'},404);
@@ -35,6 +49,9 @@ export class TournamentCoordinator{
   }
   if(u.pathname==='/clock'&&req.method==='GET')return json(tournamentClockState(this.data.clock));
   if(u.pathname==='/hand-blinds'&&req.method==='GET')return json(blindsForNewHand(this.data.clock));
+  const tableMatch=u.pathname.match(/^\/tables\/(\d+)\/(sync|report)$/);
+  if(tableMatch&&tableMatch[2]==='sync'&&req.method==='GET'){try{return json(this.tableSnapshot(Number(tableMatch[1])))}catch(e){return json({error:e.message},404)}}
+  if(tableMatch&&tableMatch[2]==='report'&&req.method==='POST'){try{this.reportTable(Number(tableMatch[1]),await req.json());await this.save();return json(this.tableSnapshot(Number(tableMatch[1])))}catch(e){return json({error:e.message},400)}}
   if(u.pathname==='/pause'&&req.method==='POST'){const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.save();return json(publicState(this.data,now))}
   if(u.pathname==='/resume'&&req.method==='POST'){const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();resumeTournamentClock(this.data.clock,now);this.data.status='running';await this.save();return json(publicState(this.data,now))}
   return json({error:'Not found.'},404)

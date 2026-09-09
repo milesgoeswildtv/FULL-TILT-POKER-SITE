@@ -1,4 +1,5 @@
 import baseWorker,{PokerTable as BasePokerTable}from'./index.js';
+export{TournamentCoordinator}from'./tournament-coordinator.js';
 import{secureInt}from'./fairness.js';
 import{DEFAULT_BLINDS,normalizeBlindStructure}from'./tournament.js';
 import{normalizeTableConfig}from'./table-config.js';

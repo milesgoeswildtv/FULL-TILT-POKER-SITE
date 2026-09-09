@@ -1,5 +1,6 @@
 import React,{useState}from'react';
 import'./lobby.css';
+import'./lobby-mobile-tabs.css';
 import{selectedBlindStructure}from'./TournamentConfig.jsx';
 import{sessionToken,rememberPlayerSession}from'./session.js';
 import{assets}from'./assets.js';

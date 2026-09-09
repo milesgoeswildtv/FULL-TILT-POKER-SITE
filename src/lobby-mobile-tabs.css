@@ -1,6 +1,8 @@
-.mobileLobbyTabs{display:none}
+.mobileLobbyTabs{display:none}.heroQuickActions{display:flex;gap:9px;margin-top:18px}.heroQuickActions button{height:42px;padding:0 16px;border-radius:10px;font-size:10px;font-weight:900;letter-spacing:.04em;cursor:pointer}.heroPrimary{border:1px solid #9a742d;background:linear-gradient(135deg,#6b2a92,#a63ac4);color:white;box-shadow:0 8px 22px #6c2b8d38}.heroSecondary{border:1px solid #4c3955;background:#0b0810c7;color:#d9c7df;backdrop-filter:blur(10px)}
 @media(max-width:760px){
-  .mobileLobbyTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 10px;padding:4px;border:1px solid #4a375188;border-radius:13px;background:#0a0710e8;box-shadow:0 10px 26px #0007;position:sticky;top:6px;z-index:35;backdrop-filter:blur(16px)}
+  .heroQuickActions{margin-top:12px;gap:6px}.heroQuickActions button{height:38px;flex:1;padding:0 9px;font-size:8px;border-radius:9px}
+  .lobbyHeroMeta{display:none!important}
+  .mobileLobbyTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 10px;padding:4px;border:1px solid #4a375188;border-radius:13px;background:#0a0710ed;box-shadow:0 10px 26px #0007;position:sticky;top:6px;z-index:35;backdrop-filter:blur(16px)}
   .mobileLobbyTabs button{height:38px;border:1px solid transparent;border-radius:9px;background:transparent;color:#887d8d;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
   .mobileLobbyTabs button.active{border-color:#8d6a2f;background:linear-gradient(180deg,#34260f,#20170b);color:#f2d16d;box-shadow:inset 0 0 18px #d4a53a14,0 4px 10px #0006}
   .lobbyActions .lobbyCard{display:none}
@@ -9,5 +11,6 @@
   .mobileJoinCard .lobbyRules{margin-top:14px}
   .mobileCreateCard .lobbyCreate{margin-bottom:0!important}
 }
+@media(max-width:390px){.heroQuickActions{gap:5px}.heroQuickActions button{font-size:7px}}
 @keyframes lobbyCardIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.lobbyActions .lobbyCard.mobileActive{animation:none}}

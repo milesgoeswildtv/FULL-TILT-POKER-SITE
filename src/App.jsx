@@ -4,6 +4,7 @@ import'./production-assets.css';
 import'./stats.css';
 import'./social.css';
 import'./pregame.css';
+import'./support-ui.css';
 import Lobby from'./Lobby.jsx';
 import{StatsPanel,HistoryPanel,ChatPanel}from'./TablePanels.jsx';
 import{TableTopbar,InfoStrip,PokerFelt,TableHUD}from'./TableSurface.jsx';

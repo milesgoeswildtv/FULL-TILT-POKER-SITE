@@ -11,6 +11,7 @@ function publicState(d,now=Date.now()){
  const clock=d.clock?tournamentClockState(d.clock,now):null;
  return{code:d.code,status:d.status,startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,players:d.players.map(({token,...p})=>p),tables:d.tables,createdAt:d.createdAt,startedAt:d.startedAt||null};
 }
+async function body(response){const b=await response.json().catch(()=>({}));if(!response.ok)throw Error(b.error||`Child table returned ${response.status}.`);return b}
 
 export class TournamentCoordinator{
  constructor(state,env){this.state=state;this.env=env;this.data=null}
@@ -26,19 +27,23 @@ export class TournamentCoordinator{
  reportTable(tableNumber,report){
   const table=this.table(tableNumber);if(!table)throw Error('Tournament table not found.');
   if(!Array.isArray(report?.players))throw Error('Table report players required.');
-  const allowed=new Set(table.playerIds);
-  for(const row of report.players){if(!allowed.has(row.id))throw Error('Table reported a player not assigned to it.');const p=this.player(row.id);if(!p)throw Error('Tournament player not found.');const chips=Math.max(0,Math.trunc(Number(row.chips)||0));p.chips=chips;if(row.eliminated||chips===0)p.eliminated=true;if(Number.isInteger(row.finishPlace))p.finishPlace=row.finishPlace}
+  const allowed=new Set(table.playerIds),allowedPlayers=table.playerIds.map(id=>this.player(id)).filter(Boolean);
+  for(const row of report.players){let p=allowed.has(row.id)?this.player(row.id):allowedPlayers.find(x=>x.name===row.name);if(!p||!allowed.has(p.id))throw Error('Table reported a player not assigned to it.');const chips=Math.max(0,Math.trunc(Number(row.chips)||0));p.chips=chips;if(row.eliminated||chips===0)p.eliminated=true;if(Number.isInteger(row.finishPlace))p.finishPlace=row.finishPlace}
   table.lastReportAt=Date.now();table.handNumber=Math.max(0,Math.trunc(Number(report.handNumber)||0));table.status=String(report.status||table.status||'running');
  }
  async provisionTables(){
   if(!this.env?.TABLES)throw Error('Poker table binding unavailable.');
   const results=[];
   for(const table of this.data.tables){
-   table.tableKey??=tournamentTableKey(this.data.code,table.tableNumber);
-   const stub=this.env.TABLES.get(this.env.TABLES.idFromName(table.tableKey)),payload=childTablePayload(this.data,table);
-   const response=await stub.fetch(new Request('https://table/mtt/init',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)})),body=await response.json().catch(()=>({}));
-   if(!response.ok)throw Error(body.error||`Could not provision Table ${table.tableNumber}.`);
-   table.provisioned=true;table.provisionedAt=Date.now();results.push({tableNumber:table.tableNumber,tableKey:table.tableKey,playerCount:table.playerIds.length});
+   table.tableKey??=tournamentTableKey(this.data.code,table.tableNumber);const payload=childTablePayload(this.data,table),[host,...guests]=payload.players;
+   const stub=this.env.TABLES.get(this.env.TABLES.idFromName(table.tableKey));
+   if(!table.provisioned){
+    const init=await body(await stub.fetch(new Request('https://table/init',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:table.tableKey,hostName:host.name,startingChips:this.data.startingChips,blindStructure:this.data.clock.blindStructure,blindMinutes:this.data.clock.levelDurationMs/60000,tournamentCode:this.data.code,tournamentTableNumber:table.tableNumber})})));
+    const hostPlayer=this.player(host.tournamentPlayerId);hostPlayer.token=init.token;
+    for(const guest of guests){const joined=await body(await stub.fetch(new Request('https://table/join',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:guest.name})})));this.player(guest.tournamentPlayerId).token=joined.token}
+    table.provisioned=true;table.provisionedAt=Date.now();
+   }
+   results.push({tableNumber:table.tableNumber,tableKey:table.tableKey,playerCount:table.playerIds.length});
   }
   await this.save();return results;
  }
@@ -49,10 +54,11 @@ export class TournamentCoordinator{
    const b=await req.json(),names=Array.isArray(b.players)?b.players.map(x=>cleanName(x?.name||x)).filter(Boolean):[];
    if(names.length<2)return json({error:'At least two players are required.'},400);
    if(names.length>MTT_MAX_PLAYERS)return json({error:`Tournament is capped at ${MTT_MAX_PLAYERS} players.`},400);
+   if(new Set(names.map(n=>n.toLowerCase())).size!==names.length)return json({error:'Tournament display names must be unique.'},400);
    const startingChips=Math.max(1,Math.trunc(Number(b.startingChips)||2500));
    const players=names.map((name,i)=>({id:playerId(i),token:sessionToken(),name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null}));
    const seating=initialAssignments(players);for(const a of seating.assignments){const p=players.find(x=>x.id===a.playerId);p.tableNumber=a.tableNumber;p.seat=a.seat}
-   const code=String(b.code||'').trim().toUpperCase();
+   const code=String(b.code||'').trim().toUpperCase();if(!code)return json({error:'Tournament code required.'},400);
    this.data={code,status:'lobby',startingChips,players,tables:seating.tables.map(t=>({tableNumber:t.tableNumber,tableKey:tournamentTableKey(code,t.tableNumber),capacity:t.capacity,playerIds:t.players.map(p=>p.playerId),status:'waiting',handNumber:0,lastReportAt:null,provisioned:false})),clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null};
    await this.save();return json(publicState(this.data,Number(b.now)||Date.now()),201)
   }

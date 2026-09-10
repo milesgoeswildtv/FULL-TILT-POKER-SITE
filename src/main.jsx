@@ -8,5 +8,6 @@ import{installSessionRouting}from'./session.js';
 import'./fx-runtime.js';
 import'./tournament-config.css';
 import'./fixed-gameplay.css';
+import'./chat-dock-override.css';
 installSessionRouting();
 createRoot(document.getElementById('root')).render(<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>);

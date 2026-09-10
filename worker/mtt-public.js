@@ -24,12 +24,12 @@ export async function handleTournamentApi(req,env){
   }
   return json({error:'Could not allocate a unique tournament code. Try again.'},503);
  }
- const match=u.pathname.match(/^\/api\/tournaments\/([A-Z0-9]{6})(?:\/(join|session|start|pause|resume|table)(?:\/(action|ws|chat))?)?$/);if(!match)return null;
+ const match=u.pathname.match(/^\/api\/tournaments\/([A-Z0-9]{6})(?:\/(join|session|start|pause|resume|end|table)(?:\/(action|ws|chat))?)?$/);if(!match)return null;
  const tournamentCode=match[1],route=match[2]||'state',tableRoute=match[3]||'',stub=coordinator(env,tournamentCode);
  if(route==='state'&&req.method==='GET')return stub.fetch(new Request('https://tournament/state'));
  if(route==='join'&&req.method==='POST'){const{raw}=await requestBody(req);return forward(stub,'/join',req,raw)}
  if(route==='session'&&req.method==='GET')return stub.fetch(new Request(`https://tournament/session${u.search}`));
- if(['start','pause','resume'].includes(route)&&req.method==='POST'){
+ if(['start','pause','resume','end'].includes(route)&&req.method==='POST'){
   let parsed;try{parsed=await requestBody(req)}catch(e){return json({error:e.message},e.status||400)}const token=String(parsed.json.token||'');
   let session;try{session=await sessionFor(stub,token)}catch(e){return json({error:e.message},e.status||403)}if(!session.session?.host)return json({error:'Tournament host only.'},403);
   return stub.fetch(new Request(`https://tournament/${route}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({now:Date.now()})}));

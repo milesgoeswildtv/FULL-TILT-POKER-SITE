@@ -4,6 +4,7 @@ import{normalizeBlindStructure}from'./tournament.js';
 
 const CODE_RETRIES=8;
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store'}})}
+function methodNotAllowed(allowed){return new Response(JSON.stringify({error:'Method not allowed.'}),{status:405,headers:{'content-type':'application/json','cache-control':'no-store','allow':allowed}})}
 function code(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[secureInt(a.length)];return s}
 function cleanName(v){return String(v||'').trim().replace(/\s+/g,' ').slice(0,24)}
 function coordinator(env,tournamentCode){if(!env?.TOURNAMENTS)throw Error('Tournament binding unavailable.');return env.TOURNAMENTS.get(env.TOURNAMENTS.idFromName(tournamentCode))}
@@ -11,6 +12,12 @@ async function read(response){const body=await response.json().catch(()=>({}));r
 function forward(stub,path,req,body){return stub.fetch(new Request(`https://tournament${path}`,{method:req.method,headers:req.headers,body:req.method==='GET'?undefined:body,duplex:body?'half':undefined}))}
 async function sessionFor(stub,token){const{response,body}=await read(await stub.fetch(new Request(`https://tournament/session?token=${encodeURIComponent(token||'')}`)));if(!response.ok)throw Object.assign(Error(body.error||'Invalid tournament session.'),{status:response.status});return body}
 async function requestBody(req){if(req.method==='GET'||req.method==='HEAD')return{raw:undefined,json:{}};const raw=await req.clone().text();let parsed={};if(raw)try{parsed=JSON.parse(raw)}catch{throw Object.assign(Error('Invalid JSON body.'),{status:400})}return{raw,json:parsed}}
+function tableProxyMethod(route){if(route==='action'||route==='chat')return'POST';if(route==='ws'||route==='')return'GET';return null}
+function childRequest(req,{path,token,parsed}){
+ const target=new URL(`https://table/${path}`),headers=new Headers(req.headers);headers.delete('content-length');
+ if(req.method==='GET'){for(const[key,value]of new URL(req.url).searchParams)if(key!=='token')target.searchParams.append(key,value);target.searchParams.set('token',token);return new Request(target,{method:'GET',headers})}
+ headers.set('content-type','application/json');const body=JSON.stringify({...parsed.json,token});return new Request(target,{method:req.method,headers,body});
+}
 
 export async function handleTournamentApi(req,env){
  const u=new URL(req.url);
@@ -35,11 +42,12 @@ export async function handleTournamentApi(req,env){
   return stub.fetch(new Request(`https://tournament/${route}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({now:Date.now()})}));
  }
  if(route==='table'){
+  const expected=tableProxyMethod(tableRoute);if(expected&&req.method!==expected)return methodNotAllowed(expected);
   let parsed;try{parsed=await requestBody(req)}catch(e){return json({error:e.message},e.status||400)}const token=String(u.searchParams.get('token')||parsed.json.token||'');
   let session;try{session=await sessionFor(stub,token)}catch(e){return json({error:e.message},e.status||403)}const s=session.session,t=session.tournament;
   if(t?.status==='lobby'||!s?.provisioned)return json({error:'Tournament is still in the lobby.',tournament:t,session:s},409);if(!s?.tableKey)return json({error:'No active tournament table is assigned to this player.'},409);
-  const tableStub=env.TABLES.get(env.TABLES.idFromName(s.tableKey)),path=tableRoute==='ws'?'websocket':tableRoute||'state',target=`https://table/${path}${req.method==='GET'?u.search:''}`;
-  return tableStub.fetch(new Request(target,{method:req.method,headers:req.headers,body:req.method==='GET'?undefined:parsed.raw,duplex:parsed.raw?'half':undefined}));
+  const tableStub=env.TABLES.get(env.TABLES.idFromName(s.tableKey)),path=tableRoute==='ws'?'websocket':tableRoute||'state';
+  return tableStub.fetch(childRequest(req,{path,token,parsed}));
  }
  return json({error:'Not found.'},404);
 }

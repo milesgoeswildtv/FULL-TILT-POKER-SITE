@@ -15,6 +15,11 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Production dependency audit
+        run: npm run audit:prod
+      - name: Toolchain dependency audit
+        continue-on-error: true
+        run: npm run audit:all
       - run: npm test
       - run: npm run build
       - run: npm run check:worker

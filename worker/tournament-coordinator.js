@@ -13,13 +13,13 @@ function cleanStats(stats={}){return{handsPlayed:nonNegativeInt(stats.handsPlaye
 function activeField(d){return d.players.filter(p=>!p.eliminated&&p.chips>0)}
 function publicState(d,now=Date.now()){
  const clock=d.clock?tournamentClockState(d.clock,now):null,pendingMoves=(d.pendingMoves||[]).map(({playerToken,...move})=>move);
- return{code:d.code,status:d.status,startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,fieldRemaining:activeField(d).length,players:d.players.map(({token,...p})=>p),tables:d.tables,pendingMoves,createdAt:d.createdAt,startedAt:d.startedAt||null,finishedAt:d.finishedAt||null};
+ return{code:d.code,status:d.status,startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,fieldRemaining:activeField(d).length,players:d.players.map(({token,...p})=>p),tables:d.tables,pendingMoves,createdAt:d.createdAt,startedAt:d.startedAt||null,finishedAt:d.finishedAt||null,endedAt:d.endedAt||null,endedByHost:!!d.endedByHost};
 }
 async function body(response){const b=await response.json().catch(()=>({}));if(!response.ok)throw Error(b.error||`Child table returned ${response.status}.`);return b}
 
 export class TournamentCoordinator{
  constructor(state,env){this.state=state;this.env=env;this.data=null}
- async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(this.data){this.data.pendingMoves??=[];for(const p of this.data.players||[]){p.stats??=cleanStats();p.host=!!p.host}if(this.data.players?.length&&!this.data.players.some(p=>p.host))this.data.players[0].host=true}}
+ async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(this.data){this.data.pendingMoves??=[];this.data.endedAt??=null;this.data.endedByHost=!!this.data.endedByHost;for(const p of this.data.players||[]){p.stats??=cleanStats();p.host=!!p.host}if(this.data.players?.length&&!this.data.players.some(p=>p.host))this.data.players[0].host=true}}
  async save(){await this.state.storage.put(KEY,this.data)}
  table(tableNumber){return this.data?.tables.find(t=>t.tableNumber===Number(tableNumber))||null}
  player(id){return this.data?.players.find(p=>p.id===id)||null}
@@ -54,7 +54,7 @@ export class TournamentCoordinator{
    if(wasAlive&&chips===0){p.eliminated=true;newlyBusted.push(p)}
   }
   const survivors=activeField(this.data).length;newlyBusted.sort((a,b)=>(b.handStartChips||0)-(a.handStartChips||0)||a.id.localeCompare(b.id)).forEach((p,i)=>{if(!Number.isInteger(p.finishPlace))p.finishPlace=survivors+i+1});
-  if(survivors===1){const winner=activeField(this.data)[0];winner.finishPlace=1;this.data.status='finished';this.data.finishedAt??=Date.now()}
+  if(survivors===1){const winner=activeField(this.data)[0];winner.finishPlace=1;this.data.status='finished';this.data.finishedAt??=Date.now();this.data.endedByHost=false}
   table.lastReportAt=Date.now();table.handNumber=Math.max(0,Math.trunc(Number(report.handNumber)||0));if(table.status!=='closed')table.status=String(report.status||table.status||'running');
   return newlyBusted;
  }
@@ -102,7 +102,7 @@ export class TournamentCoordinator{
    const startingChips=Math.max(1,Math.trunc(Number(b.startingChips)||2500));
    const players=names.map((name,i)=>({id:playerId(i),token:sessionToken(),name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:startingChips,stats:cleanStats(),cosmetic:'default',host:i===0}));
    const code=String(b.code||'').trim().toUpperCase();if(!code)return json({error:'Tournament code required.'},400);
-   this.data={code,status:'lobby',startingChips,players,tables:[],pendingMoves:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null};this.rebuildLobbySeating();
+   this.data={code,status:'lobby',startingChips,players,tables:[],pendingMoves:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false};this.rebuildLobbySeating();
    await this.save();return json({...publicState(this.data,Number(b.now)||Date.now()),token:players[0].token,host:true},201)
   }
   if(!this.data)return json({error:'Tournament not found.'},404);
@@ -113,7 +113,7 @@ export class TournamentCoordinator{
   if(u.pathname==='/start'&&req.method==='POST'){
    if(this.data.status!=='lobby')return json({error:'Tournament already started.'},409);if(this.data.players.length<2)return json({error:'At least two players are required to start.'},409);
    try{if(this.data.tables.some(t=>!t.provisioned))await this.provisionTables()}catch(e){return json({error:`Tournament table provisioning failed: ${e.message}`,state:publicState(this.data)},503)}
-   const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();this.data.status='running';this.data.startedAt=now;this.data.clock.levelStartedAt=now;this.data.clock.paused=false;this.data.clock.pausedAt=null;this.data.tables.forEach(t=>{if(t.status!=='closed')t.status='running'});await this.save();
+   const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();this.data.status='running';this.data.startedAt=now;this.data.clock.levelStartedAt=now;this.data.clock.paused=false;this.data.clock.pausedAt=null;this.data.endedAt=null;this.data.endedByHost=false;this.data.tables.forEach(t=>{if(t.status!=='closed')t.status='running'});await this.save();
    const failures=await this.controlTables('start',now);if(failures.length){pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.controlTables('pause',now);await this.save();return json({error:'One or more child tables could not start.',failures,state:publicState(this.data,now)},503)}
    return json(publicState(this.data,now));
   }
@@ -125,6 +125,9 @@ export class TournamentCoordinator{
   if(tableMatch&&tableMatch[2]==='ack-moves'&&req.method==='POST'){try{const n=Number(tableMatch[1]),b=await req.json();this.acknowledgeMoves(n,b.moveIds);this.maybeScheduleMoves(n);await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(u.pathname==='/pause'&&req.method==='POST'){if(this.data.status!=='running')return json({error:'Tournament is not running.'},409);const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.save();const failures=await this.controlTables('pause',now);return json({...publicState(this.data,now),childFailures:failures},failures.length?503:200)}
   if(u.pathname==='/resume'&&req.method==='POST'){if(this.data.status!=='paused')return json({error:'Tournament is not paused.'},409);const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();resumeTournamentClock(this.data.clock,now);this.data.status='running';await this.save();const failures=await this.controlTables('resume',now);if(failures.length){pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.controlTables('pause',now);await this.save();return json({error:'One or more child tables could not resume.',failures,state:publicState(this.data,now)},503)}return json(publicState(this.data,now))}
+  if(u.pathname==='/end'&&req.method==='POST'){
+   if(!['running','paused'].includes(this.data.status))return json({error:'Tournament is not active.'},409);const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();this.data.status='ended';this.data.endedByHost=true;this.data.endedAt=now;this.data.pendingMoves=[];await this.save();const failures=await this.controlTables('close',now);this.data.tables.forEach(t=>{if(t.provisioned){t.status='closed';t.closedAt??=now}});await this.save();return json({...publicState(this.data,now),childFailures:failures});
+  }
   return json({error:'Not found.'},404)
  }
 }

@@ -1,6 +1,9 @@
-const ROLE_PREFIX='ftp_session_role_',SESSION_PREFIX='ftp_session_',SPECTATOR_PREFIX='ftp_spectator_session_';
+const ROLE_PREFIX='ftp_session_role_',SESSION_PREFIX='ftp_session_',SPECTATOR_PREFIX='ftp_spectator_session_',TOURNAMENT_PREFIX='ftp_tournament_session_';
 function key(prefix,code){return`${prefix}${String(code||'').toUpperCase()}`}
 export function sessionToken(code){return localStorage.getItem(key(SESSION_PREFIX,code))||''}
+export function tournamentSessionToken(code){return localStorage.getItem(key(TOURNAMENT_PREFIX,code))||''}
+export function rememberTournamentSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;localStorage.setItem(key(TOURNAMENT_PREFIX,code),token)}
+export function sessionTokenFor(code,kind='table'){return kind==='tournament'?tournamentSessionToken(code):sessionToken(code)}
 export function rememberPlayerSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;localStorage.setItem(key(SESSION_PREFIX,code),token);localStorage.setItem(key(ROLE_PREFIX,code),'player');localStorage.removeItem(key(SPECTATOR_PREFIX,code))}
 export function rememberSpectatorSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;localStorage.setItem(key(SESSION_PREFIX,code),token);localStorage.setItem(key(SPECTATOR_PREFIX,code),token);localStorage.setItem(key(ROLE_PREFIX,code),'spectator')}
 export function rememberRouteSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;if(localStorage.getItem(key(ROLE_PREFIX,code))==='spectator')rememberSpectatorSession(code,token);else rememberPlayerSession(code,token)}

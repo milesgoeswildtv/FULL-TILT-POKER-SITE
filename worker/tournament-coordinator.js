@@ -12,18 +12,19 @@ function nonNegativeInt(v){return Math.max(0,Math.trunc(Number(v)||0))}
 function cleanStats(stats={}){return{handsPlayed:nonNegativeInt(stats.handsPlayed),handsWon:nonNegativeInt(stats.handsWon),vpipHands:nonNegativeInt(stats.vpipHands),pfrHands:nonNegativeInt(stats.pfrHands),biggestPotWon:nonNegativeInt(stats.biggestPotWon),knockouts:nonNegativeInt(stats.knockouts)}}
 function activeField(d){return d.players.filter(p=>!p.eliminated&&p.chips>0)}
 function publicState(d,now=Date.now()){
- const clock=d.clock?tournamentClockState(d.clock,now):null,pendingMoves=(d.pendingMoves||[]).map(({playerToken,...move})=>move);
- return{code:d.code,status:d.status,startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,fieldRemaining:activeField(d).length,players:d.players.map(({token,...p})=>p),tables:d.tables,pendingMoves,createdAt:d.createdAt,startedAt:d.startedAt||null,finishedAt:d.finishedAt||null,endedAt:d.endedAt||null,endedByHost:!!d.endedByHost};
+ const clock=d.clock?tournamentClockState(d.clock,now):null,pendingMoves=(d.pendingMoves||[]).map(({playerToken,...move})=>move),controlTransition=d.status==='starting'?'start':d.transition?.type||null;
+ return{code:d.code,status:d.status,controlTransition,registrationOpen:d.status==='lobby'&&!controlTransition&&!d.tables?.some(t=>t.provisioned),startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,fieldRemaining:activeField(d).length,players:d.players.map(({token,...p})=>p),tables:d.tables,pendingMoves,createdAt:d.createdAt,startedAt:d.startedAt||null,finishedAt:d.finishedAt||null,endedAt:d.endedAt||null,endedByHost:!!d.endedByHost};
 }
 async function body(response){const b=await response.json().catch(()=>({}));if(!response.ok)throw Error(b.error||`Child table returned ${response.status}.`);return b}
 
 export class TournamentCoordinator{
- constructor(state,env){this.state=state;this.env=env;this.data=null}
- async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(this.data){this.data.pendingMoves??=[];this.data.endedAt??=null;this.data.endedByHost=!!this.data.endedByHost;for(const p of this.data.players||[]){p.stats??=cleanStats();p.host=!!p.host}if(this.data.players?.length&&!this.data.players.some(p=>p.host))this.data.players[0].host=true}}
+ constructor(state,env){this.state=state;this.env=env;this.data=null;this.transitionInFlight=null}
+ async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(this.data){this.data.pendingMoves??=[];this.data.endedAt??=null;this.data.endedByHost=!!this.data.endedByHost;if(this.data.status==='starting')this.data.transition={type:'start',...(this.data.transition||{})};else this.data.transition=null;for(const p of this.data.players||[]){p.stats??=cleanStats();p.host=!!p.host}if(this.data.players?.length&&!this.data.players.some(p=>p.host))this.data.players[0].host=true}}
  async save(){await this.state.storage.put(KEY,this.data)}
  table(tableNumber){return this.data?.tables.find(t=>t.tableNumber===Number(tableNumber))||null}
  player(id){return this.data?.players.find(p=>p.id===id)||null}
  sessionPlayer(token){return this.data?.players.find(p=>p.token===String(token||''))||null}
+ busy(type){if(!this.transitionInFlight)return null;return json({error:`Tournament ${this.transitionInFlight} is already in progress.`,requested:type,state:publicState(this.data)},409)}
  sessionState(token,now=Date.now()){
   const p=this.sessionPlayer(token);if(!p)throw Error('Invalid tournament session.');const table=this.table(p.tableNumber);
   return{tournament:publicState(this.data,now),session:{playerId:p.id,name:p.name,host:!!p.host,chips:p.chips,eliminated:!!p.eliminated,finishPlace:p.finishPlace,tableNumber:p.tableNumber,seat:p.seat,tableKey:table?.tableKey||null,tableStatus:table?.status||null,provisioned:!!table?.provisioned}};
@@ -34,7 +35,7 @@ export class TournamentCoordinator{
   this.data.tables=seating.tables.map(t=>({tableNumber:t.tableNumber,tableKey:tournamentTableKey(this.data.code,t.tableNumber),capacity:t.capacity,playerIds:t.players.map(p=>p.playerId),status:'waiting',handNumber:0,lastReportAt:null,provisioned:false,provisionedAt:null,provisionError:null}));return this.data.tables;
  }
  joinLobby(name){
-  if(this.data.status!=='lobby')throw Error('Tournament already started.');if(this.data.tables?.some(t=>t.provisioned))throw Error('Tournament seating is locked for start.');if(this.data.players.length>=MTT_MAX_PLAYERS)throw Error(`Tournament is capped at ${MTT_MAX_PLAYERS} players.`);
+  if(this.data.status==='starting'||this.data.transition?.type==='start')throw Error('Tournament start is in progress. Registration is locked.');if(this.data.status!=='lobby')throw Error('Tournament already started.');if(this.data.tables?.some(t=>t.provisioned))throw Error('Tournament seating is locked for start.');if(this.data.players.length>=MTT_MAX_PLAYERS)throw Error(`Tournament is capped at ${MTT_MAX_PLAYERS} players.`);
   const clean=cleanName(name);if(!clean)throw Error('Display name required.');if(this.data.players.some(p=>p.name.toLowerCase()===clean.toLowerCase()))throw Error('That display name is already registered.');
   const p={id:playerId(this.data.players.length),token:sessionToken(),name:clean,chips:this.data.startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:this.data.startingChips,stats:cleanStats(),cosmetic:'default',host:false};this.data.players.push(p);this.rebuildLobbySeating();return p;
  }
@@ -102,20 +103,32 @@ export class TournamentCoordinator{
    const startingChips=Math.max(1,Math.trunc(Number(b.startingChips)||2500));
    const players=names.map((name,i)=>({id:playerId(i),token:sessionToken(),name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:startingChips,stats:cleanStats(),cosmetic:'default',host:i===0}));
    const code=String(b.code||'').trim().toUpperCase();if(!code)return json({error:'Tournament code required.'},400);
-   this.data={code,status:'lobby',startingChips,players,tables:[],pendingMoves:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false};this.rebuildLobbySeating();
+   this.data={code,status:'lobby',transition:null,startingChips,players,tables:[],pendingMoves:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false};this.rebuildLobbySeating();
    await this.save();return json({...publicState(this.data,Number(b.now)||Date.now()),token:players[0].token,host:true},201)
   }
   if(!this.data)return json({error:'Tournament not found.'},404);
   if(u.pathname==='/state'&&req.method==='GET')return json(publicState(this.data));
   if(u.pathname==='/session'&&req.method==='GET'){try{return json(this.sessionState(u.searchParams.get('token')||''))}catch(e){return json({error:e.message},403)}}
   if(u.pathname==='/join'&&req.method==='POST'){try{const b=await req.json(),p=this.joinLobby(b.name);await this.save();return json({code:this.data.code,token:p.token,playerId:p.id,tableNumber:p.tableNumber,seat:p.seat},201)}catch(e){return json({error:e.message},409)}}
-  if(u.pathname==='/provision'&&req.method==='POST'){if(this.data.status!=='lobby')return json({error:'Tables can only be provisioned before the tournament starts.'},409);if(this.data.players.length<2)return json({error:'At least two players are required to provision tables.'},409);try{return json({tables:await this.provisionTables()},201)}catch(e){return json({error:e.message},503)}}
+  if(u.pathname==='/provision'&&req.method==='POST'){
+   if(this.transitionInFlight)return this.busy('provision');if(this.data.status!=='lobby')return json({error:'Tables can only be provisioned before the tournament starts.'},409);if(this.data.players.length<2)return json({error:'At least two players are required to provision tables.'},409);
+   this.transitionInFlight='provision';try{return json({tables:await this.provisionTables()},201)}catch(e){return json({error:e.message},503)}finally{this.transitionInFlight=null}
+  }
   if(u.pathname==='/start'&&req.method==='POST'){
-   if(this.data.status!=='lobby')return json({error:'Tournament already started.'},409);if(this.data.players.length<2)return json({error:'At least two players are required to start.'},409);
-   try{if(this.data.tables.some(t=>!t.provisioned))await this.provisionTables()}catch(e){return json({error:`Tournament table provisioning failed: ${e.message}`,state:publicState(this.data)},503)}
-   const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();this.data.status='running';this.data.startedAt=now;this.data.clock.levelStartedAt=now;this.data.clock.paused=false;this.data.clock.pausedAt=null;this.data.endedAt=null;this.data.endedByHost=false;this.data.tables.forEach(t=>{if(t.status!=='closed')t.status='running'});await this.save();
-   const failures=await this.controlTables('start',now);if(failures.length){pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.controlTables('pause',now);await this.save();return json({error:'One or more child tables could not start.',failures,state:publicState(this.data,now)},503)}
-   return json(publicState(this.data,now));
+   if(this.transitionInFlight)return this.busy('start');
+   if(['running','paused'].includes(this.data.status)&&this.data.startedAt)return json(publicState(this.data));
+   if(['finished','ended'].includes(this.data.status))return json({error:'Tournament is already complete.',state:publicState(this.data)},409);
+   if(!['lobby','starting'].includes(this.data.status))return json({error:'Tournament cannot start from its current state.',state:publicState(this.data)},409);if(this.data.players.length<2)return json({error:'At least two players are required to start.'},409);
+   this.transitionInFlight='start';
+   try{
+    const b=await req.json().catch(()=>({}));
+    if(this.data.status==='lobby'){this.data.status='starting';this.data.transition={type:'start',startedAt:Date.now(),effectiveAt:null};await this.save()}
+    else if(!this.data.transition){this.data.transition={type:'start',startedAt:Date.now(),effectiveAt:null};await this.save()}
+    try{if(this.data.tables.some(t=>!t.provisioned))await this.provisionTables()}catch(e){this.data.status='lobby';this.data.transition=null;await this.save();return json({error:`Tournament table provisioning failed: ${e.message}`,state:publicState(this.data)},503)}
+    const now=Number(this.data.transition?.effectiveAt)||Number(b.now)||Date.now();if(!this.data.transition.effectiveAt){this.data.transition.effectiveAt=now;this.data.startedAt=now;this.data.clock.levelStartedAt=now;this.data.clock.paused=false;this.data.clock.pausedAt=null;this.data.endedAt=null;this.data.endedByHost=false;await this.save()}
+    const failures=await this.controlTables('start',now);if(failures.length){const failedAt=Date.now();pauseTournamentClock(this.data.clock,failedAt);this.data.status='paused';this.data.transition={type:'pause',startedAt:failedAt};await this.controlTables('pause',failedAt);this.data.transition=null;await this.save();return json({error:'One or more child tables could not start.',failures,state:publicState(this.data,failedAt)},503)}
+    this.data.status='running';this.data.transition=null;this.data.tables.forEach(t=>{if(t.status!=='closed')t.status='running'});await this.save();return json(publicState(this.data,now));
+   }finally{this.transitionInFlight=null}
   }
   if(u.pathname==='/clock'&&req.method==='GET')return json(tournamentClockState(this.data.clock));
   if(u.pathname==='/hand-blinds'&&req.method==='GET')return json(blindsForNewHand(this.data.clock));
@@ -123,10 +136,17 @@ export class TournamentCoordinator{
   if(tableMatch&&tableMatch[2]==='sync'&&req.method==='GET'){try{return json(this.tableSnapshot(Number(tableMatch[1])))}catch(e){return json({error:e.message},404)}}
   if(tableMatch&&tableMatch[2]==='report'&&req.method==='POST'){try{const n=Number(tableMatch[1]);this.reportTable(n,await req.json());this.maybeScheduleMoves(n);await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(tableMatch&&tableMatch[2]==='ack-moves'&&req.method==='POST'){try{const n=Number(tableMatch[1]),b=await req.json();this.acknowledgeMoves(n,b.moveIds);this.maybeScheduleMoves(n);await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
-  if(u.pathname==='/pause'&&req.method==='POST'){if(this.data.status!=='running')return json({error:'Tournament is not running.'},409);const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.save();const failures=await this.controlTables('pause',now);return json({...publicState(this.data,now),childFailures:failures},failures.length?503:200)}
-  if(u.pathname==='/resume'&&req.method==='POST'){if(this.data.status!=='paused')return json({error:'Tournament is not paused.'},409);const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();resumeTournamentClock(this.data.clock,now);this.data.status='running';await this.save();const failures=await this.controlTables('resume',now);if(failures.length){pauseTournamentClock(this.data.clock,now);this.data.status='paused';await this.controlTables('pause',now);await this.save();return json({error:'One or more child tables could not resume.',failures,state:publicState(this.data,now)},503)}return json(publicState(this.data,now))}
+  if(u.pathname==='/pause'&&req.method==='POST'){
+   if(this.transitionInFlight)return this.busy('pause');if(this.data.status==='paused'&&!this.data.transition)return json(publicState(this.data));if(!['running','paused'].includes(this.data.status))return json({error:'Tournament is not running.',state:publicState(this.data)},409);
+   this.transitionInFlight='pause';try{const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();if(this.data.status==='running')pauseTournamentClock(this.data.clock,now);this.data.status='paused';this.data.transition={type:'pause',startedAt:now};await this.save();const failures=await this.controlTables('pause',now);this.data.transition=null;await this.save();return json({...publicState(this.data,now),childFailures:failures},failures.length?503:200)}finally{this.transitionInFlight=null}
+  }
+  if(u.pathname==='/resume'&&req.method==='POST'){
+   if(this.transitionInFlight)return this.busy('resume');if(this.data.status==='running'&&!this.data.transition)return json(publicState(this.data));if(!['paused','running'].includes(this.data.status))return json({error:'Tournament is not paused.',state:publicState(this.data)},409);
+   this.transitionInFlight='resume';try{const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();if(this.data.status==='paused')resumeTournamentClock(this.data.clock,now);this.data.status='running';this.data.transition={type:'resume',startedAt:now};await this.save();const failures=await this.controlTables('resume',now);if(failures.length){const failedAt=Date.now();pauseTournamentClock(this.data.clock,failedAt);this.data.status='paused';this.data.transition={type:'pause',startedAt:failedAt};await this.controlTables('pause',failedAt);this.data.transition=null;await this.save();return json({error:'One or more child tables could not resume.',failures,state:publicState(this.data,failedAt)},503)}this.data.transition=null;await this.save();return json(publicState(this.data,now))}finally{this.transitionInFlight=null}
+  }
   if(u.pathname==='/end'&&req.method==='POST'){
-   if(!['running','paused'].includes(this.data.status))return json({error:'Tournament is not active.'},409);const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();this.data.status='ended';this.data.endedByHost=true;this.data.endedAt=now;this.data.pendingMoves=[];await this.save();const failures=await this.controlTables('close',now);this.data.tables.forEach(t=>{if(t.provisioned){t.status='closed';t.closedAt??=now}});await this.save();return json({...publicState(this.data,now),childFailures:failures});
+   if(this.transitionInFlight)return this.busy('end');if(this.data.status==='ended')return json(publicState(this.data));if(!['running','paused'].includes(this.data.status))return json({error:'Tournament is not active.',state:publicState(this.data)},409);
+   this.transitionInFlight='end';try{const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();this.data.status='ended';this.data.transition={type:'end',startedAt:now};this.data.endedByHost=true;this.data.endedAt=now;this.data.pendingMoves=[];await this.save();const failures=await this.controlTables('close',now);this.data.tables.forEach(t=>{if(t.provisioned){t.status='closed';t.closedAt??=now}});this.data.transition=null;await this.save();return json({...publicState(this.data,now),childFailures:failures})}finally{this.transitionInFlight=null}
   }
   return json({error:'Not found.'},404)
  }

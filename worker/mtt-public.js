@@ -8,6 +8,7 @@ function methodNotAllowed(allowed){return new Response(JSON.stringify({error:'Me
 function code(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[secureInt(a.length)];return s}
 function cleanName(v){return String(v||'').trim().replace(/\s+/g,' ').slice(0,24)}
 function coordinator(env,tournamentCode){if(!env?.TOURNAMENTS)throw Error('Tournament binding unavailable.');return env.TOURNAMENTS.get(env.TOURNAMENTS.idFromName(tournamentCode))}
+function tournamentChat(env,tournamentCode){if(!env?.TOURNAMENT_CHATS)throw Error('Tournament chat binding unavailable.');return env.TOURNAMENT_CHATS.get(env.TOURNAMENT_CHATS.idFromName(tournamentCode))}
 async function read(response){const body=await response.json().catch(()=>({}));return{response,body}}
 function forward(stub,path,req,body){return stub.fetch(new Request(`https://tournament${path}`,{method:req.method,headers:req.headers,body:req.method==='GET'?undefined:body,duplex:body?'half':undefined}))}
 async function sessionFor(stub,token){const{response,body}=await read(await stub.fetch(new Request(`https://tournament/session?token=${encodeURIComponent(token||'')}`)));if(!response.ok)throw Object.assign(Error(body.error||'Invalid tournament session.'),{status:response.status});return body}
@@ -31,7 +32,7 @@ export async function handleTournamentApi(req,env){
   }
   return json({error:'Could not allocate a unique tournament code. Try again.'},503);
  }
- const match=u.pathname.match(/^\/api\/tournaments\/([A-Z0-9]{6})(?:\/(join|session|start|pause|resume|end|table)(?:\/(action|ws|chat))?)?$/);if(!match)return null;
+ const match=u.pathname.match(/^\/api\/tournaments\/([A-Z0-9]{6})(?:\/(join|session|start|pause|resume|end|chat|table)(?:\/(action|ws|chat))?)?$/);if(!match)return null;
  const tournamentCode=match[1],route=match[2]||'state',tableRoute=match[3]||'',stub=coordinator(env,tournamentCode);
  if(route==='state'&&req.method==='GET')return stub.fetch(new Request('https://tournament/state'));
  if(route==='join'&&req.method==='POST'){const{raw}=await requestBody(req);return forward(stub,'/join',req,raw)}
@@ -40,6 +41,14 @@ export async function handleTournamentApi(req,env){
   let parsed;try{parsed=await requestBody(req)}catch(e){return json({error:e.message},e.status||400)}const token=String(parsed.json.token||'');
   let session;try{session=await sessionFor(stub,token)}catch(e){return json({error:e.message},e.status||403)}if(!session.session?.host)return json({error:'Tournament host only.'},403);
   return stub.fetch(new Request(`https://tournament/${route}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({now:Date.now()})}));
+ }
+ if(route==='chat'){
+  if(!['GET','POST'].includes(req.method))return methodNotAllowed('GET, POST');
+  let parsed;try{parsed=await requestBody(req)}catch(e){return json({error:e.message},e.status||400)}const token=String(u.searchParams.get('token')||parsed.json.token||'');
+  let session;try{session=await sessionFor(stub,token)}catch(e){return json({error:e.message},e.status||403)}const s=session.session;if(!s?.playerId)return json({error:'Tournament player session required.'},403);
+  let chatStub;try{chatStub=tournamentChat(env,tournamentCode)}catch(e){return json({error:e.message},503)}
+  if(req.method==='GET')return chatStub.fetch(new Request('https://chat/state'));
+  return chatStub.fetch(new Request('https://chat/message',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({senderId:s.playerId,name:s.name,tableNumber:s.tableNumber,message:parsed.json.message})}));
  }
  if(route==='table'){
   const expected=tableProxyMethod(tableRoute);if(expected&&req.method!==expected)return methodNotAllowed(expected);

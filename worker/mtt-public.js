@@ -45,7 +45,7 @@ export async function handleTournamentApi(req,env){
   const expected=tableProxyMethod(tableRoute);if(expected&&req.method!==expected)return methodNotAllowed(expected);
   let parsed;try{parsed=await requestBody(req)}catch(e){return json({error:e.message},e.status||400)}const token=String(u.searchParams.get('token')||parsed.json.token||'');
   let session;try{session=await sessionFor(stub,token)}catch(e){return json({error:e.message},e.status||403)}const s=session.session,t=session.tournament;
-  if(t?.status==='lobby'||!s?.provisioned)return json({error:'Tournament is still in the lobby.',tournament:t,session:s},409);if(!s?.tableKey)return json({error:'No active tournament table is assigned to this player.'},409);
+  if(['lobby','starting'].includes(t?.status)||!s?.provisioned){const starting=t?.status==='starting';return json({error:starting?'Tournament tables are still being prepared.':'Tournament is still in the lobby.',tournament:t,session:s},409)}if(!s?.tableKey)return json({error:'No active tournament table is assigned to this player.'},409);
   const tableStub=env.TABLES.get(env.TABLES.idFromName(s.tableKey)),path=tableRoute==='ws'?'websocket':tableRoute||'state';
   return tableStub.fetch(childRequest(req,{path,token,parsed}));
  }

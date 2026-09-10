@@ -1,0 +1,12 @@
+import test from'node:test';
+import assert from'node:assert/strict';
+import{PokerTable}from'../worker/app.js';
+
+function state(){let saved=null;return{storage:{get:async()=>saved,put:async(_key,value)=>{saved=structuredClone(value)},deleteAlarm:()=>{},setAlarm:()=>{}},getWebSockets:()=>[],acceptWebSocket:()=>{}}}
+function payload(stacks=[2500,2500]){return{snapshot:{tournamentCode:'ABC123',tableNumber:1,tableKey:'ABC123-T1',status:'lobby',tableStatus:'waiting',fieldRemaining:2,players:[{id:'p01',token:'stable-one',name:'One',chips:stacks[0],seat:1,moveCount:0,stats:{},cosmetic:'constellation'},{id:'p02',token:'stable-two',name:'Two',chips:stacks[1],seat:2,moveCount:0,stats:{},cosmetic:'regalia'}],moves:[],clock:{blindLevel:0,smallBlind:10,bigBlind:20,remainingMs:600000,paused:false,levelDurationMs:600000},handBlinds:{blindLevel:0,smallBlind:10,bigBlind:20,ante:0}},config:{code:'ABC123-T1',startingChips:2500,blindStructure:[[10,20],[20,40]],blindMinutes:10}}}
+
+test('child provisioning adopts coordinator tokens seats stacks and cosmetics',async()=>{const table=new PokerTable(state(),{}),result=await table.provisionMTT(payload());assert.equal(result.ok,true);assert.equal(result.playerCount,2);assert.equal(table.data.tournamentCode,'ABC123');assert.equal(table.data.tournamentTableNumber,1);assert.deepEqual(table.data.players.map(p=>p.token),['stable-one','stable-two']);assert.deepEqual(table.data.players.map(p=>p.tournamentSeat),[1,2]);assert.deepEqual(table.data.players.map(p=>p.cosmetic),['constellation','regalia']);assert.ok(table.data.players.every(p=>p.host===false));assert.equal(table.data.street,'waiting')});
+
+test('retrying provisioning is idempotent and refreshes canonical pre-start stacks',async()=>{const table=new PokerTable(state(),{});await table.provisionMTT(payload());const result=await table.provisionMTT(payload([3100,1900]));assert.equal(result.ok,true);assert.equal(table.data.players.length,2);assert.deepEqual(table.data.players.map(p=>p.chips),[3100,1900]);assert.deepEqual(table.data.players.map(p=>p.token),['stable-one','stable-two'])});
+
+test('existing child object cannot be reassigned to a different tournament',async()=>{const table=new PokerTable(state(),{});await table.provisionMTT(payload());const other=payload();other.snapshot.tournamentCode='ZZZ999';other.snapshot.tableKey='ZZZ999-T1';await assert.rejects(()=>table.provisionMTT(other),/another tournament/)});

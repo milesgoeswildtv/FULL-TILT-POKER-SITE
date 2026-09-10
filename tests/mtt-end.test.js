@@ -6,6 +6,58 @@ import{handleTournamentApi}from'../worker/mtt-public.js';
 
 function response(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json'}})}
 
-test('coordinator host-end closes every active child table without inventing finish places',async()=>{const controls=[],players=[1,2,3].map((n,i)=>({id:`p${n}`,token:`t${n}`,name:`P${n}`,chips:[5000,2000,500][i],eliminated:false,finishPlace:null,moveCount:0,tableNumber:i<2?1:2,seat:i<2?i+1:1,handStartChips:2500,stats:{},cosmetic:'default',host:i===0})),tables=[{tableNumber:1,tableKey:'T-1',capacity:8,playerIds:['p1','p2'],status:'running',provisioned:true},{tableNumber:2,tableKey:'T-2',capacity:8,playerIds:['p3'],status:'running',provisioned:true}],state={storage:{put:async()=>{}}},env={TABLES:{idFromName:x=>x,get:key=>({fetch:async req=>{controls.push({key,body:await req.json()});return response({ok:true})}})}}},c=new TournamentCoordinator(state,env);c.data={code:'ABC123',status:'running',startingChips:2500,players,tables,pendingMoves:[],clock:createTournamentClock({blindStructure:[[10,20],[20,40]],levelDurationMs:60000,now:1000}),startedAt:1000,endedAt:null,endedByHost:false};const r=await c.fetch(new Request('https://tournament/end',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({now:5000})})),j=await r.json();assert.equal(r.status,200);assert.equal(j.status,'ended');assert.equal(j.endedByHost,true);assert.equal(j.endedAt,5000);assert.deepEqual(c.data.players.map(p=>p.finishPlace),[null,null,null]);assert.ok(c.data.tables.every(t=>t.status==='closed'));assert.deepEqual(controls.map(x=>x.body.type),['close','close'])});
+test('coordinator host-end closes every active child table without inventing finish places',async()=>{
+ const controls=[];
+ const players=[1,2,3].map((n,i)=>({
+  id:`p${n}`,token:`t${n}`,name:`P${n}`,chips:[5000,2000,500][i],eliminated:false,finishPlace:null,moveCount:0,
+  tableNumber:i<2?1:2,seat:i<2?i+1:1,handStartChips:2500,stats:{},cosmetic:'default',host:i===0
+ }));
+ const tables=[
+  {tableNumber:1,tableKey:'T-1',capacity:8,playerIds:['p1','p2'],status:'running',provisioned:true},
+  {tableNumber:2,tableKey:'T-2',capacity:8,playerIds:['p3'],status:'running',provisioned:true}
+ ];
+ const state={storage:{put:async()=>{}}};
+ const env={TABLES:{
+  idFromName:x=>x,
+  get:key=>({fetch:async req=>{controls.push({key,body:await req.json()});return response({ok:true})}})
+ }};
+ const c=new TournamentCoordinator(state,env);
+ c.data={
+  code:'ABC123',status:'running',startingChips:2500,players,tables,pendingMoves:[],
+  clock:createTournamentClock({blindStructure:[[10,20],[20,40]],levelDurationMs:60000,now:1000}),
+  startedAt:1000,endedAt:null,endedByHost:false
+ };
+ const r=await c.fetch(new Request('https://tournament/end',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({now:5000})}));
+ const j=await r.json();
+ assert.equal(r.status,200);
+ assert.equal(j.status,'ended');
+ assert.equal(j.endedByHost,true);
+ assert.equal(j.endedAt,5000);
+ assert.deepEqual(c.data.players.map(p=>p.finishPlace),[null,null,null]);
+ assert.ok(c.data.tables.every(t=>t.status==='closed'));
+ assert.deepEqual(controls.map(x=>x.body.type),['close','close']);
+});
 
-test('public MTT end route is host-only and forwards an authenticated director end',async()=>{let ended=0;const stub={fetch:async req=>{const u=new URL(req.url);if(u.pathname==='/session'){const token=u.searchParams.get('token');return response({session:{host:token==='host'}})}if(u.pathname==='/end'){ended++;return response({status:'ended',endedByHost:true})}return response({error:'no'},404)}},env={TOURNAMENTS:{idFromName:x=>x,get:()=>stub}};let r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/end',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:'guest'})}),env);assert.equal(r.status,403);assert.equal(ended,0);r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/end',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:'host'})}),env);assert.equal(r.status,200);assert.equal((await r.json()).endedByHost,true);assert.equal(ended,1)});
+test('public MTT end route is host-only and forwards an authenticated director end',async()=>{
+ let ended=0;
+ const stub={fetch:async req=>{
+  const u=new URL(req.url);
+  if(u.pathname==='/session'){
+   const token=u.searchParams.get('token');
+   return response({session:{host:token==='host'}});
+  }
+  if(u.pathname==='/end'){
+   ended++;
+   return response({status:'ended',endedByHost:true});
+  }
+  return response({error:'no'},404);
+ }};
+ const env={TOURNAMENTS:{idFromName:x=>x,get:()=>stub}};
+ let r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/end',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:'guest'})}),env);
+ assert.equal(r.status,403);
+ assert.equal(ended,0);
+ r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/end',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:'host'})}),env);
+ assert.equal(r.status,200);
+ assert.equal((await r.json()).endedByHost,true);
+ assert.equal(ended,1);
+});

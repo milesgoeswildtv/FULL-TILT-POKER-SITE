@@ -1,0 +1,10 @@
+import test from'node:test';
+import assert from'node:assert/strict';
+import{handleTournamentApi}from'../worker/mtt-public.js';
+import{TournamentChat}from'../worker/tournament-chat.js';
+
+function environment(){let saved=[];const chat=new TournamentChat({storage:{get:async()=>structuredClone(saved),put:async(_key,value)=>{saved=structuredClone(value)}}}),coordinator={fetch:async req=>{const u=new URL(req.url);if(u.pathname==='/session'&&u.searchParams.get('token')==='good-token')return new Response(JSON.stringify({session:{playerId:'p07',name:'Ruby',tableNumber:4,host:false},tournament:{code:'ABC123',status:'running'}}),{status:200,headers:{'content-type':'application/json'}});return new Response(JSON.stringify({error:'Invalid tournament session.'}),{status:403,headers:{'content-type':'application/json'}})}};return{TOURNAMENTS:{idFromName:x=>x,get:()=>coordinator},TOURNAMENT_CHATS:{idFromName:x=>x,get:()=>chat},TABLES:{idFromName:x=>x,get:()=>{throw Error('table not expected')}}}}
+
+test('registered player can send and read global tournament chat',async()=>{const env=environment(),posted=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:'good-token',message:'whole field can see this'})}),env),pj=await posted.json();assert.equal(posted.status,200);assert.equal(pj.messages[0].name,'Ruby');assert.equal(pj.messages[0].tableNumber,4);const read=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/chat?token=good-token'),env),rj=await read.json();assert.equal(read.status,200);assert.equal(rj.messages[0].message,'whole field can see this')});
+
+test('global tournament chat rejects an invalid tournament session',async()=>{const env=environment(),r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/chat?token=wrong'),env),j=await r.json();assert.equal(r.status,403);assert.match(j.error,/invalid tournament session/i)});

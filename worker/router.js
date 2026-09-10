@@ -3,6 +3,7 @@ import{healthResponse}from'./health.js';
 import{handleTournamentApi}from'./mtt-public.js';
 export{PokerTable}from'./app.js';
 export{TournamentCoordinator}from'./tournament-coordinator.js';
+export{TournamentChat}from'./tournament-chat.js';
 
 const SECURITY_HEADERS={
  'x-content-type-options':'nosniff',

@@ -1,27 +1,26 @@
-.seatCards{pointer-events:none;overflow:visible}.seatCards .card{transition:opacity .2s ease,filter .2s ease;box-shadow:0 5px 10px #000a}.seatCards .card.back.productionCardBack{background-size:cover;background-position:center;background-repeat:no-repeat;border:1px solid #d0a84b55}.seatCards .card:first-child{transform:rotate(-7deg) translateX(2px);transform-origin:80% 100%}.seatCards .card:nth-child(2){transform:rotate(7deg) translateX(-2px);transform-origin:20% 100%}.seatCards .card+.card{margin-left:-7px}.seatCards.foldedSeatCards{opacity:.38;filter:saturate(.45) brightness(.72)}
+.seatCards{pointer-events:none;overflow:visible;display:flex;gap:0}.seatCards .card{transition:opacity .2s ease,filter .2s ease;box-shadow:0 5px 10px #000a}.seatCards .card.back.productionCardBack{background-size:cover;background-position:center;background-repeat:no-repeat;border:1px solid #d0a84b55}.seatCards .card:first-child{transform:rotate(-7deg) translateX(2px);transform-origin:80% 100%}.seatCards .card:nth-child(2){transform:rotate(7deg) translateX(-2px);transform-origin:20% 100%}.seatCards .card+.card{margin-left:-7px}.seatCards.foldedSeatCards{opacity:.42;filter:saturate(.5) brightness(.75)}
 
 @media(min-width:761px){
   .felt .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*16px),calc(var(--seat-dy)*14px))!important}
   .felt .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*10px),calc(var(--seat-dy)*10px))!important}
   .felt .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*16px),calc(var(--seat-dy)*14px)) scale(1.04)!important}
   .felt .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*10px),calc(var(--seat-dy)*10px)) scale(1.04)!important}
-  .seatCards{filter:drop-shadow(0 7px 10px #000b)!important}
-  .seatCards .card{width:38px!important;height:53px!important}
+  .felt>.seatCards{position:absolute;left:var(--seat-x)!important;top:var(--seat-y)!important;transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*7px),calc(var(--seat-dy)*7px))!important;z-index:8;filter:drop-shadow(0 7px 10px #000b)!important}
+  .felt>.seatCards .card{width:38px!important;height:53px!important}
 }
 
 @media(max-width:760px){
-  .felt.productionFelt>.seatCards{z-index:4!important}
+  .felt.productionFelt>.seatCards{position:absolute;left:var(--mobile-seat-x)!important;top:var(--mobile-seat-y)!important;transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*7px),calc(var(--seat-dy)*6px))!important;z-index:4!important;filter:drop-shadow(0 5px 7px #000b)!important}
+  .felt.productionFelt>.seatCards .card{width:25px!important;height:35px!important;padding:3px!important}
   .felt .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*22px)) scale(.9)!important}
   .felt .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.84)!important}
   .felt .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*22px)) scale(.95)!important}
   .felt .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.89)!important}
-  .seatCards{gap:0!important;filter:drop-shadow(0 5px 7px #000b)!important}
-  .seatCards .card{width:25px!important;height:35px!important;padding:3px!important}
   .felt[data-player-count="7"] .seat.productionSeat,.felt[data-player-count="8"] .seat.productionSeat,.felt[data-player-count="9"] .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*26px),calc(var(--seat-dy)*22px)) scale(.79)!important}
   .felt[data-player-count="7"] .seat.productionSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*26px),calc(var(--seat-dy)*22px)) scale(.84)!important}
   .felt[data-player-count="7"] .seat.productionSeat.heroSeat,.felt[data-player-count="8"] .seat.productionSeat.heroSeat,.felt[data-player-count="9"] .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.79)!important}
   .felt[data-player-count="7"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.84)!important}
-  .felt[data-player-count="7"] .seatCards .card,.felt[data-player-count="8"] .seatCards .card,.felt[data-player-count="9"] .seatCards .card{width:24px!important;height:34px!important;font-size:7px!important}
+  .felt[data-player-count="7"]>.seatCards .card,.felt[data-player-count="8"]>.seatCards .card,.felt[data-player-count="9"]>.seatCards .card{width:24px!important;height:34px!important;font-size:7px!important}
 }
 
 @media(max-width:430px){
@@ -31,5 +30,6 @@
   .felt[data-player-count="7"] .seat.productionSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*19px)) scale(.84)!important}
   .felt .seat.productionSeat.heroSeat,.felt[data-player-count="7"] .seat.productionSeat.heroSeat,.felt[data-player-count="8"] .seat.productionSeat.heroSeat,.felt[data-player-count="9"] .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*12px),calc(var(--seat-dy)*11px)) scale(.79)!important}
   .felt .seat.productionSeat.heroSeat.turn,.felt[data-player-count="7"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*12px),calc(var(--seat-dy)*11px)) scale(.84)!important}
-  .seatCards .card{width:23px!important;height:33px!important}
+  .felt.productionFelt>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*6px),calc(var(--seat-dy)*5px))!important}
+  .felt.productionFelt>.seatCards .card{width:23px!important;height:33px!important}
 }

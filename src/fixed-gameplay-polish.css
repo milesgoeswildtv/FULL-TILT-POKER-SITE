@@ -4,12 +4,16 @@
   .tablePage:has(.felt:not([data-street="waiting"]))>.topbar b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .tablePage:has(.felt:not([data-street="waiting"]))>.topbar .ghost{flex:none;white-space:nowrap}
 
-  /* Fixed-screen mobile table: wider/shorter oval instead of the tall egg shape. */
-  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:min(99vw,590px)!important;height:min(47dvh,calc(100dvh - 250px),430px)!important;min-height:350px!important;border-radius:48%/43%!important;background-size:100% 100%!important;background-position:center!important;margin-top:4px!important;margin-bottom:4px!important}
+  /* Fixed-screen mobile table: a slightly tall poker oval, not a wide circle or tall egg. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:min(96vw,550px)!important;height:min(52dvh,460px)!important;min-height:370px!important;border-radius:47%/45%!important;background-size:100% 100%!important;background-position:center!important;margin-top:4px!important;margin-bottom:4px!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt:before,.tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt:after{border-radius:inherit!important}
 
-  /* Community cards are the visual focus and should read immediately on a phone. */
+  /* Community cards stay visually dominant. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board{top:38.5%!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board .card{width:41px!important;height:58px!important;min-width:41px!important;min-height:58px!important;font-size:13px!important;padding:4px!important}
+
+  /* Bets live on their own outer action ring. The large radial shove keeps the board rectangle sacred. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt>.tableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*50px),calc(var(--seat-dy)*28px)) scale(.92)!important;transform-origin:center!important;z-index:5!important;padding:3px 5px!important;white-space:nowrap!important}
 
   /* Hero cards are intentionally larger than opponent backs. */
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{width:72px!important;height:51px!important;min-width:72px!important;min-height:51px!important;max-width:72px!important;max-height:51px!important;top:-49px!important;padding:2px!important}
@@ -30,8 +34,9 @@
 }
 
 @media(max-width:430px){
-  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:99vw!important;height:min(46dvh,400px)!important;min-height:340px!important;border-radius:48%/42%!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:96.5vw!important;height:min(51dvh,440px)!important;min-height:360px!important;border-radius:47%/44%!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board .card{width:39px!important;height:55px!important;min-width:39px!important;min-height:55px!important;font-size:12px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt>.tableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*45px),calc(var(--seat-dy)*26px)) scale(.9)!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{width:68px!important;height:48px!important;min-width:68px!important;min-height:48px!important;max-width:68px!important;max-height:48px!important;top:-46px!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole{width:64px!important;height:44px!important;min-height:44px!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole .card{flex-basis:31px!important;width:31px!important;height:44px!important;min-width:31px!important;min-height:44px!important;max-width:31px!important;max-height:44px!important;font-size:11px!important}
@@ -39,5 +44,5 @@
 }
 
 @media(max-height:720px) and (max-width:760px){
-  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{height:min(44dvh,370px)!important;min-height:310px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{height:min(49dvh,400px)!important;min-height:330px!important}
 }

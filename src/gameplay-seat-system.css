@@ -195,15 +195,15 @@
   .showdownFelt>.seatSlot>.seatCards{opacity:1!important}
   .showdownFelt>.seatSlot>.tableBet{display:none!important}
 
-  /* Protected center zone. */
-  .felt.productionFelt>.board{top:39%!important;gap:2px!important;z-index:5!important}
+  /* The board owns the true visual center of the table. */
+  .felt.productionFelt>.board{top:45%!important;gap:2px!important;z-index:5!important}
   .felt.productionFelt>.board .card{
     width:31px!important;height:44px!important;min-width:31px!important;min-height:44px!important;
     padding:3px!important;border-radius:6px!important;font-size:9px!important;
   }
   .felt.productionFelt>.potCluster,
   .felt.productionFelt>.potCluster.hasSidePots{
-    top:58.5%!important;
+    top:63%!important;
     width:auto!important;
     max-width:150px!important;
     display:grid!important;

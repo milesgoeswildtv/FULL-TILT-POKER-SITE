@@ -110,7 +110,7 @@
   /* Hero identity is already represented by the bottom HUD. */
   .felt.productionFelt>.seatSlot.heroSlot>.seat.productionSeat{display:none!important}
 
-  /* Cards get a full clear lane inward from the plaque; they never sit underneath it. */
+  /* Card offsets are computed per seat. Non-adjacent opponents hug their plaque; the two players beside hero stay farther inward. */
   .felt.productionFelt>.seatSlot>.seatCards{
     position:absolute!important;
     left:0!important;
@@ -118,7 +118,7 @@
     z-index:7!important;
     display:flex!important;
     gap:0!important;
-    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-46px),calc(var(--seat-dy)*-40px))!important;
+    transform:translate(-50%,-50%) translate(var(--card-x),var(--card-y))!important;
     filter:drop-shadow(0 4px 6px rgba(0,0,0,.72))!important;
     pointer-events:none!important;
   }
@@ -228,7 +228,7 @@
   .felt.productionFelt>.seatSlot>.seat.productionSeat .avatar{width:15px!important;height:15px!important}
   .felt.productionFelt>.seatSlot>.seat.productionSeat>b{max-width:34px!important;font-size:5.3px!important}
   .felt.productionFelt>.seatSlot>.seat.productionSeat .seatStack{font-size:6px!important}
-  .felt.productionFelt>.seatSlot>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-43px),calc(var(--seat-dy)*-36px))!important}
+  .felt.productionFelt>.seatSlot>.seatCards{transform:translate(-50%,-50%) translate(var(--card-x),var(--card-y))!important}
   .felt.productionFelt>.seatSlot>.seatCards .card{width:18px!important;height:25px!important;min-width:18px!important;min-height:25px!important;max-width:18px!important;max-height:25px!important}
   .felt.productionFelt>.seatSlot>.tableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-66px),calc(var(--seat-dy)*-56px))!important}
   .felt.productionFelt>.board .card{width:30px!important;height:42px!important;min-width:30px!important;min-height:42px!important}

@@ -27,7 +27,7 @@ export async function handleTournamentApi(req,env){
   const hostName=cleanName(input.hostName||input.name);if(!hostName)return json({error:'Display name required.'},400);
   let config,blindStructure;try{config=normalizeTableConfig(input);blindStructure=normalizeBlindStructure(input.blindStructure)}catch(e){return json({error:e.message},400)}
   for(let attempt=0;attempt<CODE_RETRIES;attempt++){
-   const tournamentCode=code(),stub=coordinator(env,tournamentCode),result=await stub.fetch(new Request('https://tournament/init',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:tournamentCode,players:[{name:hostName}],startingChips:config.startingChips,blindStructure,levelDurationMs:config.blindMinutes*60000})}));
+   const tournamentCode=code(),stub=coordinator(env,tournamentCode),result=await stub.fetch(new Request('https://tournament/init',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:tournamentCode,players:[{name:hostName,accountId:String(input.accountId||''),cosmetic:String(input.cosmetic||'default')}],startingChips:config.startingChips,blindStructure,levelDurationMs:config.blindMinutes*60000})}));
    if(result.status!==409)return result;
   }
   return json({error:'Could not allocate a unique tournament code. Try again.'},503);

@@ -1,4 +1,5 @@
 .tablePage:has(.felt) .belowTable .chatPanel{display:none!important}
 .tablePage:has(.felt) .belowTable.withChat{grid-template-columns:1fr!important}
 .tablePage:has(.felt) .belowTable>.tablePanels:empty{display:none!important;height:0!important;background:transparent!important;pointer-events:none!important}
+.tablePage:has(.felt) .belowTable:has(>.tablePanels:empty){display:none!important}
 .tablePage:has(.felt) .hudToggles button:last-child{display:none!important}

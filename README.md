@@ -2,7 +2,7 @@
 
 Private play-chip No-Limit Texas Hold’em for the Full Tilt community, built as a React/Vite frontend on a Cloudflare Worker with Durable Objects.
 
-## Current build — v0.52
+## Current build — v0.53
 
 ### Accounts + home
 - Discord OAuth is required before poker APIs can be used
@@ -15,16 +15,28 @@ Private play-chip No-Limit Texas Hold’em for the Full Tilt community, built as
 - Discord-first home screen with Create Game, Join Game, profile drawer and Booster Shop
 - Booster loadouts are account-authoritative: players equip owned boosters from their profile and the server applies that loadout at the table
 - The former free in-table cosmetic picker has been removed
-- Booster shop is structurally live; purchase/payment fulfillment is intentionally not wired yet
-- The home page now exposes public Terms, Cosmetic Purchase, Refund, Privacy, and Contact/Support policies
+- The home page exposes public Terms, Cosmetic Purchase, Refund, Privacy, and Contact/Support policies
 
-### Shop readiness
+### Stripe Booster Shop
+- Stripe-hosted Checkout is wired for Constellation, Dead Man’s Hand, and Regalia
+- Checkout is created server-side from fixed Stripe Price IDs; the browser never supplies an amount
+- Checkout requires the authenticated Discord account and refuses a second purchase for an already-owned booster
+- Stripe Checkout metadata carries the Discord account ID and booster key for fulfillment
+- `/api/shop/webhook` verifies the Stripe `Stripe-Signature` HMAC before accepting fulfillment events
+- `checkout.session.completed` and `checkout.session.async_payment_succeeded` grant the booster only when Stripe reports the session as paid
+- Purchase grants are idempotent by Checkout Session ID, so webhook retries do not duplicate entitlements
+- Purchased boosters are stored in the Discord-backed `PlayerAccount` inventory and can then be equipped from Full Tilt
+- The shop reads the configured Stripe Price objects server-side so the displayed amount comes from Stripe rather than duplicated frontend pricing
+- Returning from successful Checkout polls the account briefly until the webhook-delivered entitlement appears
+- Current Stripe configuration is sandbox/test mode; the UI labels the shop as `SANDBOX SHOP`
+- Triple Threat has a sandbox Stripe product and price reserved in configuration, but it is not offered for sale yet because Triple Threat game cosmetic assets are not present in the application
+
+### Shop policy + support
 - Public policy pages live at `/terms.html`, `/purchases.html`, `/refunds.html`, `/privacy.html`, and `/contact.html`
 - Policies explicitly state that Full Tilt is play-chip only and does not offer cash wagering, cash-out, monetary prizes, or purchased gaming currency
 - Cosmetic purchase policy limits paid items to visual customization such as card backs, chips, plaques, avatar frames, and coordinated packs
 - Refund policy covers duplicate charges, failed fulfillment, technical errors, unauthorized transactions, and rights required by law
-- Contact page currently routes support through the official Full Tilt community/Discord and states that a dedicated support email will be published before paid checkout is enabled
-- Paid checkout remains disabled until payment processing and fulfillment are implemented
+- Billing, refund, account, and security support email: `fckthefees@gmail.com`
 
 ### Poker engine
 - Server-authoritative shuffled deck; hidden cards/deck are never exposed to other clients
@@ -71,7 +83,7 @@ All `/api/*` requests are routed through the Worker before SPA asset fallback. W
 
 ## Discord OAuth configuration
 
-Production requires these Worker secrets:
+Required Worker secrets:
 
 ```text
 DISCORD_CLIENT_ID
@@ -99,6 +111,34 @@ The current workers.dev callback is:
 https://full-tilt-poker-site.milesgoeswildtv.workers.dev/api/auth/callback
 ```
 
+## Stripe configuration
+
+Required Worker secrets:
+
+```text
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+```
+
+For sandbox testing, `STRIPE_SECRET_KEY` should be the Stripe `sk_test_...` secret key. `STRIPE_WEBHOOK_SECRET` is the `whsec_...` signing secret shown for the webhook endpoint after it is created in Stripe. The Stripe publishable key is not required because Full Tilt redirects to Stripe-hosted Checkout rather than embedding Stripe Elements.
+
+Webhook endpoint:
+
+```text
+https://full-tilt-poker-site.milesgoeswildtv.workers.dev/api/shop/webhook
+```
+
+Subscribe that endpoint to:
+
+```text
+checkout.session.completed
+checkout.session.async_payment_succeeded
+```
+
+Sandbox product/price IDs are stored as non-secret Wrangler vars. Current configured products are Constellation, Dead Man’s Hand, Regalia, and a reserved Triple Threat product. Only the first three are currently purchasable because they have complete in-game cosmetic assets.
+
+When moving to live payments, replace the test product/price IDs with live-mode IDs, set `STRIPE_MODE` to `live`, replace `STRIPE_SECRET_KEY` with the live secret key, and create a live webhook endpoint to obtain the corresponding live `whsec_...` secret.
+
 ## Verification
 
 Every push to `main` runs GitHub Actions against Node 22:
@@ -125,7 +165,7 @@ npm run check:worker
 npm run deploy
 ```
 
-`npm run deploy` is the real Cloudflare deployment command. Run it only from an authenticated Cloudflare environment after CI is green and the Discord OAuth secrets are configured.
+`npm run deploy` is the real Cloudflare deployment command. Run it only from an authenticated Cloudflare environment after CI is green and the required Discord/Stripe secrets are configured.
 
 ## Scope
 

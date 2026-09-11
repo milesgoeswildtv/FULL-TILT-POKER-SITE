@@ -8,8 +8,8 @@
   .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:min(96vw,550px)!important;height:min(52dvh,460px)!important;min-height:370px!important;border-radius:47%/45%!important;background-size:100% 100%!important;background-position:center!important;margin-top:4px!important;margin-bottom:4px!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt:before,.tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt:after{border-radius:inherit!important}
 
-  /* Community cards stay visually dominant. */
-  .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board{top:38.5%!important}
+  /* Community cards stay visually dominant and can never be painted under a bet marker. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board{top:38.5%!important;z-index:7!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board .card{width:41px!important;height:58px!important;min-width:41px!important;min-height:58px!important;font-size:13px!important;padding:4px!important}
 
   /* Bets live on their own outer action ring. The large radial shove keeps the board rectangle sacred. */

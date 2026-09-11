@@ -3,24 +3,26 @@ import{createTournamentClock,tournamentClockState,blindsForNewHand,pauseTourname
 import{tournamentTableKey,childTablePayload}from'./mtt-provision.js';
 import{nextTournamentMove,planTableBreak,movePlayer}from'./mtt-moves.js';
 
-const KEY='tournament';
+const KEY='tournament',COSMETICS=new Set(['default','constellation','deadMansHand','regalia']);
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store'}})}
 function cleanName(v){return String(v||'').trim().replace(/\s+/g,' ').slice(0,24)}
+function cleanCosmetic(v){return COSMETICS.has(String(v||''))?String(v):'default'}
 function playerId(i){return`p${String(i+1).padStart(2,'0')}`}
 function sessionToken(){return crypto.randomUUID().replace(/-/g,'')}
 function nonNegativeInt(v){return Math.max(0,Math.trunc(Number(v)||0))}
-function cleanStats(stats={}){return{handsPlayed:nonNegativeInt(stats.handsPlayed),handsWon:nonNegativeInt(stats.handsWon),vpipHands:nonNegativeInt(stats.vpipHands),pfrHands:nonNegativeInt(stats.pfrHands),biggestPotWon:nonNegativeInt(stats.biggestPotWon),knockouts:nonNegativeInt(stats.knockouts)}}
+function cleanStats(stats={}){return{handsPlayed:nonNegativeInt(stats.handsPlayed),handsWon:nonNegativeInt(stats.handsWon),vpipHands:nonNegativeInt(stats.vpipHands),pfrHands:nonNegativeInt(stats.pfrHands),biggestPotWon:nonNegativeInt(stats.biggestPotWon),knockouts:nonNegativeInt(stats.knockouts),chipsWon:nonNegativeInt(stats.chipsWon)}}
 function activeField(d){return d.players.filter(p=>!p.eliminated&&p.chips>0)}
 function publicState(d,now=Date.now()){
  const clock=d.clock?tournamentClockState(d.clock,now):null,pendingMoves=(d.pendingMoves||[]).map(({playerToken,...move})=>move),controlTransition=d.status==='starting'?'start':d.transition?.type||null;
- return{code:d.code,status:d.status,controlTransition,registrationOpen:d.status==='lobby'&&!controlTransition&&!d.tables?.some(t=>t.provisioned),startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,fieldRemaining:activeField(d).length,players:d.players.map(({token,...p})=>p),tables:d.tables,pendingMoves,createdAt:d.createdAt,startedAt:d.startedAt||null,finishedAt:d.finishedAt||null,endedAt:d.endedAt||null,endedByHost:!!d.endedByHost};
+ return{code:d.code,status:d.status,controlTransition,registrationOpen:d.status==='lobby'&&!controlTransition&&!d.tables?.some(t=>t.provisioned),startingChips:d.startingChips,maxPlayers:MTT_MAX_PLAYERS,tableCapacity:MTT_TABLE_CAPACITY,maxTables:MTT_MAX_TABLES,clock,fieldRemaining:activeField(d).length,players:d.players.map(({token,accountId,...p})=>p),tables:d.tables,pendingMoves,createdAt:d.createdAt,startedAt:d.startedAt||null,finishedAt:d.finishedAt||null,endedAt:d.endedAt||null,endedByHost:!!d.endedByHost};
 }
 async function body(response){const b=await response.json().catch(()=>({}));if(!response.ok)throw Error(b.error||`Child table returned ${response.status}.`);return b}
 
 export class TournamentCoordinator{
  constructor(state,env){this.state=state;this.env=env;this.data=null;this.transitionInFlight=null}
- async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(this.data){this.data.pendingMoves??=[];this.data.endedAt??=null;this.data.endedByHost=!!this.data.endedByHost;if(this.data.status==='starting')this.data.transition={type:'start',...(this.data.transition||{})};else this.data.transition=null;for(const p of this.data.players||[]){p.stats??=cleanStats();p.host=!!p.host}if(this.data.players?.length&&!this.data.players.some(p=>p.host))this.data.players[0].host=true}}
+ async load(){if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(this.data){this.data.pendingMoves??=[];this.data.endedAt??=null;this.data.endedByHost=!!this.data.endedByHost;this.data.resultsSyncedAt??=null;if(this.data.status==='starting')this.data.transition={type:'start',...(this.data.transition||{})};else this.data.transition=null;for(const p of this.data.players||[]){p.stats={...cleanStats(),...cleanStats(p.stats)};p.host=!!p.host;p.accountId=String(p.accountId||'')||null;p.cosmetic=cleanCosmetic(p.cosmetic)}if(this.data.players?.length&&!this.data.players.some(p=>p.host))this.data.players[0].host=true}}
  async save(){await this.state.storage.put(KEY,this.data)}
+ async syncTournamentResults(){if(!this.data||this.data.status!=='finished'||this.data.resultsSyncedAt||!this.env?.ACCOUNTS)return true;const linked=this.data.players.filter(p=>p.accountId&&Number.isInteger(p.finishPlace));if(!linked.length){this.data.resultsSyncedAt=Date.now();await this.save();return true}const fieldSize=this.data.players.length,results=await Promise.allSettled(linked.map(async p=>{const stub=this.env.ACCOUNTS.get(this.env.ACCOUNTS.idFromName(p.accountId)),r=await stub.fetch(new Request('https://account.internal/stats/tournament',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({tournamentCode:this.data.code,finishPlace:p.finishPlace,fieldSize})}));if(!r.ok){const b=await r.json().catch(()=>({}));throw Error(b.error||`Tournament account sync failed with ${r.status}.`)}}));if(results.every(r=>r.status==='fulfilled')){this.data.resultsSyncedAt=Date.now();await this.save();return true}return false}
  table(tableNumber){return this.data?.tables.find(t=>t.tableNumber===Number(tableNumber))||null}
  player(id){return this.data?.players.find(p=>p.id===id)||null}
  sessionPlayer(token){return this.data?.players.find(p=>p.token===String(token||''))||null}
@@ -34,14 +36,14 @@ export class TournamentCoordinator{
   const seating=initialAssignments(this.data.players);for(const p of this.data.players){p.tableNumber=null;p.seat=null}for(const a of seating.assignments){const p=this.player(a.playerId);p.tableNumber=a.tableNumber;p.seat=a.seat}
   this.data.tables=seating.tables.map(t=>({tableNumber:t.tableNumber,tableKey:tournamentTableKey(this.data.code,t.tableNumber),capacity:t.capacity,playerIds:t.players.map(p=>p.playerId),status:'waiting',handNumber:0,lastReportAt:null,provisioned:false,provisionedAt:null,provisionError:null}));return this.data.tables;
  }
- joinLobby(name){
+ joinLobby(name,meta={}){
   if(this.data.status==='starting'||this.data.transition?.type==='start')throw Error('Tournament start is in progress. Registration is locked.');if(this.data.status!=='lobby')throw Error('Tournament already started.');if(this.data.tables?.some(t=>t.provisioned))throw Error('Tournament seating is locked for start.');if(this.data.players.length>=MTT_MAX_PLAYERS)throw Error(`Tournament is capped at ${MTT_MAX_PLAYERS} players.`);
   const clean=cleanName(name);if(!clean)throw Error('Display name required.');if(this.data.players.some(p=>p.name.toLowerCase()===clean.toLowerCase()))throw Error('That display name is already registered.');
-  const p={id:playerId(this.data.players.length),token:sessionToken(),name:clean,chips:this.data.startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:this.data.startingChips,stats:cleanStats(),cosmetic:'default',host:false};this.data.players.push(p);this.rebuildLobbySeating();return p;
+  const p={id:playerId(this.data.players.length),token:sessionToken(),accountId:String(meta.accountId||'')||null,name:clean,chips:this.data.startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:this.data.startingChips,stats:cleanStats(),cosmetic:cleanCosmetic(meta.cosmetic),host:false};this.data.players.push(p);this.rebuildLobbySeating();return p;
  }
  tableSnapshot(tableNumber,now=Date.now()){
   const table=this.table(tableNumber);if(!table)throw Error('Tournament table not found.');
-  const players=table.playerIds.map(id=>this.player(id)).filter(p=>p&&!p.eliminated&&p.chips>0).sort((a,b)=>a.seat-b.seat).map(p=>({id:p.id,token:p.token,name:p.name,chips:p.chips,eliminated:false,finishPlace:p.finishPlace,moveCount:p.moveCount,tableNumber:p.tableNumber,seat:p.seat,stats:cleanStats(p.stats),cosmetic:String(p.cosmetic||'default')}));
+  const players=table.playerIds.map(id=>this.player(id)).filter(p=>p&&!p.eliminated&&p.chips>0).sort((a,b)=>a.seat-b.seat).map(p=>({id:p.id,token:p.token,accountId:p.accountId||null,name:p.name,chips:p.chips,eliminated:false,finishPlace:p.finishPlace,moveCount:p.moveCount,tableNumber:p.tableNumber,seat:p.seat,stats:cleanStats(p.stats),cosmetic:cleanCosmetic(p.cosmetic)}));
   const moves=(this.data.pendingMoves||[]).filter(m=>!m.acknowledged&&(m.fromTable===table.tableNumber||m.toTable===table.tableNumber)).map(m=>({...m}));
   return{tournamentCode:this.data.code,tableNumber:table.tableNumber,tableKey:table.tableKey,status:this.data.status,tableStatus:table.status,fieldRemaining:activeField(this.data).length,players,moves,clock:tournamentClockState(this.data.clock,now),handBlinds:blindsForNewHand(this.data.clock,now)};
  }
@@ -51,7 +53,7 @@ export class TournamentCoordinator{
   const pendingFrom=(this.data.pendingMoves||[]).filter(m=>!m.acknowledged&&m.fromTable===table.tableNumber).map(m=>m.playerId),allowed=new Set([...table.playerIds,...pendingFrom]),allowedPlayers=[...allowed].map(id=>this.player(id)).filter(Boolean),newlyBusted=[];
   for(const row of report.players){
    const p=allowed.has(row.id)?this.player(row.id):allowedPlayers.find(x=>x.name===row.name);if(!p||!allowed.has(p.id))throw Error('Table reported a player not assigned to it.');
-   const wasAlive=!p.eliminated&&p.chips>0,chips=nonNegativeInt(row.chips);p.chips=chips;p.stats=cleanStats(row.stats||p.stats);p.cosmetic=String(row.cosmetic||p.cosmetic||'default').slice(0,32);p.handStartChips=nonNegativeInt(row.handStartChips);
+   const wasAlive=!p.eliminated&&p.chips>0,chips=nonNegativeInt(row.chips);p.chips=chips;p.stats=cleanStats(row.stats||p.stats);p.cosmetic=cleanCosmetic(row.cosmetic||p.cosmetic);p.handStartChips=nonNegativeInt(row.handStartChips);
    if(wasAlive&&chips===0){p.eliminated=true;newlyBusted.push(p)}
   }
   const survivors=activeField(this.data).length;newlyBusted.sort((a,b)=>(b.handStartChips||0)-(a.handStartChips||0)||a.id.localeCompare(b.id)).forEach((p,i)=>{if(!Number.isInteger(p.finishPlace))p.finishPlace=survivors+i+1});
@@ -96,20 +98,20 @@ export class TournamentCoordinator{
   await this.load();const u=new URL(req.url);
   if(u.pathname==='/init'&&req.method==='POST'){
    if(this.data)return json({error:'Tournament already exists.'},409);
-   const b=await req.json(),names=Array.isArray(b.players)?b.players.map(x=>cleanName(x?.name||x)).filter(Boolean):[];
+   const b=await req.json(),entries=Array.isArray(b.players)?b.players.map(x=>({name:cleanName(x?.name||x),accountId:String(x?.accountId||'')||null,cosmetic:cleanCosmetic(x?.cosmetic)})).filter(x=>x.name):[],names=entries.map(x=>x.name);
    if(names.length<1)return json({error:'At least one player is required.'},400);
    if(names.length>MTT_MAX_PLAYERS)return json({error:`Tournament is capped at ${MTT_MAX_PLAYERS} players.`},400);
    if(new Set(names.map(n=>n.toLowerCase())).size!==names.length)return json({error:'Tournament display names must be unique.'},400);
    const startingChips=Math.max(1,Math.trunc(Number(b.startingChips)||2500));
-   const players=names.map((name,i)=>({id:playerId(i),token:sessionToken(),name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:startingChips,stats:cleanStats(),cosmetic:'default',host:i===0}));
+   const players=entries.map((entry,i)=>({id:playerId(i),token:sessionToken(),accountId:entry.accountId,name:entry.name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:startingChips,stats:cleanStats(),cosmetic:entry.cosmetic,host:i===0}));
    const code=String(b.code||'').trim().toUpperCase();if(!code)return json({error:'Tournament code required.'},400);
-   this.data={code,status:'lobby',transition:null,startingChips,players,tables:[],pendingMoves:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false};this.rebuildLobbySeating();
+   this.data={code,status:'lobby',transition:null,startingChips,players,tables:[],pendingMoves:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false,resultsSyncedAt:null};this.rebuildLobbySeating();
    await this.save();return json({...publicState(this.data,Number(b.now)||Date.now()),token:players[0].token,host:true},201)
   }
   if(!this.data)return json({error:'Tournament not found.'},404);
   if(u.pathname==='/state'&&req.method==='GET')return json(publicState(this.data));
   if(u.pathname==='/session'&&req.method==='GET'){try{return json(this.sessionState(u.searchParams.get('token')||''))}catch(e){return json({error:e.message},403)}}
-  if(u.pathname==='/join'&&req.method==='POST'){try{const b=await req.json(),p=this.joinLobby(b.name);await this.save();return json({code:this.data.code,token:p.token,playerId:p.id,tableNumber:p.tableNumber,seat:p.seat},201)}catch(e){return json({error:e.message},409)}}
+  if(u.pathname==='/join'&&req.method==='POST'){try{const b=await req.json(),p=this.joinLobby(b.name,b);await this.save();return json({code:this.data.code,token:p.token,playerId:p.id,tableNumber:p.tableNumber,seat:p.seat},201)}catch(e){return json({error:e.message},409)}}
   if(u.pathname==='/provision'&&req.method==='POST'){
    if(this.transitionInFlight)return this.busy('provision');if(this.data.status!=='lobby')return json({error:'Tables can only be provisioned before the tournament starts.'},409);if(this.data.players.length<2)return json({error:'At least two players are required to provision tables.'},409);
    this.transitionInFlight='provision';try{return json({tables:await this.provisionTables()},201)}catch(e){return json({error:e.message},503)}finally{this.transitionInFlight=null}
@@ -134,7 +136,7 @@ export class TournamentCoordinator{
   if(u.pathname==='/hand-blinds'&&req.method==='GET')return json(blindsForNewHand(this.data.clock));
   const tableMatch=u.pathname.match(/^\/tables\/(\d+)\/(sync|report|ack-moves)$/);
   if(tableMatch&&tableMatch[2]==='sync'&&req.method==='GET'){try{return json(this.tableSnapshot(Number(tableMatch[1])))}catch(e){return json({error:e.message},404)}}
-  if(tableMatch&&tableMatch[2]==='report'&&req.method==='POST'){try{const n=Number(tableMatch[1]);this.reportTable(n,await req.json());this.maybeScheduleMoves(n);await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
+  if(tableMatch&&tableMatch[2]==='report'&&req.method==='POST'){try{const n=Number(tableMatch[1]);this.reportTable(n,await req.json());this.maybeScheduleMoves(n);await this.save();if(this.data.status==='finished')await this.syncTournamentResults();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(tableMatch&&tableMatch[2]==='ack-moves'&&req.method==='POST'){try{const n=Number(tableMatch[1]),b=await req.json();this.acknowledgeMoves(n,b.moveIds);this.maybeScheduleMoves(n);await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(u.pathname==='/pause'&&req.method==='POST'){
    if(this.transitionInFlight)return this.busy('pause');if(this.data.status==='paused'&&!this.data.transition)return json(publicState(this.data));if(!['running','paused'].includes(this.data.status))return json({error:'Tournament is not running.',state:publicState(this.data)},409);

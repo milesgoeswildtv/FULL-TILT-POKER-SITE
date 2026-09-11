@@ -10,5 +10,4 @@ export class PlayerAccount{
  if(u.pathname==='/profile'&&req.method==='POST'){try{return Response.json({account:publicAccount(await this.sync(body.identity))})}catch(error){return Response.json({error:error.message},{status:400})}}
  if(u.pathname==='/equip'&&req.method==='POST'){try{const account=await this.sync(body.identity),cosmetic=String(body.cosmetic||'default');if(!ALLOWED_COSMETICS.has(cosmetic))return Response.json({error:'Unknown booster loadout.'},{status:400});if(!(account.inventory||[]).includes(cosmetic))return Response.json({error:'That booster is not in your inventory.'},{status:403});account.equipped=cosmetic;account.lastSeenAt=Date.now();await this.ctx.storage.put('account',account);return Response.json({account:publicAccount(account)})}catch(error){return Response.json({error:error.message},{status:400})}}
  return Response.json({error:'Not found.'},{status:404})}
- }
 }

@@ -1,4 +1,5 @@
 import React,{useEffect,useMemo,useState}from'react';
+import'./shop.css';
 
 const PACK_COPY={constellation:'Cold stars. Clean lines. Zero mercy.',deadMansHand:'Skulls, smoke and a seat nobody wants to face.',regalia:'Royal gold for players who intend to own the room.'};
 function money(amount,currency='usd'){if(!Number.isFinite(Number(amount)))return'';try{return new Intl.NumberFormat(undefined,{style:'currency',currency:String(currency).toUpperCase()}).format(Number(amount)/100)}catch{return`$${(Number(amount)/100).toFixed(2)}`}}

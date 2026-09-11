@@ -1,0 +1,17 @@
+@media(max-width:760px){
+  .tablePage:has(.felt:not([data-street="waiting"]))>.topbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px;align-items:center}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.topbar>div{min-width:0;overflow:hidden}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.topbar b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.topbar .ghost{flex:none;white-space:nowrap}
+
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud{width:max-content!important;max-width:calc(100vw - 110px)!important;min-width:0!important;margin:2px auto max(4px,env(safe-area-inset-bottom))!important;padding:3px 7px!important;display:flex!important;grid-template-columns:none!important;grid-template-rows:none!important;align-items:center!important;justify-content:center!important;gap:6px!important;border-radius:12px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap{position:static!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:1px 3px!important;display:flex!important;align-items:center!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap>.hole{width:auto!important;height:auto!important;min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap>.hole .card{flex:0 0 25px!important;width:25px!important;height:35px!important;min-width:25px!important;min-height:35px!important;max-width:25px!important;max-height:35px!important;margin:0!important;padding:3px!important;font-size:9px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.status{display:none!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.actions{width:auto!important;display:flex!important;align-items:center!important;margin:0!important;padding:0!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud .hostControls{position:static!important;margin:0!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud .hostControls button{height:30px!important;min-height:30px!important;max-height:30px!important;padding:4px 9px!important;font-size:8px!important}
+
+  .tablePage:has(.felt:not([data-street="waiting"])) .belowTable:has(>.tablePanels:empty){display:none!important;inset:auto!important;width:0!important;height:0!important}
+}

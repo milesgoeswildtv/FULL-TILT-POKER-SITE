@@ -1,0 +1,14 @@
+const ALLOWED_COSMETICS=new Set(['default','constellation','deadMansHand','regalia']);
+const DEFAULT_STATS=()=>({handsPlayed:0,tournamentsPlayed:0,tournamentWins:0,finalTables:0,knockouts:0,biggestPot:0,chipsWon:0});
+function cleanIdentity(value={}){return{id:String(value.id||''),username:String(value.username||'Player').slice(0,64),displayName:String(value.displayName||value.globalName||value.username||'Player').slice(0,64),avatar:value.avatar?String(value.avatar):null}}
+function publicAccount(data){return{id:data.id,username:data.username,displayName:data.displayName,avatar:data.avatar,createdAt:data.createdAt,lastSeenAt:data.lastSeenAt,stats:data.stats||DEFAULT_STATS(),inventory:Array.isArray(data.inventory)?data.inventory:['default'],equipped:ALLOWED_COSMETICS.has(data.equipped)?data.equipped:'default'}}
+export class PlayerAccount{
+ constructor(ctx,env){this.ctx=ctx;this.env=env}
+ async load(){return await this.ctx.storage.get('account')||null}
+ async sync(identity){const clean=cleanIdentity(identity);if(!clean.id)throw new Error('Discord identity required.');const now=Date.now(),existing=await this.load(),next=existing?{...existing,...clean,lastSeenAt:now,stats:{...DEFAULT_STATS(),...(existing.stats||{})},inventory:Array.from(new Set(['default',...(existing.inventory||[])])),equipped:ALLOWED_COSMETICS.has(existing.equipped)?existing.equipped:'default'}:{...clean,createdAt:now,lastSeenAt:now,stats:DEFAULT_STATS(),inventory:['default'],equipped:'default'};await this.ctx.storage.put('account',next);return next}
+ async fetch(req){const u=new URL(req.url);let body={};if(req.method==='POST'){try{body=await req.json()}catch{body={}}}if(u.pathname==='/sync'&&req.method==='POST'){try{return Response.json({account:publicAccount(await this.sync(body.identity))})}catch(error){return Response.json({error:error.message},{status:400})}}
+ if(u.pathname==='/profile'&&req.method==='POST'){try{return Response.json({account:publicAccount(await this.sync(body.identity))})}catch(error){return Response.json({error:error.message},{status:400})}}
+ if(u.pathname==='/equip'&&req.method==='POST'){try{const account=await this.sync(body.identity),cosmetic=String(body.cosmetic||'default');if(!ALLOWED_COSMETICS.has(cosmetic))return Response.json({error:'Unknown booster loadout.'},{status:400});if(!(account.inventory||[]).includes(cosmetic))return Response.json({error:'That booster is not in your inventory.'},{status:403});account.equipped=cosmetic;account.lastSeenAt=Date.now();await this.ctx.storage.put('account',account);return Response.json({account:publicAccount(account)})}catch(error){return Response.json({error:error.message},{status:400})}}
+ return Response.json({error:'Not found.'},{status:404})}
+ }
+}

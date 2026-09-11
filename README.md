@@ -2,13 +2,13 @@
 
 Private play-chip No-Limit Texas Hold’em for the Full Tilt community, built as a React/Vite frontend on a Cloudflare Worker with Durable Objects.
 
-## Current build — v0.51
+## Current build — v0.52
 
 ### Accounts + home
 - Discord OAuth is required before poker APIs can be used
 - Discord username/avatar become the player’s Full Tilt identity
 - Persistent `PlayerAccount` Durable Object per Discord user
-- Direct table/tournament invite links now stop for Discord login when necessary and return the player to the same invite after OAuth
+- Direct table/tournament invite links stop for Discord login when necessary and return the player to the same invite after OAuth
 - Quick-table and tournament seats are privately linked to the Discord account ID; account IDs are not exposed in public table/tournament state
 - Lifetime hands played, knockouts, chips won and biggest pot are checkpointed to the account with retry-safe/idempotent deltas
 - Natural MTT finishes add tournament played, tournament win and final-table results exactly once
@@ -16,6 +16,15 @@ Private play-chip No-Limit Texas Hold’em for the Full Tilt community, built as
 - Booster loadouts are account-authoritative: players equip owned boosters from their profile and the server applies that loadout at the table
 - The former free in-table cosmetic picker has been removed
 - Booster shop is structurally live; purchase/payment fulfillment is intentionally not wired yet
+- The home page now exposes public Terms, Cosmetic Purchase, Refund, Privacy, and Contact/Support policies
+
+### Shop readiness
+- Public policy pages live at `/terms.html`, `/purchases.html`, `/refunds.html`, `/privacy.html`, and `/contact.html`
+- Policies explicitly state that Full Tilt is play-chip only and does not offer cash wagering, cash-out, monetary prizes, or purchased gaming currency
+- Cosmetic purchase policy limits paid items to visual customization such as card backs, chips, plaques, avatar frames, and coordinated packs
+- Refund policy covers duplicate charges, failed fulfillment, technical errors, unauthorized transactions, and rights required by law
+- Contact page currently routes support through the official Full Tilt community/Discord and states that a dedicated support email will be published before paid checkout is enabled
+- Paid checkout remains disabled until payment processing and fulfillment are implemented
 
 ### Poker engine
 - Server-authoritative shuffled deck; hidden cards/deck are never exposed to other clients

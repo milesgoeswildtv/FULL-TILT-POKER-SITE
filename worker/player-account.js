@@ -18,4 +18,5 @@ export class PlayerAccount{
  if(u.pathname==='/stats/checkpoint'&&req.method==='POST'){try{return Response.json({account:publicAccount(await this.checkpoint(body))})}catch(error){return Response.json({error:error.message},{status:400})}}
  if(u.pathname==='/stats/tournament'&&req.method==='POST'){try{return Response.json({account:publicAccount(await this.tournamentResult(body))})}catch(error){return Response.json({error:error.message},{status:400})}}
  return Response.json({error:'Not found.'},{status:404})
+ }
 }

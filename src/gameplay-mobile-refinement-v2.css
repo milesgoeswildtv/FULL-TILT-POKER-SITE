@@ -1,0 +1,175 @@
+/* Mobile gameplay refinement v2 — tuned from the second live iPhone capture.
+   Tightens the table/client composition, pulls every opponent fully inside the rail,
+   gives opponent cards a dedicated lane, and visually joins hero/table/actions. */
+@media(max-width:760px){
+  /* Shift the game composition upward without letting the top chrome become part of the table. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt{
+    transform:translateY(-28px)!important;
+    width:min(92vw,510px)!important;
+    height:min(47dvh,408px)!important;
+    min-height:334px!important;
+    margin-top:4px!important;
+    border-radius:48%/45%!important;
+  }
+
+  /* Community cards remain the visual center, but no longer span into the opponent-card lane. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .board{
+    top:40%!important;
+    gap:2px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .board .card{
+    width:33px!important;
+    height:47px!important;
+    min-width:33px!important;
+    min-height:47px!important;
+    padding:3px!important;
+    font-size:10px!important;
+  }
+
+  /* Player plaques belong just inside the rail, never half outside the table. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat){
+    width:86px!important;
+    min-height:40px!important;
+    padding:4px 5px 4px 32px!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*30px),calc(var(--seat-dy)*27px)) scale(.86)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat).turn{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*30px),calc(var(--seat-dy)*27px)) scale(.91)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) .avatar{
+    width:24px!important;
+    height:24px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) b{max-width:47px!important}
+
+  /* Opponent card backs sit between plaque and board instead of touching the community cards. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*18px),calc(var(--seat-dy)*16px))!important;
+    z-index:7!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards .card{
+    width:19px!important;
+    height:27px!important;
+    min-width:19px!important;
+    min-height:27px!important;
+    padding:2px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards .card+.card{margin-left:-4px!important}
+
+  /* Hero is an anchor on the near felt, not a card hanging off the outside rail. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat{
+    width:98px!important;
+    min-height:47px!important;
+    padding:4px 5px 4px 36px!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*4px),calc(var(--seat-dy)*3px)) scale(.92)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat.turn{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*4px),calc(var(--seat-dy)*3px)) scale(.96)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat .avatar{
+    width:27px!important;
+    height:27px!important;
+  }
+
+  /* Keep action markers in a clean middle ring. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.tableBet{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*22px),calc(var(--seat-dy)*14px)) scale(.80)!important;
+    max-width:54px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .positionBadge{
+    transform:translate(calc(-50% - var(--seat-dx)*28px),calc(-50% - var(--seat-dy)*22px)) scale(.53)!important;
+  }
+
+  /* Eliminated seats remain locatable, but stop turning the rail into gray text soup. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.out{opacity:.10!important;filter:grayscale(1) saturate(.2)!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.folded:not(.out){opacity:.24!important}
+
+  /* Pull the decision surface upward and let hero cards physically bridge the felt to the controls. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud){
+    transform:translateY(-14px)!important;
+    height:106px!important;
+    min-height:106px!important;
+    padding:5px 6px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{
+    top:-61px!important;
+    width:72px!important;
+    height:51px!important;
+    min-width:72px!important;
+    min-height:51px!important;
+    max-width:72px!important;
+    max-height:51px!important;
+    background:#0a0710f8!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole{
+    width:68px!important;
+    height:47px!important;
+    min-height:47px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole .card{
+    flex-basis:33px!important;
+    width:33px!important;
+    height:47px!important;
+    min-width:33px!important;
+    min-height:47px!important;
+    max-width:33px!important;
+    max-height:47px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud) .handStrength{top:48px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud .hudToggles{opacity:.72!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud .hudToggles button{height:18px!important;min-height:18px!important;padding:0 4px!important;font-size:5.5px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud .actionRow button{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+  }
+
+  /* Host tools become secondary controls rather than competing with the betting buttons. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud>.actions>.hostControls{
+    top:1px!important;
+    right:2px!important;
+    gap:3px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud>.actions>.hostControls button{
+    height:20px!important;
+    min-height:20px!important;
+    max-height:20px!important;
+    padding:1px 6px!important;
+    font-size:5.5px!important;
+  }
+
+  /* Edge utilities get one consistent rail and stay clear of browser gestures. */
+  .tableChatDockButton{right:50px!important;top:53px!important;width:32px!important;min-width:32px!important;height:32px!important}
+  .actionLogDock{right:10px!important;top:53px!important}
+  .actionLogToggle{width:32px!important;min-width:32px!important;height:32px!important}
+}
+
+@media(max-width:430px){
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt{
+    width:91.5vw!important;
+    height:min(46.5dvh,398px)!important;
+    min-height:330px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat){
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*28px),calc(var(--seat-dy)*25px)) scale(.84)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat).turn{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*28px),calc(var(--seat-dy)*25px)) scale(.89)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .board .card{
+    width:31px!important;
+    height:44px!important;
+    min-width:31px!important;
+    min-height:44px!important;
+    font-size:9px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*17px),calc(var(--seat-dy)*15px))!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards .card{
+    width:18px!important;
+    height:26px!important;
+    min-width:18px!important;
+    min-height:26px!important;
+  }
+}

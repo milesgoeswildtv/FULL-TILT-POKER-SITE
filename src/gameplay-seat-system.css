@@ -1,6 +1,6 @@
 /* Canonical gameplay seat system.
    One anchor per player; plate, cards and bet each get a dedicated radial lane.
-   This file intentionally replaces the prior mobile refinement stack. */
+   Opponent anchors live on the outer rail while cards/bets step inward in strict lanes. */
 @media(max-width:760px){
   .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt{
     width:min(92vw,510px)!important;
@@ -107,10 +107,10 @@
     letter-spacing:.06em!important;
   }
 
-  /* Hero identity is already represented by the bottom HUD. Don't duplicate it as a giant felt plaque. */
+  /* Hero identity is already represented by the bottom HUD. */
   .felt.productionFelt>.seatSlot.heroSlot>.seat.productionSeat{display:none!important}
 
-  /* Cards always occupy the first inward lane from the rail. */
+  /* Cards get a full clear lane inward from the plaque; they never sit underneath it. */
   .felt.productionFelt>.seatSlot>.seatCards{
     position:absolute!important;
     left:0!important;
@@ -118,7 +118,7 @@
     z-index:7!important;
     display:flex!important;
     gap:0!important;
-    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-28px),calc(var(--seat-dy)*-24px))!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-46px),calc(var(--seat-dy)*-40px))!important;
     filter:drop-shadow(0 4px 6px rgba(0,0,0,.72))!important;
     pointer-events:none!important;
   }
@@ -135,13 +135,13 @@
   }
   .felt.productionFelt>.seatSlot>.seatCards .card+.card{margin-left:-4px!important}
 
-  /* Bets live one lane further inward than cards. */
+  /* Bets use the next inward lane, separated from both cards and board. */
   .felt.productionFelt>.seatSlot>.tableBet{
     position:absolute!important;
     left:0!important;
     top:0!important;
     z-index:6!important;
-    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-49px),calc(var(--seat-dy)*-42px))!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-70px),calc(var(--seat-dy)*-60px))!important;
     min-width:24px!important;
     max-width:46px!important;
     min-height:16px!important;
@@ -219,7 +219,6 @@
   .felt.productionFelt>.potCluster .potSlice small{font-size:4.1px!important}
   .felt.productionFelt>.potCluster .potSlice b{font-size:6px!important}
 
-  /* Hero cards bridge felt and controls; the HUD owns hero identity. */
   .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud){transform:translateY(-16px)!important}
   .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{top:-60px!important}
 }
@@ -229,8 +228,8 @@
   .felt.productionFelt>.seatSlot>.seat.productionSeat .avatar{width:15px!important;height:15px!important}
   .felt.productionFelt>.seatSlot>.seat.productionSeat>b{max-width:34px!important;font-size:5.3px!important}
   .felt.productionFelt>.seatSlot>.seat.productionSeat .seatStack{font-size:6px!important}
-  .felt.productionFelt>.seatSlot>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-26px),calc(var(--seat-dy)*-22px))!important}
+  .felt.productionFelt>.seatSlot>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-43px),calc(var(--seat-dy)*-36px))!important}
   .felt.productionFelt>.seatSlot>.seatCards .card{width:18px!important;height:25px!important;min-width:18px!important;min-height:25px!important;max-width:18px!important;max-height:25px!important}
-  .felt.productionFelt>.seatSlot>.tableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-45px),calc(var(--seat-dy)*-38px))!important}
+  .felt.productionFelt>.seatSlot>.tableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-66px),calc(var(--seat-dy)*-56px))!important}
   .felt.productionFelt>.board .card{width:30px!important;height:42px!important;min-width:30px!important;min-height:42px!important}
 }

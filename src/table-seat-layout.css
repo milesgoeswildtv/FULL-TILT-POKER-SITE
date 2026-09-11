@@ -10,26 +10,26 @@
 }
 
 @media(max-width:760px){
-  .felt.productionFelt>.seatCards{position:absolute;left:var(--mobile-seat-x)!important;top:var(--mobile-seat-y)!important;transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*7px),calc(var(--seat-dy)*6px))!important;z-index:4!important;filter:drop-shadow(0 5px 7px #000b)!important}
-  .felt.productionFelt>.seatCards .card{width:25px!important;height:35px!important;padding:3px!important}
-  .felt .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*22px)) scale(.9)!important}
+  .felt.productionFelt>.seatCards{position:absolute;left:var(--mobile-seat-x)!important;top:var(--mobile-seat-y)!important;transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*20px),calc(var(--seat-dy)*18px))!important;z-index:4!important;filter:drop-shadow(0 5px 7px #000b)!important}
+  .felt.productionFelt>.seatCards .card{width:27px!important;height:38px!important;padding:3px!important}
+  .felt .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*34px),calc(var(--seat-dy)*30px)) scale(.9)!important}
   .felt .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.84)!important}
-  .felt .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*22px)) scale(.95)!important}
+  .felt .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*34px),calc(var(--seat-dy)*30px)) scale(.95)!important}
   .felt .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.89)!important}
-  .felt[data-player-count="7"] .seat.productionSeat,.felt[data-player-count="8"] .seat.productionSeat,.felt[data-player-count="9"] .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*26px),calc(var(--seat-dy)*22px)) scale(.79)!important}
-  .felt[data-player-count="7"] .seat.productionSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*26px),calc(var(--seat-dy)*22px)) scale(.84)!important}
+  .felt[data-player-count="7"] .seat.productionSeat,.felt[data-player-count="8"] .seat.productionSeat,.felt[data-player-count="9"] .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*36px),calc(var(--seat-dy)*30px)) scale(.79)!important}
+  .felt[data-player-count="7"] .seat.productionSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*36px),calc(var(--seat-dy)*30px)) scale(.84)!important}
   .felt[data-player-count="7"] .seat.productionSeat.heroSeat,.felt[data-player-count="8"] .seat.productionSeat.heroSeat,.felt[data-player-count="9"] .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.79)!important}
   .felt[data-player-count="7"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*14px),calc(var(--seat-dy)*14px)) scale(.84)!important}
-  .felt[data-player-count="7"]>.seatCards .card,.felt[data-player-count="8"]>.seatCards .card,.felt[data-player-count="9"]>.seatCards .card{width:24px!important;height:34px!important;font-size:7px!important}
+  .felt[data-player-count="7"]>.seatCards .card,.felt[data-player-count="8"]>.seatCards .card,.felt[data-player-count="9"]>.seatCards .card{width:26px!important;height:37px!important;font-size:7px!important}
 }
 
 @media(max-width:430px){
-  .felt .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*22px),calc(var(--seat-dy)*19px)) scale(.9)!important}
-  .felt .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*22px),calc(var(--seat-dy)*19px)) scale(.95)!important}
-  .felt[data-player-count="7"] .seat.productionSeat,.felt[data-player-count="8"] .seat.productionSeat,.felt[data-player-count="9"] .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*19px)) scale(.79)!important}
-  .felt[data-player-count="7"] .seat.productionSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*24px),calc(var(--seat-dy)*19px)) scale(.84)!important}
+  .felt .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*31px),calc(var(--seat-dy)*27px)) scale(.9)!important}
+  .felt .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*31px),calc(var(--seat-dy)*27px)) scale(.95)!important}
+  .felt[data-player-count="7"] .seat.productionSeat,.felt[data-player-count="8"] .seat.productionSeat,.felt[data-player-count="9"] .seat.productionSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*33px),calc(var(--seat-dy)*27px)) scale(.79)!important}
+  .felt[data-player-count="7"] .seat.productionSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*33px),calc(var(--seat-dy)*27px)) scale(.84)!important}
   .felt .seat.productionSeat.heroSeat,.felt[data-player-count="7"] .seat.productionSeat.heroSeat,.felt[data-player-count="8"] .seat.productionSeat.heroSeat,.felt[data-player-count="9"] .seat.productionSeat.heroSeat{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*12px),calc(var(--seat-dy)*11px)) scale(.79)!important}
   .felt .seat.productionSeat.heroSeat.turn,.felt[data-player-count="7"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="8"] .seat.productionSeat.heroSeat.turn,.felt[data-player-count="9"] .seat.productionSeat.heroSeat.turn{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*12px),calc(var(--seat-dy)*11px)) scale(.84)!important}
-  .felt.productionFelt>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*6px),calc(var(--seat-dy)*5px))!important}
-  .felt.productionFelt>.seatCards .card{width:23px!important;height:33px!important}
+  .felt.productionFelt>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*18px),calc(var(--seat-dy)*16px))!important}
+  .felt.productionFelt>.seatCards .card{width:25px!important;height:36px!important}
 }

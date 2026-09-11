@@ -2,7 +2,16 @@
 
 Private play-chip No-Limit Texas Hold’em for the Full Tilt community, built as a React/Vite frontend on a Cloudflare Worker with Durable Objects.
 
-## Current build — v0.46
+## Current build — v0.50
+
+### Accounts + home
+- Discord OAuth is required before poker APIs can be used
+- Discord username/avatar become the player’s Full Tilt identity
+- Persistent `PlayerAccount` Durable Object per Discord user
+- Lifetime stat record and booster inventory/loadout foundation
+- Discord-first home screen with Create Game, Join Game, profile drawer and Booster Shop
+- Profile loadout writes the equipped booster to the account and browser table preference
+- Booster shop is structurally live; purchase fulfillment is intentionally not wired yet
 
 ### Poker engine
 - Server-authoritative shuffled deck; hidden cards/deck are never exposed to other clients
@@ -39,9 +48,35 @@ Private play-chip No-Limit Texas Hold’em for the Full Tilt community, built as
 
 `TABLES` → `PokerTable` Durable Objects  
 `TOURNAMENTS` → `TournamentCoordinator` Durable Objects  
+`TOURNAMENT_CHATS` → `TournamentChat` Durable Objects  
+`ACCOUNTS` → `PlayerAccount` Durable Objects  
 `ASSETS` → built Vite frontend
 
-Wrangler migrations currently contain both Durable Object classes. Do not remove or rename those migration entries on an existing deployment.
+Wrangler migrations contain all Durable Object classes. Do not remove or rename migration entries on an existing deployment.
+
+## Discord OAuth configuration
+
+Production requires these Worker secrets/variables:
+
+```text
+DISCORD_CLIENT_ID
+DISCORD_CLIENT_SECRET
+AUTH_SECRET
+```
+
+Optional:
+
+```text
+DISCORD_REDIRECT_URI
+```
+
+If `DISCORD_REDIRECT_URI` is omitted, Full Tilt uses:
+
+```text
+https://<current-origin>/api/auth/callback
+```
+
+That exact callback URL must also be registered in the Discord application’s OAuth2 redirect list. `AUTH_SECRET` should be a long random secret used only for signing Full Tilt account sessions.
 
 ## Verification
 
@@ -69,7 +104,7 @@ npm run check:worker
 npm run deploy
 ```
 
-`npm run deploy` is the real Cloudflare deployment command. Run it only from an authenticated Cloudflare environment after CI is green.
+`npm run deploy` is the real Cloudflare deployment command. Run it only from an authenticated Cloudflare environment after CI is green and the Discord OAuth secrets are configured.
 
 ## Scope
 

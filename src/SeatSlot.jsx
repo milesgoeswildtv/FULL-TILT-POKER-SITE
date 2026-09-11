@@ -3,7 +3,7 @@ import{Card,ordinal}from'./TablePanels.jsx';
 import{plaqueFor,avatarFrameFor,chipFor,cardBackFor}from'./assets.js';
 
 function seatGeometry(index,players,me){
-  const n=Math.max(1,players.length),hero=Math.max(0,me?players.findIndex(p=>p.id===me.id):0),rel=(index-hero+n)%n,theta=(90+rel*(360/n))*Math.PI/180,dx=Math.cos(theta),dy=Math.sin(theta),ring={1:[0,0,0,0],2:[34,33,34,36],3:[36,34,35,37],4:[38,35,36.5,38.5],5:[40,36,37.5,39.5],6:[41.5,37,38.5,40],7:[42.5,38,39.25,40.5],8:[43,38.5,40,41],9:[43.5,39,40.5,41.5]}[Math.min(9,n)]||[43.5,39,40.5,41.5],desktopSeatX=50+ring[0]*dx,desktopSeatY=50+ring[1]*dy,mobileSeatX=50+ring[2]*dx,mobileSeatY=50+ring[3]*dy;
+  const n=Math.max(1,players.length),hero=Math.max(0,me?players.findIndex(p=>p.id===me.id):0),rel=(index-hero+n)%n,theta=(90+rel*(360/n))*Math.PI/180,dx=Math.cos(theta),dy=Math.sin(theta),ring={1:[0,0,0,0],2:[34,33,42,43],3:[36,34,43,43.5],4:[38,35,44,44],5:[40,36,44.5,44.5],6:[41.5,37,45,45],7:[42.5,38,45.25,45.25],8:[43,38.5,45.5,45.5],9:[43.5,39,45.5,45.5]}[Math.min(9,n)]||[43.5,39,45.5,45.5],desktopSeatX=50+ring[0]*dx,desktopSeatY=50+ring[1]*dy,mobileSeatX=50+ring[2]*dx,mobileSeatY=50+ring[3]*dy;
   return{'--seat-x':`${desktopSeatX.toFixed(2)}%`,'--seat-y':`${desktopSeatY.toFixed(2)}%`,'--mobile-seat-x':`${mobileSeatX.toFixed(2)}%`,'--mobile-seat-y':`${mobileSeatY.toFixed(2)}%`,'--seat-dx':dx.toFixed(3),'--seat-dy':dy.toFixed(3)};
 }
 

@@ -1,0 +1,236 @@
+/* Canonical gameplay seat system.
+   One anchor per player; plate, cards and bet each get a dedicated radial lane.
+   This file intentionally replaces the prior mobile refinement stack. */
+@media(max-width:760px){
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt{
+    width:min(92vw,510px)!important;
+    height:min(47dvh,408px)!important;
+    min-height:334px!important;
+    margin:4px auto 0!important;
+    transform:translateY(-24px)!important;
+    border-radius:48%/45%!important;
+  }
+
+  .felt.productionFelt>.seatSlot{
+    position:absolute!important;
+    left:var(--mobile-seat-x)!important;
+    top:var(--mobile-seat-y)!important;
+    width:0!important;
+    height:0!important;
+    z-index:8!important;
+    pointer-events:none;
+  }
+
+  .felt.productionFelt>.seatSlot>.seat.productionSeat{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    width:68px!important;
+    min-height:30px!important;
+    height:auto!important;
+    padding:3px 5px 3px 24px!important;
+    margin:0!important;
+    transform:translate(-50%,-50%)!important;
+    border-radius:10px!important;
+    background:linear-gradient(145deg,rgba(21,13,27,.72),rgba(8,6,12,.66))!important;
+    border:1px solid rgba(172,126,62,.46)!important;
+    box-shadow:0 4px 10px rgba(0,0,0,.42)!important;
+    backdrop-filter:blur(6px)!important;
+    display:grid!important;
+    align-content:center!important;
+    text-align:left!important;
+    pointer-events:auto;
+    overflow:visible!important;
+    transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease!important;
+  }
+
+  .felt.productionFelt>.seatSlot>.seat.productionSeat.turn{
+    transform:translate(-50%,-50%)!important;
+    border-color:#d8ae4f!important;
+    box-shadow:0 0 0 1px rgba(216,174,79,.3),0 0 16px rgba(150,68,198,.26),0 4px 10px rgba(0,0,0,.5)!important;
+    animation:none!important;
+  }
+
+  .felt.productionFelt>.seatSlot>.seat.productionSeat .avatar{
+    position:absolute!important;
+    left:4px!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    width:16px!important;
+    height:16px!important;
+    margin:0!important;
+    border-radius:50%!important;
+    border:1px solid rgba(133,91,157,.68)!important;
+    background:#160f1d!important;
+    font-size:4.8px!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+  .felt.productionFelt>.seatSlot>.seat.productionSeat .avatar:after{display:none!important}
+  .felt.productionFelt>.seatSlot>.seat.productionSeat>b{
+    max-width:38px!important;
+    margin:0!important;
+    color:#eee7ef!important;
+    font-size:5.8px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .felt.productionFelt>.seatSlot>.seat.productionSeat .seatStack{
+    margin:1px 0 0!important;
+    color:#eacb70!important;
+    font-size:6.6px!important;
+    line-height:1!important;
+  }
+  .felt.productionFelt>.seatSlot>.seat.productionSeat small,
+  .felt.productionFelt>.seatSlot>.seat.productionSeat em{
+    max-width:38px!important;
+    margin:1px 0 0!important;
+    font-size:4.6px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .felt.productionFelt>.seatSlot>.seat.productionSeat .seatBotBadge{
+    position:absolute!important;
+    right:-4px!important;
+    top:-5px!important;
+    padding:1px 3px!important;
+    border-radius:999px!important;
+    border:1px solid #5d4569!important;
+    background:#100b15!important;
+    color:#aa91b7!important;
+    font-size:4px!important;
+    line-height:1!important;
+    letter-spacing:.06em!important;
+  }
+
+  /* Hero identity is already represented by the bottom HUD. Don't duplicate it as a giant felt plaque. */
+  .felt.productionFelt>.seatSlot.heroSlot>.seat.productionSeat{display:none!important}
+
+  /* Cards always occupy the first inward lane from the rail. */
+  .felt.productionFelt>.seatSlot>.seatCards{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    z-index:7!important;
+    display:flex!important;
+    gap:0!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-28px),calc(var(--seat-dy)*-24px))!important;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,.72))!important;
+    pointer-events:none!important;
+  }
+  .felt.productionFelt>.seatSlot>.seatCards .card{
+    width:19px!important;
+    height:27px!important;
+    min-width:19px!important;
+    min-height:27px!important;
+    max-width:19px!important;
+    max-height:27px!important;
+    padding:2px!important;
+    border-radius:4px!important;
+    font-size:6px!important;
+  }
+  .felt.productionFelt>.seatSlot>.seatCards .card+.card{margin-left:-4px!important}
+
+  /* Bets live one lane further inward than cards. */
+  .felt.productionFelt>.seatSlot>.tableBet{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    z-index:6!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-49px),calc(var(--seat-dy)*-42px))!important;
+    min-width:24px!important;
+    max-width:46px!important;
+    min-height:16px!important;
+    margin:0!important;
+    padding:2px 4px!important;
+    border-radius:999px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    border:1px solid rgba(177,132,53,.48)!important;
+    background:rgba(12,8,16,.86)!important;
+    box-shadow:0 3px 8px rgba(0,0,0,.5)!important;
+    color:#ead27f!important;
+    font-size:5.6px!important;
+    line-height:1!important;
+    pointer-events:none!important;
+  }
+  .felt.productionFelt>.seatSlot>.tableBet .miniChipArt{width:9px!important;height:9px!important;min-width:9px!important;object-fit:contain!important}
+  .felt.productionFelt>.seatSlot>.tableBet small{display:none!important}
+
+  /* Position badge hugs the player plate and never enters the card lane. */
+  .felt.productionFelt>.seatSlot>.seat .positionBadge{
+    position:absolute!important;
+    left:50%!important;
+    top:50%!important;
+    transform:translate(calc(-50% + var(--seat-dy)*-38px),calc(-50% + var(--seat-dx)*38px)) scale(.48)!important;
+    z-index:3!important;
+  }
+
+  .felt.productionFelt>.seatSlot.foldedSlot{opacity:.28!important}
+  .felt.productionFelt>.seatSlot.foldedSlot>.seatCards{opacity:.18!important;filter:grayscale(.8) brightness(.65)!important}
+  .felt.productionFelt>.seatSlot.outSlot>.seat,
+  .felt.productionFelt>.seatSlot.outSlot>.seatCards,
+  .felt.productionFelt>.seatSlot.outSlot>.tableBet{display:none!important}
+
+  /* Showdown is state-only: reveal/highlight without changing coordinates. */
+  .showdownFelt>.seatSlot>.seat.productionSeat,
+  .showdownFelt>.seatSlot>.seat.productionSeat.showdownWinner,
+  .showdownFelt>.seatSlot>.seat.productionSeat.showdownLoser{
+    transform:translate(-50%,-50%)!important;
+  }
+  .showdownFelt>.seatSlot.winnerSlot>.seat.productionSeat{
+    display:grid!important;
+    opacity:1!important;
+    border-color:#e3ba59!important;
+    box-shadow:0 0 0 1px rgba(227,186,89,.5),0 0 18px rgba(210,165,59,.35),0 4px 10px rgba(0,0,0,.5)!important;
+    animation:none!important;
+  }
+  .showdownFelt>.seatSlot.loserSlot{opacity:.22!important}
+  .showdownFelt>.seatSlot>.seatCards{opacity:1!important}
+  .showdownFelt>.seatSlot>.tableBet{display:none!important}
+
+  /* Protected center zone. */
+  .felt.productionFelt>.board{top:39%!important;gap:2px!important;z-index:5!important}
+  .felt.productionFelt>.board .card{
+    width:31px!important;height:44px!important;min-width:31px!important;min-height:44px!important;
+    padding:3px!important;border-radius:6px!important;font-size:9px!important;
+  }
+  .felt.productionFelt>.potCluster,
+  .felt.productionFelt>.potCluster.hasSidePots{
+    top:58.5%!important;
+    width:auto!important;
+    max-width:150px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    justify-items:center!important;
+    gap:3px!important;
+    z-index:5!important;
+  }
+  .felt.productionFelt>.potCluster .productionPotArt{display:none!important}
+  .felt.productionFelt>.potCluster>.pot{min-width:66px!important;padding:3px 7px!important;font-size:7px!important}
+  .felt.productionFelt>.potCluster>.sidePots{display:flex!important;flex-wrap:nowrap!important;justify-content:center!important;gap:2px!important;max-width:150px!important}
+  .felt.productionFelt>.potCluster .potSlice{min-width:33px!important;padding:2px 3px!important;border-radius:6px!important}
+  .felt.productionFelt>.potCluster .potSlice small{font-size:4.1px!important}
+  .felt.productionFelt>.potCluster .potSlice b{font-size:6px!important}
+
+  /* Hero cards bridge felt and controls; the HUD owns hero identity. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud){transform:translateY(-16px)!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{top:-60px!important}
+}
+
+@media(max-width:430px){
+  .felt.productionFelt>.seatSlot>.seat.productionSeat{width:62px!important;min-height:28px!important;padding-left:22px!important}
+  .felt.productionFelt>.seatSlot>.seat.productionSeat .avatar{width:15px!important;height:15px!important}
+  .felt.productionFelt>.seatSlot>.seat.productionSeat>b{max-width:34px!important;font-size:5.3px!important}
+  .felt.productionFelt>.seatSlot>.seat.productionSeat .seatStack{font-size:6px!important}
+  .felt.productionFelt>.seatSlot>.seatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-26px),calc(var(--seat-dy)*-22px))!important}
+  .felt.productionFelt>.seatSlot>.seatCards .card{width:18px!important;height:25px!important;min-width:18px!important;min-height:25px!important;max-width:18px!important;max-height:25px!important}
+  .felt.productionFelt>.seatSlot>.tableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-45px),calc(var(--seat-dy)*-38px))!important}
+  .felt.productionFelt>.board .card{width:30px!important;height:42px!important;min-width:30px!important;min-height:42px!important}
+}

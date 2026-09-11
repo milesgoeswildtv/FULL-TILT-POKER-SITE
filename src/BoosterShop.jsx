@@ -1,5 +1,6 @@
 import React,{useEffect,useMemo,useState}from'react';
 import'./shop.css';
+import'./unlock.css';
 import{assets}from'./assets.js';
 
 const PACK_COPY={constellation:'Cold stars. Clean lines. Zero mercy.',deadMansHand:'Skulls, smoke and a seat nobody wants to face.',regalia:'Royal gold for players who intend to own the room.',tripleThreat:'One purchase. All three premium booster packs: Constellation, Dead Man’s Hand and Regalia.'};

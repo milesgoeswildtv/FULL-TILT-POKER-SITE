@@ -4,14 +4,40 @@
   .tablePage:has(.felt:not([data-street="waiting"]))>.topbar b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .tablePage:has(.felt:not([data-street="waiting"]))>.topbar .ghost{flex:none;white-space:nowrap}
 
+  /* Fixed-screen mobile table: wider/shorter oval instead of the tall egg shape. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:min(99vw,590px)!important;height:min(47dvh,calc(100dvh - 250px),430px)!important;min-height:350px!important;border-radius:48%/43%!important;background-size:100% 100%!important;background-position:center!important;margin-top:4px!important;margin-bottom:4px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt:before,.tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt:after{border-radius:inherit!important}
+
+  /* Community cards are the visual focus and should read immediately on a phone. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board .card{width:41px!important;height:58px!important;min-width:41px!important;min-height:58px!important;font-size:13px!important;padding:4px!important}
+
+  /* Hero cards are intentionally larger than opponent backs. */
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{width:72px!important;height:51px!important;min-width:72px!important;min-height:51px!important;max-width:72px!important;max-height:51px!important;top:-49px!important;padding:2px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole{width:68px!important;height:47px!important;min-height:47px!important;gap:2px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole .card{flex:0 0 33px!important;width:33px!important;height:47px!important;min-width:33px!important;min-height:47px!important;max-width:33px!important;max-height:47px!important;font-size:12px!important;padding:4px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud) .handStrength{top:48px!important}
+
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud{width:max-content!important;max-width:calc(100vw - 110px)!important;min-width:0!important;margin:2px auto max(4px,env(safe-area-inset-bottom))!important;padding:3px 7px!important;display:flex!important;grid-template-columns:none!important;grid-template-rows:none!important;align-items:center!important;justify-content:center!important;gap:6px!important;border-radius:12px!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap{position:static!important;left:auto!important;top:auto!important;transform:none!important;width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:1px 3px!important;display:flex!important;align-items:center!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap>.hole{width:auto!important;height:auto!important;min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important}
-  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap>.hole .card{flex:0 0 25px!important;width:25px!important;height:35px!important;min-width:25px!important;min-height:35px!important;max-width:25px!important;max-height:35px!important;margin:0!important;padding:3px!important;font-size:9px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.holeWrap>.hole .card{flex:0 0 27px!important;width:27px!important;height:38px!important;min-width:27px!important;min-height:38px!important;max-width:27px!important;max-height:38px!important;margin:0!important;padding:3px!important;font-size:10px!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.status{display:none!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud>.actions{width:auto!important;display:flex!important;align-items:center!important;margin:0!important;padding:0!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud .hostControls{position:static!important;margin:0!important}
   .tablePage:has(.felt:not([data-street="waiting"]))>.hud.showdownHud .hostControls button{height:30px!important;min-height:30px!important;max-height:30px!important;padding:4px 9px!important;font-size:8px!important}
 
   .tablePage:has(.felt:not([data-street="waiting"])) .belowTable:has(>.tablePanels:empty){display:none!important;inset:auto!important;width:0!important;height:0!important}
+}
+
+@media(max-width:430px){
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{width:99vw!important;height:min(46dvh,400px)!important;min-height:340px!important;border-radius:48%/42%!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt .board .card{width:39px!important;height:55px!important;min-width:39px!important;min-height:55px!important;font-size:12px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{width:68px!important;height:48px!important;min-width:68px!important;min-height:48px!important;max-width:68px!important;max-height:48px!important;top:-46px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole{width:64px!important;height:44px!important;min-height:44px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap>.hole .card{flex-basis:31px!important;width:31px!important;height:44px!important;min-width:31px!important;min-height:44px!important;max-width:31px!important;max-height:44px!important;font-size:11px!important}
+  .tablePage:has(.felt:not([data-street="waiting"]))>.hud:not(.showdownHud) .handStrength{top:45px!important}
+}
+
+@media(max-height:720px) and (max-width:760px){
+  .tablePage:has(.felt:not([data-street="waiting"]))>.felt.productionFelt{height:min(44dvh,370px)!important;min-height:310px!important}
 }

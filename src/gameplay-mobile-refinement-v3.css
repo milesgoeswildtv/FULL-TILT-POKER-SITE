@@ -1,0 +1,169 @@
+/* Mobile gameplay refinement v3 — compact seat capsules + protected center lanes.
+   Tuned from the third live iPhone capture. The table now has three explicit rings:
+   outer = player plaques, middle = hole cards / bets, center = board + pots only. */
+@media(max-width:760px){
+  /* Opponent plaques become slim capsules instead of large black cards. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat){
+    width:64px!important;
+    min-height:31px!important;
+    height:auto!important;
+    padding:3px 4px 3px 23px!important;
+    border-radius:9px!important;
+    border:1px solid rgba(139,101,63,.72)!important;
+    background:linear-gradient(145deg,rgba(25,15,31,.86),rgba(8,6,11,.84))!important;
+    box-shadow:0 4px 10px rgba(0,0,0,.52)!important;
+    backdrop-filter:blur(7px)!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*34px),calc(var(--seat-dy)*31px)) scale(.86)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat).turn{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*34px),calc(var(--seat-dy)*31px)) scale(.91)!important;
+    border-color:#d7ae49!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) .avatar{
+    left:4px!important;
+    width:16px!important;
+    height:16px!important;
+    font-size:5px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) b{
+    max-width:34px!important;
+    margin:0!important;
+    font-size:5.8px!important;
+    line-height:1.05!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) .seatStack{
+    margin-top:1px!important;
+    font-size:6.5px!important;
+    line-height:1!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) small,
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) em{
+    max-width:34px!important;
+    margin-top:1px!important;
+    font-size:4.8px!important;
+    line-height:1!important;
+  }
+
+  /* Folded/out seats are positional hints, not visual furniture. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.out{
+    opacity:.045!important;
+    filter:grayscale(1) saturate(.1)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.out small,
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.out em{display:none!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.folded:not(.out){opacity:.13!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seatCards.foldedSeatCards{opacity:.08!important;filter:saturate(.2) brightness(.55)!important}
+
+  /* Middle ring: opponent cards and bets stay visibly separated from plaques and board. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*13px),calc(var(--seat-dy)*12px))!important;
+    z-index:7!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards .card{
+    width:16px!important;
+    height:23px!important;
+    min-width:16px!important;
+    min-height:23px!important;
+    padding:1px!important;
+    border-radius:3px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.seatCards .card+.card{margin-left:-3px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt.productionFelt>.tableBet{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*16px),calc(var(--seat-dy)*10px)) scale(.72)!important;
+    max-width:45px!important;
+    padding:2px 3px!important;
+    font-size:5.5px!important;
+    z-index:6!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .positionBadge{
+    transform:translate(calc(-50% - var(--seat-dx)*23px),calc(-50% - var(--seat-dy)*18px)) scale(.48)!important;
+  }
+
+  /* Protected center: community cards stay isolated and side pots stack beneath them instead of stretching sideways into seats. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .board{
+    top:39.5%!important;
+    gap:2px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .board .card{
+    width:31px!important;
+    height:44px!important;
+    min-width:31px!important;
+    min-height:44px!important;
+    padding:3px!important;
+    font-size:9px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potCluster,
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potCluster.hasSidePots{
+    top:60%!important;
+    width:auto!important;
+    max-width:150px!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    justify-items:center!important;
+    align-items:center!important;
+    gap:3px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .productionPotArt{display:none!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potCluster>.pot{
+    min-width:68px!important;
+    padding:3px 7px!important;
+    font-size:7px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .sidePots{
+    display:flex!important;
+    justify-content:center!important;
+    flex-wrap:nowrap!important;
+    gap:2px!important;
+    max-width:150px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potSlice{
+    min-width:34px!important;
+    padding:2px 3px!important;
+    border-radius:6px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potSlice small{font-size:4.2px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potSlice b{font-size:6px!important}
+
+  /* Hero stays readable, but loses some of the giant-card feeling from the prior pass. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat{
+    width:88px!important;
+    min-height:43px!important;
+    padding:4px 5px 4px 32px!important;
+    border-radius:10px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat .avatar{
+    width:23px!important;
+    height:23px!important;
+    left:5px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat b{max-width:48px!important;font-size:7px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat.heroSeat .seatStack{font-size:8px!important}
+
+  /* Slightly less empty space between table and decision dock. */
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud){transform:translateY(-18px)!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.hud:not(.showdownHud)>.holeWrap{top:-58px!important}
+}
+
+@media(max-width:430px){
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat){
+    width:60px!important;
+    min-height:29px!important;
+    padding-left:22px!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*32px),calc(var(--seat-dy)*29px)) scale(.84)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat).turn{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*32px),calc(var(--seat-dy)*29px)) scale(.89)!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) b{max-width:31px!important;font-size:5.4px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .seat.productionSeat:not(.heroSeat) .seatStack{font-size:6px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .board .card{
+    width:30px!important;
+    height:42px!important;
+    min-width:30px!important;
+    min-height:42px!important;
+  }
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potCluster,
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potCluster.hasSidePots{max-width:138px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .sidePots{max-width:138px!important}
+  .tablePage:has(.productionFelt:not([data-street="waiting"]))>.felt .potSlice{min-width:31px!important}
+}

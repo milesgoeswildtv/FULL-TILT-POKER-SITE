@@ -5,9 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#09060d" />
   <title>Full Tilt Poker</title>
+  <style>
+    .globalLegal{display:none;position:relative;z-index:20;width:min(1180px,calc(100% - 32px));margin:-16px auto 28px;padding:18px 4px 0;border-top:1px solid #302438;font:700 10px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#776b7b;text-align:center}
+    .globalLegal.isHome{display:block}.globalLegal strong{color:#ad914e;letter-spacing:.12em}.globalLegal p{margin:4px 0 10px}.globalLegal div{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 14px}.globalLegal a{color:#9b8ca1;text-decoration:none}.globalLegal a:hover,.globalLegal a:focus{color:#e3c66d;text-decoration:underline}
+    @media(max-width:760px){.globalLegal{width:calc(100% - 18px);margin:-8px auto 20px;font-size:9px}}
+  </style>
 </head>
 <body>
   <div id="root"></div>
+  <nav id="globalLegal" class="globalLegal" aria-label="Full Tilt policies">
+    <strong>FULL TILT POKER</strong>
+    <p>Private play-chip poker • Optional cosmetic digital items only • No cash-out or monetary prizes</p>
+    <div>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/purchases.html">Cosmetic Purchases</a>
+      <a href="/refunds.html">Refund Policy</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/contact.html">Contact &amp; Support</a>
+    </div>
+  </nav>
   <script type="module" src="/src/main.jsx"></script>
+  <script>
+    (()=>{const root=document.getElementById('root'),legal=document.getElementById('globalLegal');const sync=()=>legal.classList.toggle('isHome',!!root.querySelector('.homeShell'));new MutationObserver(sync).observe(root,{childList:true,subtree:true});sync()})();
+  </script>
 </body>
 </html>

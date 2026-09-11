@@ -12,5 +12,6 @@ import'./chat-dock-override.css';
 import'./fixed-gameplay-polish.css';
 import'./gameplay-layout-v2.css';
 import'./gameplay-mobile-refinement.css';
+import'./gameplay-mobile-refinement-v2.css';
 installSessionRouting();
 createRoot(document.getElementById('root')).render(<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>);

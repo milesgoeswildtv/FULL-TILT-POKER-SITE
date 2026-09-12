@@ -12,7 +12,7 @@ export const assets={
     avatarFrame:`${root}/default/default-avatar-frame.png`,
     feltDesktop:`${root}/default/desktop-felt.png`,
     feltMobile:`${root}/default/mobile-felt-portrait.png`,
-    feltCashV2:`${root}/default/TABLE FELT V2.PNG`,
+    feltCashV2:`${root}/default/TABLE FELT V2.PNG?v=official-2`,
     lobbyDesktop:`${root}/default/desktop-background.png`,
     lobbyMobile:`${root}/default/mobile-background.png`,
     pot:`${root}/default/default-pot-chips.png`,

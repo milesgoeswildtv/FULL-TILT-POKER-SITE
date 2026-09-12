@@ -9,7 +9,7 @@
     opacity:1!important;
     z-index:65!important;
     background-color:transparent!important;
-    background-image:url('/assets/default/TABLE%20FELT%20V2.PNG?v=official-4')!important;
+    background-image:url('/assets/default/TABLE%20FELT%20V2.PNG?v=official-5')!important;
     background-size:100% 100%!important;
     background-position:center!important;
     background-repeat:no-repeat!important;
@@ -26,8 +26,16 @@
     display:none!important;
   }
 
+  /* CRITICAL: the old mobile .hud rule used backdrop-filter:blur(12px).
+     Because Gameplay V2 expands the HUD to the full viewport, that blur was
+     smearing the entire felt underneath it. Keep the HUD transparent and sharp. */
   html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Hud{
     z-index:70!important;
+    background:transparent!important;
+    filter:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    mix-blend-mode:normal!important;
   }
 
   html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Topbar{

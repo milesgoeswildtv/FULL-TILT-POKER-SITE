@@ -2,6 +2,7 @@ import React from'react';
 import{Card}from'./TablePanels.jsx';
 import{assets,cardBackFor,chipFor}from'./assets.js';
 
+const CANVAS={w:710,h:1536};
 const TABLE={x:90,y:194,w:526,h:820};
 const SLOT_ANGLES={slot1:270,slot2:315,slot3:0,slot4:45,slot5:135,slot6:180,slot7:225};
 const SLOTS={
@@ -16,6 +17,7 @@ const SLOTS={
 const CENTER={board:{x:164,y:470,w:382,h:78},street:{x:230,y:409,w:250,h:54},pot:{x:275,y:564,w:160,h:74},sides:[{x:109,y:646,w:94,h:44},{x:210,y:646,w:94,h:44},{x:311,y:646,w:94,h:44},{x:412,y:646,w:94,h:44},{x:513,y:646,w:94,h:44}]};
 
 function rectStyle(r){return{left:`${((r.x-TABLE.x)/TABLE.w)*100}%`,top:`${((r.y-TABLE.y)/TABLE.h)*100}%`,width:`${(r.w/TABLE.w)*100}%`,height:`${(r.h/TABLE.h)*100}%`}}
+function tableStyle(){return{position:'absolute',left:`${TABLE.x/CANVAS.w*100}%`,top:`${TABLE.y/CANVAS.h*100}%`,width:`${TABLE.w/CANVAS.w*100}%`,height:`${TABLE.h/CANVAS.h*100}%`,minHeight:0,maxWidth:'none',maxHeight:'none',margin:0,padding:0,overflow:'visible',border:0,borderRadius:0,backgroundColor:'transparent',backgroundImage:`url("${assets.default.feltCashV2}")`,backgroundSize:'100% 100%',backgroundPosition:'center',backgroundRepeat:'no-repeat',boxShadow:'none',filter:'none',opacity:1,isolation:'isolate',zIndex:20,display:'block'}}
 function angleDiff(a,b){const d=Math.abs(a-b)%360;return Math.min(d,360-d)}
 function mapOpponents(players,me){
  const n=Math.max(1,players.length),hero=Math.max(0,me?players.findIndex(p=>p.id===me.id):0),opponents=players.map((player,index)=>({player,index,rel:(index-hero+n)%n})).filter(x=>x.rel!==0),free=new Set(Object.keys(SLOTS));
@@ -23,7 +25,7 @@ function mapOpponents(players,me){
 }
 function showdownWinners(state){if(state.street!=='showdown')return new Map();const wins=new Map();for(const award of state.lastResult?.awards||[])wins.set(award.playerId,(wins.get(award.playerId)||0)+Number(award.amount||0));return wins}
 
-function ApprovedSeat({entry,state,me,pos,turnLeft,winners}){
+function ApprovedSeat({entry,state,pos,turnLeft,winners}){
  const{player,index,slot}=entry,box=SLOTS[slot],won=winners.has(player.id),allIn=player.chips===0&&!player.eliminated&&state.started,isShowdown=state.street==='showdown',showCards=state.started&&!player.eliminated,values=isShowdown&&Array.isArray(player.cards)&&player.cards.some(Boolean)?player.cards.slice(0,2):['',''],back=cardBackFor(player),initials=player.testBot?'BOT':player.name.split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase();
  return <>
   <div className={`approvedCashSeat ${player.turn?'turn':''} ${player.folded?'folded':''} ${player.eliminated?'out':''} ${allIn?'allin':''} ${won?'winner':''}`} style={rectStyle(box.seat)} data-approved-slot={slot}>
@@ -37,9 +39,9 @@ function ApprovedSeat({entry,state,me,pos,turnLeft,winners}){
 
 export default function ApprovedCashFelt({state,finished,showdownLeft,pos,turnLeft,me}){
  const winners=showdownWinners(state),mapped=mapOpponents(state.players,me),isShowdown=state.street==='showdown',live=Array.isArray(state.livePots)?state.livePots:[],showSlices=!isShowdown&&live.length>1,displayPot=isShowdown?Number(state.lastResult?.settledPot||0):Number(state.pot||0);
- return <section className={`gameplayV2Felt approvedCashFelt ${isShowdown?'approvedShowdown':''}`} data-player-count={state.players.length} data-street={state.street}>
-  <img className="approvedCashFeltImage" src={assets.default.feltCashV2} alt=""/>
-  {mapped.map(entry=><ApprovedSeat key={entry.player.id} entry={entry} state={state} me={me} pos={pos} turnLeft={turnLeft} winners={winners}/>) }
+ return <section className={`approvedCashFelt ${isShowdown?'approvedShowdown':''}`} style={tableStyle()} data-player-count={state.players.length} data-street={state.street}>
+  <img className="approvedCashFeltImage" src={assets.default.feltCashV2} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'fill',objectPosition:'center',display:'block',zIndex:0,pointerEvents:'none',filter:'none',opacity:1,transform:'none'}}/>
+  {mapped.map(entry=><ApprovedSeat key={entry.player.id} entry={entry} state={state} pos={pos} turnLeft={turnLeft} winners={winners}/>) }
   <div className="approvedCashBoard" style={rectStyle(CENTER.board)}>{state.board.map((c,i)=><Card key={`${state.handNumber}-${i}`} c={c}/>)}</div>
   {state.started&&state.board.length===0&&!finished&&<div className="approvedCashStreet" style={rectStyle(CENTER.street)}>{state.paused?'Paused':'Pre-flop'}</div>}
   {!state.started&&!finished&&<div className="approvedCashStreet" style={rectStyle(CENTER.street)}>Waiting for host to start</div>}

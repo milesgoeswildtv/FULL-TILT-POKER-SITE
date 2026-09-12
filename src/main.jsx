@@ -1,6 +1,7 @@
 import React from'react';
 import{createRoot}from'react-dom/client';
 import App from'./App.jsx';
+import LayoutLab from'./LayoutLab.jsx';
 import TournamentConfig from'./TournamentConfig.jsx';
 import ActionLogPanel from'./ActionLogPanel.jsx';
 import TableChatDock from'./TableChatDock.jsx';
@@ -17,4 +18,7 @@ import'./cash-table-v2.css';
 import'./cash-table-v2-polish.css';
 import'./cash-table-v2-polish-v2.css';
 installSessionRouting();
-createRoot(document.getElementById('root')).render(<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>);
+const root=createRoot(document.getElementById('root'));
+function render(){const lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}
+addEventListener('hashchange',render);
+render();

@@ -1,0 +1,667 @@
+/* FULL TILT POKER — Gameplay V2
+   Mockup-1 direction: luxury mobile poker client, not a stacked webpage.
+   The backend/state engine stays intact; this file owns the live gameplay presentation. */
+
+.gameplayV2Page{
+  --v2-gold:#e5b94e;
+  --v2-gold-soft:#9f7427;
+  --v2-purple:#9c36ef;
+  --v2-purple-bright:#b740ff;
+  --v2-panel:rgba(13,8,18,.94);
+  --v2-panel-soft:rgba(22,12,29,.82);
+  --v2-line:rgba(142,82,163,.45);
+  --v2-text:#f4eef7;
+  --v2-muted:#9c8da5;
+}
+
+@media(max-width:760px){
+  .gameplayV2Page{
+    height:100dvh!important;
+    min-height:100dvh!important;
+    overflow:hidden!important;
+    padding:calc(env(safe-area-inset-top,0px) + 6px) 8px calc(env(safe-area-inset-bottom,0px) + 6px)!important;
+    display:grid!important;
+    grid-template-rows:112px minmax(0,1fr) 196px!important;
+    gap:4px!important;
+    background-color:#08050b!important;
+    background-image:linear-gradient(180deg,rgba(4,2,7,.05),rgba(5,3,8,.2)),var(--mobile-bg)!important;
+    background-position:center!important;
+    background-size:cover!important;
+  }
+
+  .gameplayV2Page>.productionInfoStrip,
+  .gameplayV2Page>.infoStrip{display:none!important}
+
+  /* ===== TOP HUD ===== */
+  .gameplayV2Page>.gameplayV2Topbar{
+    grid-row:1!important;
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    min-height:108px!important;
+    margin:0!important;
+    padding:8px 10px!important;
+    display:grid!important;
+    grid-template-columns:78px minmax(0,1fr) 92px!important;
+    align-items:start!important;
+    gap:8px!important;
+    border:1px solid rgba(116,66,129,.48)!important;
+    border-radius:22px!important;
+    background:linear-gradient(180deg,rgba(20,12,26,.96),rgba(8,6,12,.95))!important;
+    box-shadow:0 12px 34px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.025)!important;
+    backdrop-filter:blur(18px)!important;
+    z-index:40!important;
+  }
+  .gameplayV2Page .v2LobbyButton,
+  .gameplayV2Page .v2InviteButton{
+    min-height:42px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(113,68,126,.55)!important;
+    background:#100b16!important;
+    color:#eee6f1!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    letter-spacing:.04em!important;
+    box-shadow:none!important;
+  }
+  .gameplayV2Page .v2LobbyButton{display:flex!important;gap:4px!important;align-items:center!important;justify-content:center!important}
+  .gameplayV2Page .v2LobbyButton:first-letter{font-size:18px!important;color:#f1cf72!important}
+  .gameplayV2Page .v2InviteButton{border-color:rgba(212,163,54,.62)!important;color:#f4dc8a!important}
+
+  .gameplayV2Page .v2TableIdentity{
+    min-width:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    text-align:center!important;
+  }
+  .gameplayV2Page .v2TableIdentity>b{
+    color:#e8bd59!important;
+    font-size:13px!important;
+    line-height:1!important;
+    letter-spacing:.08em!important;
+    font-style:italic!important;
+    text-shadow:0 0 16px rgba(191,127,35,.24)!important;
+  }
+  .gameplayV2Page .v2TableIdentity>strong{
+    max-width:100%!important;
+    margin-top:7px!important;
+    color:#faf7fb!important;
+    font-size:10px!important;
+    letter-spacing:.13em!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .gameplayV2Page .v2TableMeta{
+    width:100%!important;
+    min-height:28px!important;
+    margin-top:7px!important;
+    padding:0 8px!important;
+    border:1px solid rgba(107,70,117,.35)!important;
+    border-radius:999px!important;
+    background:rgba(7,5,10,.56)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    color:#aaa0ae!important;
+    font-size:6.8px!important;
+    font-weight:700!important;
+    letter-spacing:.06em!important;
+    white-space:nowrap!important;
+  }
+  .gameplayV2Page .v2TableMeta i{width:2px!important;height:2px!important;border-radius:50%!important;background:#7f657f!important}
+  .gameplayV2Page .v2TableMeta .liveMeta{color:#7fe0ad!important}
+  .gameplayV2Page .v2TableMeta .reconnectMeta{color:#edb265!important}
+
+  .gameplayV2Page .v2TopActions{display:flex!important;flex-direction:column!important;gap:5px!important}
+  .gameplayV2Page .v2UtilityRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:4px!important}
+  .gameplayV2Page .v2UtilityRow button{
+    min-width:0!important;
+    height:37px!important;
+    padding:2px!important;
+    border:1px solid rgba(109,66,121,.55)!important;
+    border-radius:11px!important;
+    background:#0f0a14!important;
+    color:#d9cedf!important;
+    font-size:14px!important;
+    display:grid!important;
+    place-items:center!important;
+    gap:0!important;
+  }
+  .gameplayV2Page .v2UtilityRow button span{display:block!important;margin-top:-2px!important;font-size:4.8px!important;text-transform:uppercase!important;letter-spacing:.08em!important}
+  .gameplayV2Page .v2UtilityRow button.active{border-color:#a84cce!important;box-shadow:0 0 12px rgba(163,57,202,.22)!important}
+
+  /* ===== TABLE ===== */
+  .gameplayV2Page>.gameplayV2Felt{
+    grid-row:2!important;
+    align-self:center!important;
+    justify-self:center!important;
+    position:relative!important;
+    inset:auto!important;
+    width:min(94vw,520px)!important;
+    height:min(100%,540px)!important;
+    min-height:410px!important;
+    margin:0!important;
+    overflow:visible!important;
+    transform:none!important;
+    border-radius:50%/46%!important;
+    background-image:var(--felt-mobile)!important;
+    background-size:100% 100%!important;
+    background-position:center!important;
+    border:2px solid rgba(208,160,54,.82)!important;
+    box-shadow:0 0 0 7px rgba(27,15,30,.88),0 0 0 9px rgba(169,121,35,.55),0 18px 40px rgba(0,0,0,.55),0 0 40px rgba(105,31,136,.14)!important;
+    isolation:isolate!important;
+  }
+  .gameplayV2Page>.gameplayV2Felt:before{
+    content:""!important;
+    position:absolute!important;
+    inset:7%!important;
+    border-radius:50%!important;
+    border:1px solid rgba(215,173,72,.14)!important;
+    pointer-events:none!important;
+    z-index:1!important;
+  }
+  .gameplayV2Page .v2FeltBrand{
+    position:absolute!important;
+    left:50%!important;
+    top:28%!important;
+    transform:translate(-50%,-50%)!important;
+    z-index:2!important;
+    text-align:center!important;
+    pointer-events:none!important;
+    opacity:.55!important;
+  }
+  .gameplayV2Page .v2FeltBrand b{display:block!important;color:#d8a749!important;font-size:23px!important;line-height:.9!important;font-style:italic!important;letter-spacing:-.04em!important;text-shadow:0 4px 18px rgba(0,0,0,.55)!important}
+  .gameplayV2Page .v2FeltBrand span{display:block!important;margin-top:5px!important;color:#a98b66!important;font-size:5px!important;letter-spacing:.28em!important}
+
+  /* ===== OPPONENT SEATS ===== */
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot{
+    position:absolute!important;
+    left:var(--mobile-seat-x)!important;
+    top:var(--mobile-seat-y)!important;
+    width:0!important;
+    height:0!important;
+    z-index:12!important;
+    pointer-events:none!important;
+  }
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot.heroSlot{display:none!important}
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.seatPlate{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    width:92px!important;
+    height:42px!important;
+    min-height:42px!important;
+    padding:5px 7px 5px 35px!important;
+    transform:translate(-50%,-50%)!important;
+    border:1px solid rgba(212,166,60,.72)!important;
+    border-radius:14px!important;
+    background:linear-gradient(150deg,rgba(18,12,23,.93),rgba(7,5,10,.92))!important;
+    box-shadow:0 5px 15px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.025)!important;
+    backdrop-filter:blur(10px)!important;
+    display:block!important;
+    overflow:visible!important;
+    pointer-events:auto!important;
+  }
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.seatPlate.turn{
+    transform:translate(-50%,-50%)!important;
+    border-color:#e8bd59!important;
+    box-shadow:0 0 0 1px rgba(232,189,89,.35),0 0 20px rgba(177,66,232,.34),0 5px 15px rgba(0,0,0,.55)!important;
+    animation:none!important;
+  }
+  .gameplayV2Page .v2SeatAvatar{
+    position:absolute!important;
+    left:-7px!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    width:37px!important;
+    height:37px!important;
+    border-radius:50%!important;
+    border:2px solid #be9142!important;
+    background:radial-gradient(circle at 40% 30%,#4a265a,#160d1c 62%,#08050a)!important;
+    box-shadow:0 0 0 3px #160e1d,0 4px 12px rgba(0,0,0,.48)!important;
+    display:grid!important;
+    place-items:center!important;
+    color:#dbc6e1!important;
+    font-size:8px!important;
+    font-weight:900!important;
+    overflow:hidden!important;
+  }
+  .gameplayV2Page .v2SeatText{
+    width:100%!important;
+    height:100%!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    text-align:left!important;
+    min-width:0!important;
+  }
+  .gameplayV2Page .v2SeatText>b{
+    max-width:53px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    color:#f5eef6!important;
+    font-size:8.4px!important;
+    line-height:1!important;
+    letter-spacing:.01em!important;
+  }
+  .gameplayV2Page .v2SeatText>.seatStack{
+    margin-top:4px!important;
+    color:#f0c859!important;
+    font-size:10.5px!important;
+    font-weight:900!important;
+    line-height:1!important;
+  }
+  .gameplayV2Page .seatPlate em{position:absolute!important;right:5px!important;bottom:-10px!important;padding:2px 5px!important;border-radius:999px!important;background:#3a1135!important;color:#ffb5e9!important;font-size:5px!important;font-style:normal!important;letter-spacing:.08em!important}
+  .gameplayV2Page .positionBadge{
+    position:absolute!important;
+    right:-10px!important;
+    bottom:-13px!important;
+    left:auto!important;
+    top:auto!important;
+    transform:none!important;
+    min-width:20px!important;
+    height:20px!important;
+    padding:0 4px!important;
+    border-radius:999px!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid rgba(217,176,77,.8)!important;
+    background:#100b13!important;
+    color:#f4d981!important;
+    font-size:6px!important;
+    font-weight:900!important;
+    z-index:6!important;
+  }
+  .gameplayV2Page .turnClock{
+    position:absolute!important;
+    left:50%!important;
+    bottom:-15px!important;
+    transform:translateX(-50%)!important;
+    min-width:28px!important;
+    height:12px!important;
+    padding:0 5px!important;
+    border-radius:999px!important;
+    background:#15101a!important;
+    border:1px solid rgba(180,136,52,.65)!important;
+    color:#e8c75d!important;
+    font-size:5px!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+
+  /* Cards stay visually attached to the seat. Near-hero seats get a little extra room. */
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.v2SeatCards{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-27px),calc(var(--seat-dy)*-25px))!important;
+    z-index:10!important;
+    display:flex!important;
+    gap:1px!important;
+    pointer-events:none!important;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.72))!important;
+  }
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot.nearHeroSlot>.v2SeatCards{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-38px),calc(var(--seat-dy)*-34px))!important;
+  }
+  .gameplayV2Page .v2SeatCards .card{
+    width:21px!important;
+    height:30px!important;
+    min-width:21px!important;
+    min-height:30px!important;
+    max-width:21px!important;
+    max-height:30px!important;
+    padding:2px!important;
+    border-radius:4px!important;
+    font-size:6px!important;
+    border-width:1px!important;
+  }
+  .gameplayV2Page .v2SeatCards .card+.card{margin-left:-5px!important}
+
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.v2TableBet{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-64px),calc(var(--seat-dy)*-56px))!important;
+    z-index:8!important;
+    min-width:29px!important;
+    height:18px!important;
+    padding:2px 5px!important;
+    border-radius:999px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    border:1px solid rgba(207,161,56,.64)!important;
+    background:rgba(12,8,15,.92)!important;
+    box-shadow:0 3px 8px rgba(0,0,0,.5)!important;
+    color:#e9c765!important;
+    font-size:6px!important;
+    font-weight:900!important;
+  }
+  .gameplayV2Page .v2TableBet .miniChipArt{width:10px!important;height:10px!important;object-fit:contain!important}
+  .gameplayV2Page .foldedSlot{opacity:.32!important}
+  .gameplayV2Page .outSlot{display:none!important}
+
+  /* ===== CENTER PLAY AREA ===== */
+  .gameplayV2Page .gameplayV2Felt>.board{
+    position:absolute!important;
+    left:50%!important;
+    top:48%!important;
+    transform:translate(-50%,-50%)!important;
+    width:auto!important;
+    display:flex!important;
+    gap:4px!important;
+    z-index:7!important;
+  }
+  .gameplayV2Page .gameplayV2Felt>.board .card{
+    width:49px!important;
+    height:68px!important;
+    min-width:49px!important;
+    min-height:68px!important;
+    max-width:49px!important;
+    max-height:68px!important;
+    padding:6px!important;
+    border-radius:8px!important;
+    font-size:15px!important;
+    box-shadow:0 6px 12px rgba(0,0,0,.34)!important;
+  }
+  .gameplayV2Page .gameplayV2Felt>.board .waiting{
+    padding:8px 13px!important;
+    border-radius:999px!important;
+    border:1px solid rgba(114,68,126,.45)!important;
+    background:rgba(9,6,12,.76)!important;
+    color:#c5b7cb!important;
+    font-size:8px!important;
+  }
+
+  .gameplayV2Page .v2PotCluster{
+    position:absolute!important;
+    left:50%!important;
+    top:67%!important;
+    transform:translateX(-50%)!important;
+    width:180px!important;
+    z-index:7!important;
+    display:grid!important;
+    justify-items:center!important;
+    gap:5px!important;
+  }
+  .gameplayV2Page .v2PotCluster>.productionPotArt{display:none!important}
+  .gameplayV2Page .v2PotCluster>.pot{
+    min-width:106px!important;
+    min-height:34px!important;
+    padding:4px 12px!important;
+    border:1px solid rgba(220,174,58,.76)!important;
+    border-radius:999px!important;
+    background:linear-gradient(180deg,rgba(29,17,31,.94),rgba(10,7,13,.94))!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    color:#e7c66c!important;
+    box-shadow:0 6px 14px rgba(0,0,0,.4)!important;
+  }
+  .gameplayV2Page .v2PotCluster>.pot small{font-size:6px!important;letter-spacing:.14em!important;color:#bc9c58!important}
+  .gameplayV2Page .v2PotCluster>.pot b{font-size:15px!important;line-height:1!important}
+  .gameplayV2Page .v2PotCluster>.sidePots{display:flex!important;justify-content:center!important;gap:4px!important}
+  .gameplayV2Page .v2PotCluster .potSlice{
+    min-width:48px!important;
+    min-height:28px!important;
+    padding:4px 5px!important;
+    border:1px solid rgba(130,73,150,.6)!important;
+    border-radius:10px!important;
+    background:rgba(13,8,17,.9)!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+  .gameplayV2Page .v2PotCluster .potSlice small{font-size:4.7px!important;color:#9f8ca5!important;letter-spacing:.08em!important}
+  .gameplayV2Page .v2PotCluster .potSlice b{font-size:8px!important;color:#e9ca72!important}
+
+  /* ===== HERO + ACTIONS ===== */
+  .gameplayV2Page>.gameplayV2Hud{
+    grid-row:3!important;
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    height:192px!important;
+    margin:0!important;
+    padding:0!important;
+    transform:none!important;
+    background:transparent!important;
+    border:none!important;
+    box-shadow:none!important;
+    z-index:50!important;
+    overflow:visible!important;
+  }
+  .gameplayV2Page .gameplayV2Hud>.status{display:none!important}
+  .gameplayV2Page .gameplayV2Hud>.holeWrap{
+    position:absolute!important;
+    left:50%!important;
+    top:-86px!important;
+    transform:translateX(-50%)!important;
+    width:145px!important;
+    min-height:96px!important;
+    z-index:4!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    pointer-events:none!important;
+  }
+  .gameplayV2Page .gameplayV2Hud .hole{display:flex!important;justify-content:center!important;gap:3px!important;filter:drop-shadow(0 7px 8px rgba(0,0,0,.48))!important}
+  .gameplayV2Page .gameplayV2Hud .hole .card{
+    width:50px!important;
+    height:70px!important;
+    min-width:50px!important;
+    min-height:70px!important;
+    max-width:50px!important;
+    max-height:70px!important;
+    padding:6px!important;
+    border-radius:8px!important;
+    font-size:14px!important;
+  }
+  .gameplayV2Page .v2HeroIdentity{
+    margin-top:-4px!important;
+    min-width:116px!important;
+    min-height:38px!important;
+    padding:5px 11px 5px 42px!important;
+    border:1px solid rgba(219,173,59,.78)!important;
+    border-radius:14px!important;
+    background:linear-gradient(150deg,rgba(21,13,26,.98),rgba(8,6,11,.97))!important;
+    box-shadow:0 5px 14px rgba(0,0,0,.5)!important;
+    position:relative!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+  .gameplayV2Page .v2HeroCrown{
+    position:absolute!important;
+    left:8px!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    width:28px!important;
+    height:28px!important;
+    border-radius:50%!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid #c89435!important;
+    background:#291708!important;
+    color:#f0c958!important;
+    font-size:15px!important;
+  }
+  .gameplayV2Page .v2HeroIdentity div{display:flex!important;flex-direction:column!important;text-align:left!important}
+  .gameplayV2Page .v2HeroIdentity small{font-size:6px!important;color:#ede5ef!important;letter-spacing:.12em!important}
+  .gameplayV2Page .v2HeroIdentity b{margin-top:2px!important;color:#f1cc64!important;font-size:12px!important;line-height:1!important}
+  .gameplayV2Page .gameplayV2Hud .handStrength{
+    margin-top:3px!important;
+    min-width:68px!important;
+    padding:2px 8px!important;
+    border-radius:999px!important;
+    border:1px solid rgba(205,158,54,.62)!important;
+    background:#100b13!important;
+    color:#e9cb72!important;
+    font-size:6px!important;
+    letter-spacing:.13em!important;
+    text-transform:uppercase!important;
+  }
+
+  .gameplayV2Page .gameplayV2Hud>.actions{
+    position:absolute!important;
+    inset:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  .gameplayV2Page .v2ActionDock{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:188px!important;
+    padding:12px 10px 10px!important;
+    border:1px solid rgba(217,172,57,.72)!important;
+    border-radius:20px!important;
+    background:linear-gradient(180deg,rgba(17,10,22,.97),rgba(7,5,10,.98))!important;
+    box-shadow:0 14px 30px rgba(0,0,0,.56),inset 0 1px 0 rgba(255,255,255,.025)!important;
+    backdrop-filter:blur(18px)!important;
+  }
+  .gameplayV2Page .v2ActionDock>.actionRow{
+    height:103px!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  .gameplayV2Page .v2ActionDock>.actionRow>button{
+    min-width:0!important;
+    height:100%!important;
+    padding:8px 4px!important;
+    border-radius:15px!important;
+    border:1px solid rgba(95,57,108,.72)!important;
+    background:linear-gradient(180deg,#211328,#120b18)!important;
+    color:#f4eef5!important;
+    font-size:13px!important;
+    font-weight:900!important;
+    letter-spacing:.02em!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    box-shadow:none!important;
+  }
+  .gameplayV2Page .v2ActionDock .foldAction{color:#d6cad8!important;background:linear-gradient(180deg,#171019,#0d0910)!important}
+  .gameplayV2Page .v2ActionDock .checkCallAction{background:linear-gradient(180deg,#25152d,#150c1c)!important}
+  .gameplayV2Page .v2ActionDock .raiseAction{
+    border-color:#a94bdb!important;
+    background:linear-gradient(145deg,#7d26d6,#b63ce3)!important;
+    box-shadow:0 0 22px rgba(159,50,220,.3)!important;
+  }
+  .gameplayV2Page .v2ActionDock .allin{
+    border-color:#d7a63d!important;
+    background:linear-gradient(145deg,#4d3407,#8b6417)!important;
+    color:#ffe6a0!important;
+    box-shadow:0 0 18px rgba(186,130,25,.22)!important;
+  }
+  .gameplayV2Page .v2ActionDock .actionCost{font-size:7px!important;font-weight:700!important;color:rgba(255,255,255,.76)!important}
+  .gameplayV2Page .v2RaiseControls{
+    height:55px!important;
+    margin-top:8px!important;
+    padding:7px 8px!important;
+    border:1px solid rgba(93,58,104,.45)!important;
+    border-radius:13px!important;
+    background:rgba(8,6,11,.7)!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    gap:8px!important;
+    align-items:center!important;
+  }
+  .gameplayV2Page .v2SliderRow{display:grid!important;grid-template-columns:auto 1fr!important;gap:8px!important;align-items:center!important}
+  .gameplayV2Page .v2SliderRow span{font-size:7px!important;color:#a99bab!important;white-space:nowrap!important}
+  .gameplayV2Page .v2SliderRow b{color:#f0d06f!important}
+  .gameplayV2Page .v2SliderRow input[type="range"]{width:100%!important;accent-color:#a92fe8!important}
+  .gameplayV2Page .v2QuickBets{display:grid!important;grid-template-columns:repeat(4,33px)!important;gap:4px!important}
+  .gameplayV2Page .v2QuickBets button{
+    height:29px!important;
+    min-width:0!important;
+    padding:0!important;
+    border:1px solid rgba(104,65,117,.62)!important;
+    border-radius:8px!important;
+    background:#15101a!important;
+    color:#d8cbdc!important;
+    font-size:6.5px!important;
+  }
+  .gameplayV2Page .v2HostControls{
+    position:absolute!important;
+    right:8px!important;
+    top:-32px!important;
+    display:flex!important;
+    gap:5px!important;
+    z-index:5!important;
+  }
+  .gameplayV2Page .v2HostControls button{height:26px!important;padding:0 9px!important;border-radius:999px!important;font-size:6px!important;background:rgba(13,8,17,.9)!important}
+
+  /* ===== DRAWERS ===== */
+  .gameplayV2Page>.belowTable{
+    position:fixed!important;
+    left:10px!important;
+    right:10px!important;
+    bottom:calc(200px + env(safe-area-inset-bottom,0px))!important;
+    z-index:70!important;
+    pointer-events:none!important;
+    display:flex!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+  }
+  .gameplayV2Page>.belowTable:empty{display:none!important}
+  .gameplayV2Page>.belowTable>*{pointer-events:auto!important}
+  .gameplayV2Page .chatPanel,
+  .gameplayV2Page .historyPanel,
+  .gameplayV2Page .statsPanel{
+    width:min(92vw,360px)!important;
+    max-height:48dvh!important;
+    overflow:auto!important;
+    border-radius:18px!important;
+    border:1px solid rgba(121,70,137,.62)!important;
+    background:rgba(12,8,16,.97)!important;
+    box-shadow:0 18px 40px rgba(0,0,0,.62)!important;
+    backdrop-filter:blur(20px)!important;
+  }
+
+  .gameplayV2Page .spectatorRibbon{position:fixed!important;top:118px!important;left:50%!important;transform:translateX(-50%)!important;z-index:60!important}
+  .gameplayV2Page>.mttFieldBar,
+  .gameplayV2Page>.mttHostBar{position:fixed!important;z-index:60!important}
+}
+
+@media(max-width:430px){
+  .gameplayV2Page{grid-template-rows:106px minmax(0,1fr) 188px!important;padding-left:6px!important;padding-right:6px!important}
+  .gameplayV2Page>.gameplayV2Topbar{grid-template-columns:68px minmax(0,1fr) 82px!important;padding:7px!important;border-radius:18px!important}
+  .gameplayV2Page .v2LobbyButton,.gameplayV2Page .v2InviteButton{font-size:8.5px!important;padding:0 5px!important}
+  .gameplayV2Page .v2TableIdentity>b{font-size:11.5px!important}
+  .gameplayV2Page .v2TableIdentity>strong{font-size:8.8px!important}
+  .gameplayV2Page .v2TableMeta{padding:0 5px!important;gap:4px!important;font-size:5.8px!important}
+  .gameplayV2Page>.gameplayV2Felt{width:min(95vw,460px)!important;min-height:390px!important}
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.seatPlate{width:84px!important;height:39px!important;min-height:39px!important;padding-left:32px!important}
+  .gameplayV2Page .v2SeatAvatar{width:34px!important;height:34px!important}
+  .gameplayV2Page .v2SeatText>b{max-width:48px!important;font-size:7.7px!important}
+  .gameplayV2Page .v2SeatText>.seatStack{font-size:9.7px!important}
+  .gameplayV2Page .gameplayV2Felt>.board .card{width:43px!important;height:61px!important;min-width:43px!important;min-height:61px!important;max-width:43px!important;max-height:61px!important;font-size:13px!important}
+  .gameplayV2Page .v2FeltBrand b{font-size:20px!important}
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.v2SeatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-24px),calc(var(--seat-dy)*-22px))!important}
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot.nearHeroSlot>.v2SeatCards{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-35px),calc(var(--seat-dy)*-31px))!important}
+  .gameplayV2Page .gameplayV2Felt>.v2SeatSlot>.v2TableBet{transform:translate(-50%,-50%) translate(calc(var(--seat-dx)*-58px),calc(var(--seat-dy)*-51px))!important}
+  .gameplayV2Page>.gameplayV2Hud{height:184px!important}
+  .gameplayV2Page .v2ActionDock{height:180px!important;padding:10px 8px 8px!important}
+  .gameplayV2Page .v2ActionDock>.actionRow{height:99px!important;gap:5px!important}
+  .gameplayV2Page .v2ActionDock>.actionRow>button{font-size:12px!important;border-radius:13px!important}
+  .gameplayV2Page .v2RaiseControls{height:53px!important;margin-top:7px!important;padding:6px!important}
+  .gameplayV2Page .v2QuickBets{grid-template-columns:repeat(4,30px)!important;gap:3px!important}
+  .gameplayV2Page .gameplayV2Hud>.holeWrap{top:-80px!important}
+  .gameplayV2Page .gameplayV2Hud .hole .card{width:47px!important;height:66px!important;min-width:47px!important;min-height:66px!important;max-width:47px!important;max-height:66px!important}
+}
+
+@media(min-width:761px){
+  .gameplayV2Page>.gameplayV2Topbar{max-width:1160px!important;margin:12px auto 8px!important}
+  .gameplayV2Page>.gameplayV2Felt{margin:0 auto!important}
+  .gameplayV2Page .v2SeatText>.seatStack{font-weight:900!important}
+}

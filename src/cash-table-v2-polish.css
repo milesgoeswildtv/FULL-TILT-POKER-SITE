@@ -1,0 +1,217 @@
+/* FULL TILT POKER — Cash Table V2 polish pass
+   Tuned against iPhone screenshots using TABLE FELT V2.PNG as the locked base. */
+
+@media(max-width:760px){
+  .cashTableV2Page{
+    grid-template-rows:82px minmax(0,1fr) 214px!important;
+  }
+
+  /* Keep the cash V2 class stable and make the header impossible to disappear. */
+  .cashTableV2Page>.gameplayV2Topbar{
+    height:82px!important;
+    min-height:82px!important;
+    display:grid!important;
+    grid-template-columns:68px minmax(0,1fr) 82px!important;
+    align-items:center!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+  .cashTableV2Page .v2TableIdentity{
+    display:grid!important;
+    justify-items:center!important;
+    align-content:center!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+  .cashTableV2Page .v2TopLogo{
+    display:block!important;
+    width:min(128px,33vw)!important;
+    height:24px!important;
+    margin:0 0 2px!important;
+    object-fit:contain!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+  .cashTableV2Page .v2TableIdentity>strong,
+  .cashTableV2Page .v2TableMeta,
+  .cashTableV2Page .v2TopActions,
+  .cashTableV2Page .v2InviteButton{visibility:visible!important;opacity:1!important}
+
+  /* Pregame should not become a second giant page above the table. */
+  .cashTableV2Page>.pregameRoom{display:none!important}
+
+  /* Felt stays centered, with no legacy border/shape treatment. */
+  .cashTableV2Page>.gameplayV2Felt{
+    align-self:center!important;
+    justify-self:center!important;
+    width:min(88vw,520px)!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:100%!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background-image:var(--felt-cash-v2)!important;
+    background-size:100% 100%!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  /* Seat anchors: keep plaques on the rail but safely inside the viewport. */
+  .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot){
+    left:calc(50% + (var(--seat-dx) * 40.5%))!important;
+    top:calc(50% + (var(--seat-dy) * 42.5%))!important;
+  }
+  .cashTableV2Page .gameplayV2Felt .seat.productionSeat:not(.heroSeat){
+    width:84px!important;
+    min-height:40px!important;
+    height:40px!important;
+    padding:4px 5px 4px 29px!important;
+    border-radius:12px!important;
+  }
+  .cashTableV2Page .v2SeatAvatar{
+    left:-7px!important;
+    width:33px!important;
+    height:33px!important;
+  }
+  .cashTableV2Page .v2SeatText>b{max-width:48px!important;font-size:7.1px!important}
+  .cashTableV2Page .v2SeatText>.seatStack{font-size:10.3px!important}
+
+  /* Cards live tight under the plaque; bets get the next lane inward. */
+  .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot)>.v2SeatCards{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx) * -21px),calc(var(--seat-dy) * -21px))!important;
+  }
+  .cashTableV2Page .v2SeatCards .card{
+    width:17px!important;
+    min-width:17px!important;
+    height:24px!important;
+    min-height:24px!important;
+  }
+  .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot)>.v2TableBet{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx) * -48px),calc(var(--seat-dy) * -48px))!important;
+  }
+
+  /* Board + pot get the clean visual middle. */
+  .cashTableV2Page .gameplayV2Felt>.board{top:48.5%!important}
+  .cashTableV2Page .gameplayV2Felt>.board .card{
+    width:36px!important;
+    min-width:36px!important;
+    height:52px!important;
+    min-height:52px!important;
+    gap:0!important;
+  }
+  .cashTableV2Page .gameplayV2Felt>.v2PotCluster{top:61.5%!important}
+
+  /* Hero HUD: cards float above a dock that starts clearly below them. */
+  .cashTableV2Page>.gameplayV2Hud{
+    height:214px!important;
+    min-height:214px!important;
+  }
+  .cashTableV2Page .gameplayV2Hud>.holeWrap{
+    top:-78px!important;
+    z-index:60!important;
+  }
+  .cashTableV2Page .gameplayV2Hud .hole .card{
+    width:40px!important;
+    min-width:40px!important;
+    height:57px!important;
+    min-height:57px!important;
+  }
+  .cashTableV2Page .v2HeroIdentity{
+    min-width:108px!important;
+    height:34px!important;
+    margin-top:2px!important;
+  }
+  .cashTableV2Page .handStrength{margin-top:3px!important}
+
+  /* The action bar is a strict 4-column control strip. Kill every inherited grid/span rule. */
+  .cashTableV2Page .gameplayV2Hud>.actions{
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:auto!important;
+  }
+  .cashTableV2Page .v2ActionDock{
+    width:100%!important;
+    min-height:158px!important;
+    padding:9px!important;
+    border-radius:18px!important;
+  }
+  .cashTableV2Page .v2ActionDock .actionRow{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-auto-flow:column!important;
+    gap:6px!important;
+    width:100%!important;
+    margin:0!important;
+  }
+  .cashTableV2Page .v2ActionDock .actionRow>button,
+  .cashTableV2Page .v2ActionDock .actionRow>.foldAction,
+  .cashTableV2Page .v2ActionDock .actionRow>.checkCallAction,
+  .cashTableV2Page .v2ActionDock .actionRow>.raiseAction,
+  .cashTableV2Page .v2ActionDock .actionRow>.allin{
+    position:relative!important;
+    inset:auto!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:66px!important;
+    min-height:66px!important;
+    margin:0!important;
+    padding:5px 3px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    line-height:1.05!important;
+  }
+  .cashTableV2Page .v2RaiseControls{
+    margin-top:8px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:6px!important;
+  }
+
+  /* Host controls sit above the dock, never inside the decision row. */
+  .cashTableV2Page .v2HostControls{
+    right:8px!important;
+    top:-34px!important;
+  }
+
+  /* Utility pills align beside the hero, above the action dock. */
+  #root:has(.cashTableV2Page) .tableChatDockButton{
+    left:12px!important;
+    bottom:220px!important;
+    width:78px!important;
+    height:38px!important;
+  }
+  #root:has(.cashTableV2Page) .actionLogDock{
+    right:12px!important;
+    bottom:220px!important;
+  }
+  #root:has(.cashTableV2Page) .actionLogToggle{
+    height:38px!important;
+    min-width:90px!important;
+  }
+
+  /* Pregame host controls get one compact bottom bar. */
+  .cashTableV2Page .gameplayV2Hud .hostControls:not(.v2HostControls){
+    min-height:72px!important;
+    padding:8px!important;
+  }
+  .cashTableV2Page .gameplayV2Hud .hostControls:not(.v2HostControls)>button{min-height:50px!important}
+}
+
+@media(max-width:390px){
+  .cashTableV2Page{grid-template-rows:78px minmax(0,1fr) 206px!important}
+  .cashTableV2Page>.gameplayV2Topbar{height:78px!important;min-height:78px!important}
+  .cashTableV2Page>.gameplayV2Felt{width:min(86vw,500px)!important}
+  .cashTableV2Page>.gameplayV2Hud{height:206px!important;min-height:206px!important}
+  .cashTableV2Page .gameplayV2Hud>.holeWrap{top:-74px!important}
+  #root:has(.cashTableV2Page) .tableChatDockButton,
+  #root:has(.cashTableV2Page) .actionLogDock{bottom:212px!important}
+}

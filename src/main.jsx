@@ -17,6 +17,7 @@ import'./gameplay-v2-art.css';
 import'./cash-table-v2.css';
 import'./cash-table-v2-polish.css';
 import'./cash-table-v2-polish-v2.css';
+import'./cash-table-approved-layout.css';
 installSessionRouting();
 const root=createRoot(document.getElementById('root'));
 function render(){const lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}

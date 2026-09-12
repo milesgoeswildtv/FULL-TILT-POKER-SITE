@@ -1,0 +1,288 @@
+{
+  "viewport": {
+    "width": 710,
+    "height": 1536
+  },
+  "elements": {
+    "table": {
+      "x": 90,
+      "y": 194,
+      "w": 526,
+      "h": 820,
+      "type": "table"
+    },
+    "seat1": {
+      "x": 282,
+      "y": 208,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "Tilt Gremlin",
+      "stack": "2,480"
+    },
+    "cards1": {
+      "x": 373,
+      "y": 237,
+      "w": 43,
+      "h": 20,
+      "type": "backs"
+    },
+    "bet1": {
+      "x": 324,
+      "y": 291,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "20"
+    },
+    "seat2": {
+      "x": 521,
+      "y": 328,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "Bad Beat",
+      "stack": "2,480"
+    },
+    "cards2": {
+      "x": 607,
+      "y": 352,
+      "w": 48,
+      "h": 36,
+      "type": "backs"
+    },
+    "bet2": {
+      "x": 452,
+      "y": 368,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "20"
+    },
+    "seat3": {
+      "x": 561,
+      "y": 543,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "Pocket Trash",
+      "stack": "2,480"
+    },
+    "cards3": {
+      "x": 648,
+      "y": 570,
+      "w": 48,
+      "h": 36,
+      "type": "backs"
+    },
+    "bet3": {
+      "x": 491,
+      "y": 565,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "40"
+    },
+    "seat4": {
+      "x": 551,
+      "y": 707,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "Shove More",
+      "stack": "2,420"
+    },
+    "cards4": {
+      "x": 635,
+      "y": 738,
+      "w": 48,
+      "h": 36,
+      "type": "backs"
+    },
+    "bet4": {
+      "x": 472,
+      "y": 713,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "40"
+    },
+    "seat5": {
+      "x": 17,
+      "y": 707,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "Muck Rat",
+      "stack": "2,460"
+    },
+    "cards5": {
+      "x": 104,
+      "y": 733,
+      "w": 48,
+      "h": 36,
+      "type": "backs"
+    },
+    "bet5": {
+      "x": 186,
+      "y": 718,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "20"
+    },
+    "seat6": {
+      "x": 15,
+      "y": 543,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "River Goblin",
+      "stack": "2,480"
+    },
+    "cards6": {
+      "x": 101,
+      "y": 570,
+      "w": 48,
+      "h": 36,
+      "type": "backs"
+    },
+    "bet6": {
+      "x": 164,
+      "y": 570,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "10"
+    },
+    "seat7": {
+      "x": 52,
+      "y": 328,
+      "w": 132,
+      "h": 52,
+      "type": "seat",
+      "name": "Call Station",
+      "stack": "2,460"
+    },
+    "cards7": {
+      "x": 136,
+      "y": 358,
+      "w": 48,
+      "h": 36,
+      "type": "backs"
+    },
+    "bet7": {
+      "x": 196,
+      "y": 368,
+      "w": 54,
+      "h": 30,
+      "type": "bet",
+      "text": "20"
+    },
+    "board": {
+      "x": 164,
+      "y": 470,
+      "w": 382,
+      "h": 78,
+      "type": "board"
+    },
+    "street": {
+      "x": 230,
+      "y": 409,
+      "w": 250,
+      "h": 54,
+      "type": "street"
+    },
+    "pot": {
+      "x": 275,
+      "y": 564,
+      "w": 160,
+      "h": 74,
+      "type": "pot"
+    },
+    "side1": {
+      "x": 109,
+      "y": 646,
+      "w": 94,
+      "h": 44,
+      "type": "side",
+      "text": "Main 80"
+    },
+    "side2": {
+      "x": 210,
+      "y": 646,
+      "w": 94,
+      "h": 44,
+      "type": "side",
+      "text": "Side 1 70"
+    },
+    "side3": {
+      "x": 311,
+      "y": 646,
+      "w": 94,
+      "h": 44,
+      "type": "side",
+      "text": "Side 2 120"
+    },
+    "side4": {
+      "x": 412,
+      "y": 646,
+      "w": 94,
+      "h": 44,
+      "type": "side",
+      "text": "Side 3 60"
+    },
+    "side5": {
+      "x": 513,
+      "y": 646,
+      "w": 94,
+      "h": 44,
+      "type": "side",
+      "text": "Side 4 40"
+    },
+    "heroCards": {
+      "x": 298,
+      "y": 920,
+      "w": 114,
+      "h": 78,
+      "type": "heroCards"
+    },
+    "heroRank": {
+      "x": 290,
+      "y": 1000,
+      "w": 130,
+      "h": 30,
+      "type": "rank"
+    },
+    "heroSeat": {
+      "x": 270,
+      "y": 1036,
+      "w": 170,
+      "h": 62,
+      "type": "hero"
+    },
+    "chat": {
+      "x": 18,
+      "y": 1065,
+      "w": 120,
+      "h": 62,
+      "type": "pill",
+      "text": "CHAT"
+    },
+    "handLog": {
+      "x": 572,
+      "y": 1065,
+      "w": 120,
+      "h": 62,
+      "type": "pill",
+      "text": "HAND LOG"
+    },
+    "dock": {
+      "x": 18,
+      "y": 1142,
+      "w": 674,
+      "h": 365,
+      "type": "dock"
+    }
+  }
+}

@@ -15,5 +15,6 @@ import'./gameplay-v2-rebuild.css';
 import'./gameplay-v2-art.css';
 import'./cash-table-v2.css';
 import'./cash-table-v2-polish.css';
+import'./cash-table-v2-polish-v2.css';
 installSessionRouting();
 createRoot(document.getElementById('root')).render(<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>);

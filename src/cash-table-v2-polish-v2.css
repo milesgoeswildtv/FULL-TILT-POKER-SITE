@@ -1,0 +1,190 @@
+/* FULL TILT POKER — Cash Table V2 screenshot pass 2
+   Aggressive mobile cleanup after live iPhone validation. */
+
+@media(max-width:760px){
+  /* Route-level selector so pregame can never resurrect the legacy staging block. */
+  html.cash-table-v2-route #root .pregameRoom{
+    display:none!important;
+    visibility:hidden!important;
+    width:0!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  /* Cleaner, shorter header. The mobile logo file is an icon, so use a readable wordmark here. */
+  html.cash-table-v2-route #root .cashTableV2Page{
+    grid-template-rows:76px minmax(0,1fr) 210px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Topbar{
+    height:76px!important;
+    min-height:76px!important;
+    grid-template-columns:62px minmax(0,1fr) 80px!important;
+    padding:6px 7px!important;
+    border-radius:20px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2TopLogo{display:none!important}
+  html.cash-table-v2-route #root .cashTableV2Page .v2TableIdentity:before{
+    content:'FULL TILT POKER';
+    display:block;
+    color:#e2b957;
+    font-size:10px;
+    line-height:1;
+    font-weight:950;
+    font-style:italic;
+    letter-spacing:.06em;
+    text-shadow:0 2px 10px #000b;
+    margin-bottom:4px;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2TableIdentity>strong{
+    font-size:8.5px!important;
+    letter-spacing:.12em!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2TableMeta{
+    margin-top:3px!important;
+    min-height:0!important;
+    padding:0!important;
+    border:0!important;
+    background:none!important;
+    gap:3px!important;
+    color:#b7a9bb!important;
+    font-size:6.2px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2TableMeta i{opacity:.55!important}
+
+  /* Felt stays the one coordinate system. */
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Felt{
+    width:min(90vw,520px)!important;
+    max-width:none!important;
+    background-image:var(--felt-cash-v2)!important;
+    background-size:contain!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+  }
+
+  /* Pull the side seats in. 40.5% was still putting plaques offscreen. */
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot){
+    left:calc(50% + (var(--seat-dx) * 34.5%))!important;
+    top:calc(50% + (var(--seat-dy) * 40.5%))!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt .seat.productionSeat:not(.heroSeat){
+    width:80px!important;
+    min-height:38px!important;
+    height:38px!important;
+    padding:3px 5px 3px 27px!important;
+    border-radius:12px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2SeatAvatar{
+    left:-6px!important;
+    width:31px!important;
+    height:31px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2SeatText>b{
+    max-width:45px!important;
+    font-size:6.8px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2SeatText>.seatStack{
+    font-size:10px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot)>.v2SeatCards{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx) * -17px),calc(var(--seat-dy) * -17px))!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2SeatCards .card{
+    width:16px!important;
+    min-width:16px!important;
+    height:23px!important;
+    min-height:23px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot)>.v2TableBet{
+    transform:translate(-50%,-50%) translate(calc(var(--seat-dx) * -42px),calc(var(--seat-dy) * -42px))!important;
+  }
+
+  /* Folded players stay locatable without leaving a cloud of cards/text over the felt. */
+  html.cash-table-v2-route #root .cashTableV2Page .seat.productionSeat.folded{opacity:.14!important}
+  html.cash-table-v2-route #root .cashTableV2Page .foldedSeatCards{display:none!important}
+
+  /* Board + pot own the middle. */
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.board{
+    top:49.5%!important;
+    gap:2px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.board>.card{
+    width:34px!important;
+    min-width:34px!important;
+    height:49px!important;
+    min-height:49px!important;
+    border-radius:5px!important;
+    font-size:14px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.v2PotCluster{top:62.5%!important}
+
+  /* Hero and utilities breathe above the dock. */
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Hud{
+    height:210px!important;
+    min-height:210px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Hud>.holeWrap{top:-73px!important}
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Hud .hole .card{
+    width:38px!important;
+    min-width:38px!important;
+    height:54px!important;
+    min-height:54px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2HeroIdentity{min-width:106px!important;height:33px!important}
+  html.cash-table-v2-route #root:has(.cashTableV2Page) .tableChatDockButton,
+  html.cash-table-v2-route #root:has(.cashTableV2Page) .actionLogDock{bottom:216px!important}
+
+  /* Keep the decision dock stable. */
+  html.cash-table-v2-route #root .cashTableV2Page .v2ActionDock{
+    min-height:154px!important;
+    padding:8px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .v2ActionDock .actionRow>button{
+    height:64px!important;
+    min-height:64px!important;
+  }
+
+  /* Showdown is an overlay state, not a second layout. */
+  html.cash-table-v2-route #root .cashTableV2Page>.showdownHud{
+    height:150px!important;
+    min-height:150px!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page>.showdownHud>.actions{display:none!important}
+  html.cash-table-v2-route #root .cashTableV2Page>.showdownHud>.holeWrap{top:-58px!important}
+  html.cash-table-v2-route #root .cashTableV2Page .showdownFelt .showdownBoard{top:46.5%!important}
+  html.cash-table-v2-route #root .cashTableV2Page .showdownFelt>.v2PotCluster{top:66.5%!important}
+  html.cash-table-v2-route #root .cashTableV2Page .showdownBanner{
+    top:57.5%!important;
+    width:min(78%,310px)!important;
+    padding:5px 7px!important;
+    gap:2px!important;
+    border-radius:9px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page .showdownBanner small{font-size:5.5px!important}
+  html.cash-table-v2-route #root .cashTableV2Page .showdownBanner strong{font-size:8px!important;line-height:1.18!important}
+  html.cash-table-v2-route #root .cashTableV2Page .winnerLine{display:none!important}
+  html.cash-table-v2-route #root .cashTableV2Page .showdownFelt .seat.showdownWinner{
+    transform:translate(-50%,-50%)!important;
+  }
+}
+
+@media(max-width:390px){
+  html.cash-table-v2-route #root .cashTableV2Page{
+    grid-template-rows:74px minmax(0,1fr) 204px!important;
+  }
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Topbar{height:74px!important;min-height:74px!important}
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Felt{width:min(89vw,500px)!important}
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Hud{height:204px!important;min-height:204px!important}
+  html.cash-table-v2-route #root .cashTableV2Page .gameplayV2Felt>.seatSlot:not(.heroSlot){
+    left:calc(50% + (var(--seat-dx) * 33.5%))!important;
+    top:calc(50% + (var(--seat-dy) * 40%))!important;
+  }
+  html.cash-table-v2-route #root:has(.cashTableV2Page) .tableChatDockButton,
+  html.cash-table-v2-route #root:has(.cashTableV2Page) .actionLogDock{bottom:210px!important}
+}

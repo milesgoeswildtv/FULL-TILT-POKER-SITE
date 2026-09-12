@@ -9,6 +9,7 @@ import'./cosmetics.css';
 import'./table-seat-layout.css';
 import{Card}from'./TablePanels.jsx';
 import SeatSlot from'./SeatSlot.jsx';
+import ApprovedCashFelt from'./ApprovedCashFelt.jsx';
 import{assets,cardBackFor}from'./assets.js';
 
 function showdownWinners(state){if(state.street!=='showdown')return new Map();const wins=new Map();for(const award of state.lastResult?.awards||[])wins.set(award.playerId,(wins.get(award.playerId)||0)+Number(award.amount||0));return wins}
@@ -23,7 +24,7 @@ export function TableTopbar({code,state,realtime,blindLeft,next,copied,onCopy,on
 
 export function InfoStrip({alive,state,blindLeft}){const style={'--info-art':`url(${assets.default.ui.infoStrip})`};return <div className="infoStrip productionInfoStrip" style={style}><span><b>{alive}</b> left</span><span><b>{state.pot.toLocaleString()}</b> pot</span><span><b>{state.street?.toUpperCase()}</b> street</span><span><b>{state.paused?'PAUSED':blindLeft}</b> blinds</span></div>}
 
-export function PokerFelt({state,finished,showdownLeft,pos,turnLeft,me,onKick}){const winners=showdownWinners(state),isShowdown=state.street==='showdown',winnerIds=[...winners.keys()],feltStyle={'--felt-desktop':`url(${assets.default.feltDesktop})`,'--felt-mobile':`url(${assets.default.feltMobile})`,'--felt-cash-v2':`url("${assets.default.feltCashV2}")`,'--showdown-art':`url(${assets.default.ui.showdown})`,'--winner-art':`url(${assets.default.ui.tournamentWinner})`};return <section data-street={state.street} data-hand={state.handNumber||0} data-player-count={state.players.length} style={feltStyle} className={`felt productionFelt gameplayV2Felt ${isShowdown?'showdownFelt':''}`}>
+export function PokerFelt(props){const{state,finished,showdownLeft,pos,turnLeft,me,onKick}=props,cash=typeof location!=='undefined'&&/^#\/table\//i.test(location.hash);if(cash&&state.players.length<=8)return <ApprovedCashFelt {...props}/>;const winners=showdownWinners(state),isShowdown=state.street==='showdown',winnerIds=[...winners.keys()],feltStyle={'--felt-desktop':`url(${assets.default.feltDesktop})`,'--felt-mobile':`url(${assets.default.feltMobile})`,'--felt-cash-v2':`url("${assets.default.feltCashV2}")`,'--showdown-art':`url(${assets.default.ui.showdown})`,'--winner-art':`url(${assets.default.ui.tournamentWinner})`};return <section data-street={state.street} data-hand={state.handNumber||0} data-player-count={state.players.length} style={feltStyle} className={`felt productionFelt gameplayV2Felt ${isShowdown?'showdownFelt':''}`}>
   {isShowdown&&<div className="showdownArt"/>}
   {finished&&!state.endedByHost&&<div className="winnerArt"/>}
   <div className="v2FeltBrand"><b>FULL TILT</b><span>DEGENS PLAY HERE</span></div>

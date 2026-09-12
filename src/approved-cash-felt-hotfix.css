@@ -1,0 +1,47 @@
+/* FINAL CASH FELT VISIBILITY OVERRIDE
+   The approved cash renderer must sit above every legacy table/staging art layer,
+   but below the interactive HUD/header. The felt is rendered as a direct CSS
+   background here so no generic <img> rule can suppress it. */
+@media(max-width:760px){
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    z-index:65!important;
+    background-color:transparent!important;
+    background-image:url('/assets/default/TABLE%20FELT%20V2.PNG?v=official-4')!important;
+    background-size:100% 100%!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    filter:none!important;
+    mix-blend-mode:normal!important;
+    clip-path:none!important;
+    mask:none!important;
+    -webkit-mask:none!important;
+    pointer-events:none!important;
+  }
+
+  /* The CSS background above is authoritative; avoid a duplicate image layer. */
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt>.approvedCashFeltImage{
+    display:none!important;
+  }
+
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Hud{
+    z-index:70!important;
+  }
+
+  html.cash-table-v2-route #root .cashTableV2Page>.gameplayV2Topbar{
+    z-index:90!important;
+  }
+
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashSeat,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashCards,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashBet,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashBoard,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashStreet,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashPot,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashSide,
+  html.cash-table-v2-route #root .cashTableV2Page>.approvedCashFelt .approvedCashShowdown{
+    visibility:visible!important;
+  }
+}

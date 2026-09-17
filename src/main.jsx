@@ -7,6 +7,7 @@ import TournamentConfig from'./TournamentConfig.jsx';
 import ActionLogPanel from'./ActionLogPanel.jsx';
 import TableChatDock from'./TableChatDock.jsx';
 import{installSessionRouting}from'./session.js';
+import{bootstrapPlatform}from'./platform.js';
 import'./fx-runtime.js';
 import'./cash-table-v2-route.js';
 import'./tournament-config.css';
@@ -26,8 +27,8 @@ import'./gameplay-v3-pass2.css';
 import'./gameplay-v3-pass3.css';
 import'./gameplay-v3-pass4.css';
 import'./global-royal-grade.css';
-installSessionRouting();
+import'./telegram.css';
 const root=createRoot(document.getElementById('root'));
 function render(){const preview=/^#\/v3-preview(?:$|\?)/i.test(location.hash),lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(preview?<V3Preview/>:lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}
-addEventListener('hashchange',render);
-render();
+async function boot(){root.render(<div className="telegramBoot">Opening Full Tilt…</div>);await bootstrapPlatform();installSessionRouting();addEventListener('hashchange',render);render()}
+boot();

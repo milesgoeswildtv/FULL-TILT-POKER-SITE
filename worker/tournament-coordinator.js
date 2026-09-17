@@ -3,6 +3,7 @@ import{createTournamentClock,tournamentClockState,blindsForNewHand,pauseTourname
 import{tournamentTableKey,childTablePayload}from'./mtt-provision.js';
 import{nextTournamentMove,planTableBreak,movePlayer}from'./mtt-moves.js';
 import{validateBoundaryHeader,validateCompleteRoster,validateNextBigBlind,assertBoundaryChipConservation,eliminationEvent,recomputeEliminationPlaces}from'./mtt-protocol.js';
+import{sendTelegramTournamentNotification}from'./telegram-notifications.js';
 
 const KEY='tournament',COSMETICS=new Set(['default','constellation','deadMansHand','regalia']);
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store'}})}
@@ -26,7 +27,7 @@ export class TournamentCoordinator{
  constructor(state,env){this.state=state;this.env=env;this.data=null;this.transitionInFlight=null}
  async load(){
   if(this.data)return;this.data=await this.state.storage.get(KEY)||null;if(!this.data)return;
-  const d=this.data;d.pendingMoves??=[];d.eliminationLedger??=[];d.endedAt??=null;d.endedByHost=!!d.endedByHost;d.resultsSyncedAt??=null;if(d.status==='starting')d.transition={type:'start',...(d.transition||{})};else d.transition=null;
+  const d=this.data;d.pendingMoves??=[];d.eliminationLedger??=[];d.telegramNotifications??=[];d.endedAt??=null;d.endedByHost=!!d.endedByHost;d.resultsSyncedAt??=null;if(d.status==='starting')d.transition={type:'start',...(d.transition||{})};else d.transition=null;
   for(const table of d.tables||[]){table.reportGeneration=positiveInt(table.reportGeneration);table.lastBoundarySequence=nonNegativeInt(table.lastBoundarySequence??table.handNumber);table.lastBoundaryFingerprint??=null;table.handNumber=nonNegativeInt(table.handNumber);table.nextBigBlindPlayerId??=null}
   for(const p of d.players||[]){p.stats={...cleanStats(),...cleanStats(p.stats)};p.host=!!p.host;p.accountId=String(p.accountId||'')||null;p.cosmetic=cleanCosmetic(p.cosmetic);p.ownershipGeneration=positiveInt(p.ownershipGeneration);if(p.reportOwnerTable===undefined)p.reportOwnerTable=p.eliminated?null:p.tableNumber;p.pendingMoveId??=null}
   for(const move of d.pendingMoves.filter(m=>!m.acknowledged)){const p=this.player(move.playerId);if(!p)continue;move.fromOwnershipGeneration=positiveInt(move.fromOwnershipGeneration,p.ownershipGeneration);move.toOwnershipGeneration=positiveInt(move.toOwnershipGeneration,p.ownershipGeneration);p.ownershipGeneration=move.toOwnershipGeneration;p.reportOwnerTable=null;p.pendingMoveId=move.id;if(move.toSeat==null)p.seat=null}
@@ -69,6 +70,10 @@ export class TournamentCoordinator{
   return{kind:'new',newlyBusted:newlyBusted.map(p=>p.id)};
  }
  bumpReportGeneration(tableNumber){const table=this.table(tableNumber);if(table)table.reportGeneration=positiveInt(table.reportGeneration)+1}
+ queueTelegramNotification(event){const d=this.data;if(!d)return false;d.telegramNotifications??=[];const id=String(event?.id||'');if(!id||d.telegramNotifications.some(x=>x.id===id))return false;d.telegramNotifications.push({...event,id,status:'pending',attempts:0,createdAt:Date.now(),nextAttemptAt:Date.now()});if(d.telegramNotifications.length>500)d.telegramNotifications=d.telegramNotifications.slice(-500);return true}
+ scheduleTelegramNotifications(){const q=(this.data?.telegramNotifications||[]).filter(x=>x.status==='pending');if(!q.length||typeof this.state.storage.setAlarm!=='function')return;const next=Math.min(...q.map(x=>Math.max(Date.now()+50,Number(x.nextAttemptAt)||Date.now())));this.state.storage.setAlarm(next)}
+ async flushTelegramNotifications(now=Date.now()){const q=(this.data?.telegramNotifications||[]).filter(x=>x.status==='pending'&&(Number(x.nextAttemptAt)||0)<=now).slice(0,8);if(!q.length){this.scheduleTelegramNotifications();return}for(const event of q){const p=this.player(event.playerId),result=p?.accountId?await sendTelegramTournamentNotification(this.env,p.accountId,event):{sent:false,retryable:false,reason:'no-account'};event.attempts=nonNegativeInt(event.attempts)+1;event.lastAttemptAt=Date.now();if(result.sent){event.status='delivered';event.deliveredAt=Date.now();event.lastError=null}else if(result.retryable&&event.attempts<5){event.nextAttemptAt=Date.now()+Math.min(30000,1000*(2**Math.max(0,event.attempts-1)));event.lastError=result.reason||'Telegram delivery failed.'}else{event.status='failed';event.failedAt=Date.now();event.lastError=result.reason||'Telegram delivery failed.'}}await this.save();this.scheduleTelegramNotifications()}
+ async alarm(){await this.load();if(this.data)await this.flushTelegramNotifications()}
  maybeScheduleMoves(boundaryTableNumber){
   if(this.data.status!=='running'||activeField(this.data).length<=1)return[];
   if((this.data.pendingMoves||[]).some(m=>!m.acknowledged))return[];
@@ -82,7 +87,7 @@ export class TournamentCoordinator{
   for(const move of this.data.pendingMoves||[]){if(move.acknowledged||move.toTable!==Number(tableNumber)||!byId.has(move.id))continue;const p=this.player(move.playerId),ack=byId.get(move.id);if(!p||p.pendingMoveId!==move.id||positiveInt(p.ownershipGeneration)!==positiveInt(move.toOwnershipGeneration))throw Error('Tournament move ownership acknowledgement is stale.');
    if(move.toSeat==null){const seat=Number(ack?.seat);if(!Number.isInteger(seat)||seat<1||seat>table.capacity)throw Error('Balancing move acknowledgement requires a valid destination seat.');const occupied=table.playerIds.map(id=>this.player(id)).filter(x=>x&&x.id!==p.id&&!x.eliminated&&x.chips>0).some(x=>validSeat(x.seat)&&Number(x.seat)===seat);if(occupied)throw Error('Balancing move destination seat is occupied.');move.toSeat=seat;p.seat=seat}
    else if(ack?.seat!=null&&Number(ack.seat)!==Number(move.toSeat))throw Error('Tournament move acknowledgement seat does not match its assigned seat.');
-   move.acknowledged=true;move.acknowledgedAt=Date.now();p.reportOwnerTable=Number(tableNumber);p.pendingMoveId=null;acked.push(move.id)}if(acked.length)this.bumpReportGeneration(tableNumber);return acked;
+   move.acknowledged=true;move.acknowledgedAt=Date.now();p.reportOwnerTable=Number(tableNumber);p.pendingMoveId=null;acked.push(move.id);this.queueTelegramNotification({id:`move:${move.id}`,kind:'table-move',playerId:p.id,code:this.data.code,toTable:Number(tableNumber),toSeat:Number(p.seat)})}if(acked.length)this.bumpReportGeneration(tableNumber);return acked;
  }
  async controlTable(table,type,now=Date.now()){
   if(!this.env?.TABLES)throw Error('Poker table binding unavailable.');if(!table?.tableKey)throw Error('Tournament table key unavailable.');
@@ -115,7 +120,7 @@ export class TournamentCoordinator{
    const startingChips=Math.max(1,Math.trunc(Number(b.startingChips)||2500));
    const players=entries.map((entry,i)=>({id:playerId(i),token:sessionToken(),accountId:entry.accountId,name:entry.name,chips:startingChips,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:startingChips,stats:cleanStats(),cosmetic:entry.cosmetic,host:i===0,ownershipGeneration:1,reportOwnerTable:null,pendingMoveId:null}));
    const code=String(b.code||'').trim().toUpperCase();if(!code)return json({error:'Tournament code required.'},400);
-   this.data={code,status:'lobby',transition:null,startingChips,players,tables:[],pendingMoves:[],eliminationLedger:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false,resultsSyncedAt:null};this.rebuildLobbySeating();
+   this.data={code,status:'lobby',transition:null,startingChips,players,tables:[],pendingMoves:[],eliminationLedger:[],telegramNotifications:[],clock:createTournamentClock({blindStructure:b.blindStructure,levelDurationMs:b.levelDurationMs,now:Number(b.now)||Date.now()}),createdAt:Date.now(),startedAt:null,finishedAt:null,endedAt:null,endedByHost:false,resultsSyncedAt:null};this.rebuildLobbySeating();
    await this.save();return json({...publicState(this.data,Number(b.now)||Date.now()),token:players[0].token,host:true},201)
   }
   if(!this.data)return json({error:'Tournament not found.'},404);
@@ -139,7 +144,7 @@ export class TournamentCoordinator{
     try{if(this.data.tables.some(t=>!t.provisioned))await this.provisionTables()}catch(e){this.data.status='lobby';this.data.transition=null;await this.save();return json({error:`Tournament table provisioning failed: ${e.message}`,state:publicState(this.data)},503)}
     const now=Number(this.data.transition?.effectiveAt)||Number(b.now)||Date.now();if(!this.data.transition.effectiveAt){this.data.transition.effectiveAt=now;this.data.startedAt=now;this.data.clock.levelStartedAt=now;this.data.clock.paused=false;this.data.clock.pausedAt=null;this.data.endedAt=null;this.data.endedByHost=false;await this.save()}
     const failures=await this.controlTables('start',now);if(failures.length){const failedAt=Date.now();pauseTournamentClock(this.data.clock,failedAt);this.data.status='paused';this.data.transition={type:'pause',startedAt:failedAt};await this.controlTables('pause',failedAt);this.data.transition=null;await this.save();return json({error:'One or more child tables could not start.',failures,state:publicState(this.data,failedAt)},503)}
-    this.data.status='running';this.data.transition=null;this.data.tables.forEach(t=>{if(t.status!=='closed')t.status='running'});await this.save();return json(publicState(this.data,now));
+    this.data.status='running';this.data.transition=null;this.data.tables.forEach(t=>{if(t.status!=='closed')t.status='running'});for(const p of this.data.players)if(!p.eliminated&&p.accountId)this.queueTelegramNotification({id:`start:${this.data.startedAt}:${p.id}`,kind:'tournament-start',playerId:p.id,code:this.data.code,tableNumber:Number(p.tableNumber),seat:Number(p.seat)});await this.save();this.scheduleTelegramNotifications();return json(publicState(this.data,now));
    }finally{this.transitionInFlight=null}
   }
   if(u.pathname==='/clock'&&req.method==='GET')return json(tournamentClockState(this.data.clock));
@@ -147,7 +152,7 @@ export class TournamentCoordinator{
   const tableMatch=u.pathname.match(/^\/tables\/(\d+)\/(sync|report|ack-moves)$/);
   if(tableMatch&&tableMatch[2]==='sync'&&req.method==='GET'){try{const n=Number(tableMatch[1]);if(u.searchParams.get('atBoundary')==='1'&&this.data.status==='running'){const moves=this.maybeScheduleMoves(n);if(moves.length){this.assertTournamentChipSupply();await this.save()}}return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},404)}}
   if(tableMatch&&tableMatch[2]==='report'&&req.method==='POST'){try{const n=Number(tableMatch[1]),outcome=this.reportTable(n,await req.json());if(outcome.kind==='new'&&this.data.status==='running')this.maybeScheduleMoves(n);await this.save();if(this.data.status==='finished')await this.syncTournamentResults();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
-  if(tableMatch&&tableMatch[2]==='ack-moves'&&req.method==='POST'){try{const n=Number(tableMatch[1]),b=await req.json();this.acknowledgeMoves(n,b.moves||b.moveIds);this.assertTournamentChipSupply();await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
+  if(tableMatch&&tableMatch[2]==='ack-moves'&&req.method==='POST'){try{const n=Number(tableMatch[1]),b=await req.json();this.acknowledgeMoves(n,b.moves||b.moveIds);this.assertTournamentChipSupply();await this.save();this.scheduleTelegramNotifications();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(u.pathname==='/pause'&&req.method==='POST'){
    if(this.transitionInFlight)return this.busy('pause');if(this.data.status==='paused'&&!this.data.transition)return json(publicState(this.data));if(!['running','paused'].includes(this.data.status))return json({error:'Tournament is not running.',state:publicState(this.data)},409);
    this.transitionInFlight='pause';try{const b=await req.json().catch(()=>({})),now=Number(b.now)||Date.now();if(this.data.status==='running')pauseTournamentClock(this.data.clock,now);this.data.status='paused';this.data.transition={type:'pause',startedAt:now};await this.save();const failures=await this.controlTables('pause',now);this.data.transition=null;await this.save();return json({...publicState(this.data,now),childFailures:failures},failures.length?503:200)}finally{this.transitionInFlight=null}

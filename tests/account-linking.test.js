@@ -33,3 +33,6 @@ test('already-open Telegram tables forward later stat checkpoints through the al
 test('one Discord account cannot silently absorb two different Telegram identities',async()=>{
  const ns=new AccountNamespace(),env={ACCOUNTS:ns},other={id:'telegram:112233',provider:'telegram',providerId:'112233',username:'other',displayName:'Other'};await accountRequest(env,discord,'/sync');await accountRequest(env,telegram,'/sync');await accountRequest(env,other,'/sync');await linkTelegramToDiscord(env,telegram,discord);await assert.rejects(()=>linkTelegramToDiscord(env,other,discord),/already linked to another Telegram/i);assert.equal(await resolveAccountId(env,other.id),other.id);
 });
+
+
+test('account notification outbox de-duplicates the same event id',async()=>{const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,telegram,'/sync');const event={id:'table-ready:ABC123',kind:'table-ready',code:'ABC123',playerCount:2};let r=await post(ns.get(telegram.id),'/notifications/enqueue',{id:event.id,event});assert.equal(r.response.status,200);r=await post(ns.get(telegram.id),'/notifications/enqueue',{id:event.id,event});assert.equal(r.response.status,200);const stored=await ns.rows.get(telegram.id).account.load();assert.equal(stored.notificationOutbox.length,1);assert.equal(stored.notificationOutbox[0].event.kind,'table-ready')});

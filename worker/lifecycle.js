@@ -1,5 +1,7 @@
 export function frozenTurnRemaining(deadline,now=Date.now()){return deadline?Math.max(0,deadline-now):null}
-export function resumeTurnDeadline(remainingMs,now=Date.now()){return remainingMs==null?null:now+Math.max(1000,remainingMs)}
+export function resumeDeadline(remainingMs,now=Date.now(),minimumGraceMs=0){return remainingMs==null?null:now+Math.max(Math.max(0,minimumGraceMs),Math.max(0,Number(remainingMs)||0))}
+export function resumeTurnDeadline(remainingMs,now=Date.now()){return resumeDeadline(remainingMs,now,1000)}
+export function resumePhaseDeadline(remainingMs,now=Date.now()){return resumeDeadline(remainingMs,now,250)}
 export function shiftedLevelStart(levelStartedAt,pausedAt,now=Date.now()){return levelStartedAt&&pausedAt?levelStartedAt+(now-pausedAt):levelStartedAt}
 export function showdownExpired({street,phaseDeadline},now=Date.now()){return street==='showdown'&&!!phaseDeadline&&now>=phaseDeadline}
 export function blindAdvance({started,paused,levelStartedAt,blindMinutes,blindLevel,levels},now=Date.now()){

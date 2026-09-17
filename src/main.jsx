@@ -23,6 +23,7 @@ import'./approved-cash-felt.css';
 import'./approved-cash-felt-hotfix.css';
 import'./gameplay-v3-refinement.css';
 import'./gameplay-v3-pass2.css';
+import'./gameplay-v3-pass3.css';
 installSessionRouting();
 const root=createRoot(document.getElementById('root'));
 function render(){const preview=/^#\/v3-preview(?:$|\?)/i.test(location.hash),lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(preview?<V3Preview/>:lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}

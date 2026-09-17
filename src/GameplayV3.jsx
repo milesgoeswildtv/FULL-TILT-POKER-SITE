@@ -4,96 +4,27 @@ import{assets,avatarFrameFor,cardBackFor,chipFor}from'./assets.js';
 import'./gameplay-v3-fresh.css';
 
 const SLOT_PRESETS={
-  1:[[50,7]],
-  2:[[18,25],[82,25]],
-  3:[[50,7],[11,43],[89,43]],
-  4:[[25,13],[75,13],[8,52],[92,52]],
-  5:[[50,7],[12,26],[88,26],[12,59],[88,59]],
-  6:[[50,7],[12,24],[88,24],[6,51],[94,51],[50,72]],
-  7:[[50,7],[12,24],[88,24],[6,49],[94,49],[20,72],[80,72]],
-  8:[[28,9],[72,9],[8,27],[92,27],[5,53],[95,53],[22,74],[78,74]]
+ 1:[[50,5]],2:[[18,22],[82,22]],3:[[50,5],[8,43],[92,43]],4:[[25,10],[75,10],[5,50],[95,50]],5:[[50,5],[8,25],[92,25],[12,67],[88,67]],6:[[50,5],[8,24],[92,24],[5,52],[95,52],[50,76]],7:[[50,4],[7,24],[93,24],[3,51],[97,51],[17,76],[83,76]],8:[[27,7],[73,7],[6,26],[94,26],[3,53],[97,53],[20,77],[80,77]]
 };
-
 function initials(name='Player'){return name.split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase()||'P'}
 function showdownWinners(state){if(state.street!=='showdown')return new Map();const map=new Map();for(const award of state.lastResult?.awards||[])map.set(award.playerId,(map.get(award.playerId)||0)+Number(award.amount||0));return map}
 function aroundHero(players,me){if(!players?.length)return[];if(!me)return players.slice(0,8);const hero=players.findIndex(p=>p.id===me.id);return players.map((player,index)=>({player,index,rel:(index-hero+players.length)%players.length})).filter(x=>x.rel!==0).sort((a,b)=>a.rel-b.rel).slice(0,8)}
-function opponentEntries(players,me){const source=aroundHero(players,me),slots=SLOT_PRESETS[source.length]||SLOT_PRESETS[8];return source.map((item,i)=>({...item,xy:slots[i]}))}
-
+function opponentEntries(players,me){const source=aroundHero(players,me),slots=SLOT_PRESETS[source.length]||SLOT_PRESETS[8];return source.map((item,i)=>({...item,seatIndex:i,xy:slots[i]}))}
 function InviteIcon(){return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 18c.8-3 2.7-4.5 5.5-4.5s4.7 1.5 5.5 4.5M18 6v6M15 9h6"/></svg>}
 function ChatIcon(){return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H9l-5 3v-14Z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>}
 function LogIcon(){return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"/></svg>}
-
-export function TableTopbar({code,state,copied,onCopy,onExit}){
- return <header className="ftp3Header">
-  <button className="ftp3Back" onClick={onExit} aria-label="Back to lobby">‹</button>
-  <div className="ftp3HeaderBrand">
-   <img src={assets.default.logoMobile} alt="Full Tilt Poker"/>
-   <strong>{Number(state.smallBlind||0).toLocaleString()} / {Number(state.bigBlind||0).toLocaleString()} NLH</strong>
-   <span>Table {code} <i/> Hand #{state.handNumber||0}</span>
-  </div>
-  <button className="ftp3Invite" onClick={onCopy}><InviteIcon/>{copied?'Copied':'Invite'}</button>
- </header>
-}
-
+export function TableTopbar({code,state,copied,onCopy,onExit}){return <header className="ftp3Header"><button className="ftp3Back" onClick={onExit} aria-label="Back to lobby">‹</button><div className="ftp3HeaderBrand"><img src={assets.default.logoMobile} alt="Full Tilt Poker"/><strong>{Number(state.smallBlind||0).toLocaleString()} / {Number(state.bigBlind||0).toLocaleString()} NLH</strong><span>Table {code} <i/> Hand #{state.handNumber||0}</span></div><button className="ftp3Invite" onClick={onCopy}><InviteIcon/>{copied?'Copied':'Invite'}</button></header>}
 export function InfoStrip(){return null}
-
-function OpponentSeat({entry,state,pos,turnLeft,winners}){
- const{player,index,xy}=entry,[x,y]=xy,showCards=state.started&&!player.eliminated,isShowdown=state.street==='showdown',revealed=isShowdown&&Array.isArray(player.cards)&&player.cards.some(Boolean),cards=revealed?player.cards.slice(0,2):['',''],won=winners.has(player.id),allIn=player.chips===0&&!player.eliminated&&state.started;
- const dx=50-x,dy=50-y,mag=Math.hypot(dx,dy)||1,betX=x+(dx/mag)*14,betY=y+(dy/mag)*12;
- return <>
-  <div className={`ftp3Seat ${player.turn?'turn':''} ${player.folded?'folded':''} ${player.eliminated?'out':''} ${allIn?'allin':''}`} style={{left:`${x}%`,top:`${y}%`}}>
-   {showCards&&<div className="ftp3SeatCards">{cards.map((c,i)=><Card key={i} c={c} backAsset={cardBackFor(player)}/>)}</div>}
-   <div className="ftp3SeatPlaque">
-    <span className="ftp3Avatar"><span>{initials(player.name)}</span><img src={avatarFrameFor(player)} alt=""/></span>
-    <span className="ftp3SeatCopy"><b>{player.name}</b><strong>{Number(player.chips||0).toLocaleString()}</strong></span>
-    {pos[index]&&<em className="ftp3Pos">{pos[index]}</em>}
-    {player.turn&&turnLeft!=null&&<i className="ftp3Clock">{turnLeft}s</i>}
-    {won&&<i className="ftp3Win">+{Number(winners.get(player.id)||0).toLocaleString()}</i>}
-   </div>
-  </div>
-  {player.bet>0&&<div className="ftp3Bet" style={{left:`${betX}%`,top:`${betY}%`}}><img src={chipFor(player,'purple')} alt=""/><b>{Number(player.bet).toLocaleString()}</b></div>}
- </>
+function OpponentSeat({entry,state,pos,turnLeft,winners}){const{player,index,xy,seatIndex}=entry,[x,y]=xy,showCards=state.started&&!player.eliminated,isShowdown=state.street==='showdown',revealed=isShowdown&&Array.isArray(player.cards)&&player.cards.some(Boolean),cards=revealed?player.cards.slice(0,2):['',''],won=winners.has(player.id),allIn=player.chips===0&&!player.eliminated&&state.started;const dx=50-x,dy=50-y,mag=Math.hypot(dx,dy)||1,betX=x+(dx/mag)*18,betY=y+(dy/mag)*15;return <div className="ftp3SeatUnit" data-seat={seatIndex} style={{'--seat-x':`${x}%`,'--seat-y':`${y}%`,'--bet-x':`${betX}%`,'--bet-y':`${betY}%`}}><div className={`ftp3Seat ${player.turn?'turn':''} ${player.folded?'folded':''} ${player.eliminated?'out':''} ${allIn?'allin':''}`}><div className="ftp3SeatCards">{showCards&&cards.map((c,i)=><Card key={i} c={c} backAsset={cardBackFor(player)}/>)}</div><div className="ftp3SeatPlaque"><span className="ftp3Avatar"><span>{initials(player.name)}</span><img src={avatarFrameFor(player)} alt=""/></span><span className="ftp3SeatCopy"><b>{player.name}</b><strong>{Number(player.chips||0).toLocaleString()}</strong></span>{pos[index]&&<em className="ftp3Pos">{pos[index]}</em>}{player.turn&&turnLeft!=null&&<i className="ftp3Clock">{turnLeft}s</i>}{won&&<i className="ftp3Win">+{Number(winners.get(player.id)||0).toLocaleString()}</i>}</div></div>{player.bet>0&&<div className="ftp3Bet"><img src={chipFor(player,'purple')} alt=""/><b>{Number(player.bet).toLocaleString()}</b></div>}</div>}
+export function PokerFelt({state,finished,showdownLeft,pos,turnLeft,me}){const winners=showdownWinners(state),entries=opponentEntries(state.players,me),live=Array.isArray(state.livePots)?state.livePots:[],isShowdown=state.street==='showdown',pot=isShowdown?Number(state.lastResult?.settledPot||0):Number(state.pot||0);return <section className="ftp3Stage" data-opponents={entries.length} data-player-count={state.players.length} data-street={state.street}><div className="ftp3TableShell"><div className="ftp3Rail"><div className="ftp3FeltSurface"/></div></div><div className="ftp3CenterMark"><img src={assets.default.logoMobile} alt=""/><span>DEGENS PLAY HERE</span></div>{entries.map(entry=><OpponentSeat key={entry.player.id} entry={entry} state={state} pos={pos} turnLeft={turnLeft} winners={winners}/>) }<div className="ftp3Board">{state.board.map((c,i)=><Card key={`${state.handNumber}-${i}`} c={c}/>)}{state.board.length===0&&<span className="ftp3Street">{state.started?(state.paused?'Paused':'Pre-flop'):finished?'Game complete':'Waiting for start'}</span>}</div><div className="ftp3Pot"><small>{isShowdown?'AWARDED':'POT'}</small><strong>{pot.toLocaleString()}</strong></div>{!isShowdown&&live.length>1&&<div className="ftp3SidePots">{live.slice(0,4).map((p,i)=><span key={i}><small>{i===0?'MAIN':`SIDE ${i}`}</small><b>{Number(p.amount||0).toLocaleString()}</b></span>)}</div>}{isShowdown&&state.lastResult&&<div className="ftp3Showdown"><small>NEXT HAND IN {showdownLeft}s</small><b>{state.lastResult.summary}</b></div>}{finished&&<div className="ftp3Showdown"><small>GAME COMPLETE</small><b>{state.message}</b></div>}</section>}
+export function TableHUD({state,me,isSpectator,strength,turnLeft,raise,setRaise,showHistory,setShowHistory,showChat,setShowChat,onAction}){const canAct=!!(me&&state.started&&!state.paused&&state.street!=='showdown'&&me.turn&&!me.folded&&!me.eliminated&&me.chips>0),toCall=Math.min(Number(me?.chips||0),Math.max(0,Number(state.toCall||0))),minRaise=Math.max(0,Number(state.raiseTo||0)),maxRaise=Math.max(minRaise,Number(me?.bet||0)+Number(me?.chips||0)),target=Math.min(maxRaise,Math.max(minRaise,Number(raise||minRaise))),heroCards=Array.isArray(me?.cards)?me.cards:[];
+function quick(frac){
+ if(!state.canRaise)return;
+ const call=Math.max(0,Number(state.toCall||0));
+ const pot=Math.max(0,Number(state.pot||0));
+ const currentBet=Number(state.currentBet||0);
+ const suggested=Math.round(currentBet+call+(pot*frac));
+ const clamped=Math.min(maxRaise,Math.max(minRaise,suggested));
+ setRaise(String(clamped));
 }
-
-export function PokerFelt({state,finished,showdownLeft,pos,turnLeft,me}){
- const winners=showdownWinners(state),entries=opponentEntries(state.players,me),live=Array.isArray(state.livePots)?state.livePots:[],isShowdown=state.street==='showdown',pot=isShowdown?Number(state.lastResult?.settledPot||0):Number(state.pot||0);
- return <section className="ftp3Stage" data-player-count={state.players.length} data-street={state.street}>
-  <div className="ftp3TableShell"><div className="ftp3Rail"><div className="ftp3FeltSurface"/></div></div>
-  <div className="ftp3CenterMark"><img src={assets.default.logoMobile} alt=""/><span>DEGENS PLAY HERE</span></div>
-  {entries.map(entry=><OpponentSeat key={entry.player.id} entry={entry} state={state} pos={pos} turnLeft={turnLeft} winners={winners}/>) }
-  <div className="ftp3Board">{state.board.map((c,i)=><Card key={`${state.handNumber}-${i}`} c={c}/>)}{state.board.length===0&&<span className="ftp3Street">{state.started?(state.paused?'Paused':'Pre-flop'):finished?'Game complete':'Waiting for start'}</span>}</div>
-  <div className="ftp3Pot"><small>{isShowdown?'AWARDED':'POT'}</small><strong>{pot.toLocaleString()}</strong></div>
-  {!isShowdown&&live.length>1&&<div className="ftp3SidePots">{live.slice(0,4).map((p,i)=><span key={i}><small>{i===0?'MAIN':`SIDE ${i}`}</small><b>{Number(p.amount||0).toLocaleString()}</b></span>)}</div>}
-  {isShowdown&&state.lastResult&&<div className="ftp3Showdown"><small>NEXT HAND IN {showdownLeft}s</small><b>{state.lastResult.summary}</b></div>}
-  {finished&&<div className="ftp3Showdown"><small>GAME COMPLETE</small><b>{state.message}</b></div>}
- </section>
-}
-
-export function TableHUD({state,me,isSpectator,strength,turnLeft,raise,setRaise,showHistory,setShowHistory,showChat,setShowChat,onAction}){
- const canAct=!!(me&&state.started&&!state.paused&&state.street!=='showdown'&&me.turn&&!me.folded&&!me.eliminated&&me.chips>0),toCall=Math.min(Number(me?.chips||0),Math.max(0,Number(state.toCall||0))),minRaise=Math.max(0,Number(state.raiseTo||0)),maxRaise=Math.max(minRaise,Number(me?.bet||0)+Number(me?.chips||0)),target=Math.min(maxRaise,Math.max(minRaise,Number(raise||minRaise))),heroCards=Array.isArray(me?.cards)?me.cards:[];
- function quick(frac){if(!state.canRaise)return;const call=Math.max(0,Number(state.toCall||0)),pot=Math.max(0,Number(state.pot||0));setRaise(String(Math.min(maxRaise,Math.max(minRaise,Math.round((state.currentBet||0)+call+pot*frac)))))}
- const primaryLabel=state.toCall===0?'Check':'Call';
- return <>
-  <div className="ftp3Hero">
-   <div className="ftp3HeroCards">{heroCards.length?heroCards.map((c,i)=><Card key={i} c={c} backAsset={cardBackFor(me)}/>):<><Card c="" backAsset={cardBackFor(me)}/><Card c="" backAsset={cardBackFor(me)}/></>}</div>
-   {strength&&state.started&&!me?.folded&&state.street!=='showdown'&&<div className="ftp3Strength">{strength}</div>}
-   <div className="ftp3HeroPlaque"><span className="ftp3HeroCrown">♠</span><div><small>{isSpectator?'SPECTATOR':'YOU'}</small><b>{Number(me?.chips||0).toLocaleString()}</b></div>{canAct&&turnLeft!=null&&<em>{turnLeft}s</em>}</div>
-  </div>
-  <div className="ftp3UtilityBar">
-   <button className={showChat?'active':''} onClick={()=>setShowChat(v=>!v)}><ChatIcon/>Chat</button>
-   <button className={showHistory?'active':''} onClick={()=>setShowHistory(v=>!v)}><LogIcon/>Hand Log</button>
-  </div>
-  <section className="ftp3ActionDock">
-   {!state.started&&me?.host?<div className="ftp3PregameControls"><button className="ftp3Start" onClick={()=>onAction('start')}>Start Game</button><button onClick={()=>onAction('addbot')}>+ Test Bot</button></div>:isSpectator?<div className="ftp3Watching">Watching table • read only</div>:<>
-    <div className="ftp3ActionRow">
-     <button className="fold" disabled={!canAct} onClick={()=>onAction('fold')}>Fold</button>
-     <button disabled={!canAct} onClick={()=>onAction(state.toCall===0?'check':'call')}>{primaryLabel}{state.toCall>0&&<small>{toCall.toLocaleString()}</small>}</button>
-     <button className="raise" disabled={!canAct||!state.canRaise} onClick={()=>onAction('raise',target)}>Raise<small>{state.canRaise?`to ${target.toLocaleString()}`:'—'}</small></button>
-     <button className="allin" disabled={!canAct||!state.canAllIn} onClick={()=>onAction('allin')}>All In<small>{Number(me?.chips||0).toLocaleString()}</small></button>
-    </div>
-    {state.canRaise&&<div className="ftp3RaiseRow"><span>Bet Size: <b>{target.toLocaleString()}</b></span><input type="range" min={minRaise} max={maxRaise} step="1" value={target} onChange={e=>setRaise(e.target.value)}/><div><button onClick={()=>quick(.25)}>25%</button><button onClick={()=>quick(.5)}>50%</button><button onClick={()=>quick(.75)}>75%</button><button onClick={()=>setRaise(String(maxRaise))}>Max</button></div></div>}
-   </>}
-   {me?.host&&state.started&&<div className="ftp3HostRow"><button onClick={()=>onAction(state.paused?'resume':'pause')}>{state.paused?'Resume':'Pause'}</button><button onClick={()=>onAction('end')}>End Game</button></div>}
-  </section>
- </>
-}
+const primaryLabel=state.toCall===0?'Check':'Call';return <><div className="ftp3Hero"><div className="ftp3HeroCards">{heroCards.length?heroCards.map((c,i)=><Card key={i} c={c} backAsset={cardBackFor(me)}/>):<><Card c="" backAsset={cardBackFor(me)}/><Card c="" backAsset={cardBackFor(me)}/></>}</div>{strength&&state.started&&!me?.folded&&state.street!=='showdown'&&<div className="ftp3Strength">{strength}</div>}<div className="ftp3HeroPlaque"><span className="ftp3HeroCrown">♠</span><div><small>{isSpectator?'SPECTATOR':'YOU'}</small><b>{Number(me?.chips||0).toLocaleString()}</b></div>{canAct&&turnLeft!=null&&<em>{turnLeft}s</em>}</div></div><div className="ftp3UtilityBar"><button className={showChat?'active':''} onClick={()=>setShowChat(v=>!v)}><ChatIcon/>Chat</button><button className={showHistory?'active':''} onClick={()=>setShowHistory(v=>!v)}><LogIcon/>Hand Log</button></div><section className="ftp3ActionDock">{!state.started&&me?.host?<div className="ftp3PregameControls"><button className="ftp3Start" onClick={()=>onAction('start')}>Start Game</button><button onClick={()=>onAction('addbot')}>+ Test Bot</button></div>:isSpectator?<div className="ftp3Watching">Watching table • read only</div>:<><div className="ftp3ActionRow"><button className="fold" disabled={!canAct} onClick={()=>onAction('fold')}>Fold</button><button disabled={!canAct} onClick={()=>onAction(state.toCall===0?'check':'call')}>{primaryLabel}{state.toCall>0&&<small>{toCall.toLocaleString()}</small>}</button><button className="raise" disabled={!canAct||!state.canRaise} onClick={()=>onAction('raise',target)}>Raise<small>{state.canRaise?`to ${target.toLocaleString()}`:'—'}</small></button><button className="allin" disabled={!canAct||!state.canAllIn} onClick={()=>onAction('allin')}>All In<small>{Number(me?.chips||0).toLocaleString()}</small></button></div>{state.canRaise&&<div className="ftp3RaiseRow"><span>Bet Size: <b>{target.toLocaleString()}</b></span><input type="range" min={minRaise} max={maxRaise} step="1" value={target} onChange={e=>setRaise(e.target.value)}/><div><button onClick={()=>quick(.25)}>25%</button><button onClick={()=>quick(.5)}>50%</button><button onClick={()=>quick(.75)}>75%</button><button onClick={()=>setRaise(String(maxRaise))}>Max</button></div></div>}</>}{me?.host&&state.started&&<div className="ftp3HostRow"><button onClick={()=>onAction(state.paused?'resume':'pause')}>{state.paused?'Resume':'Pause'}</button><button onClick={()=>onAction('end')}>End Game</button></div>}</section></>}

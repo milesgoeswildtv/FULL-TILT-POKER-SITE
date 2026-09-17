@@ -2,8 +2,8 @@ export function tournamentStub(env,code){if(!env?.TOURNAMENTS||!code)throw Error
 
 async function readJson(response){const body=await response.json().catch(()=>({}));if(!response.ok)throw Error(body.error||`Tournament coordinator returned ${response.status}.`);return body}
 
-export async function syncTournamentTable(env,{tournamentCode,tableNumber}){
- const stub=tournamentStub(env,tournamentCode),response=await stub.fetch(new Request(`https://tournament/tables/${Number(tableNumber)}/sync`));
+export async function syncTournamentTable(env,{tournamentCode,tableNumber,atBoundary=true}){
+ const suffix=atBoundary?'?atBoundary=1':'',stub=tournamentStub(env,tournamentCode),response=await stub.fetch(new Request(`https://tournament/tables/${Number(tableNumber)}/sync${suffix}`));
  return readJson(response);
 }
 
@@ -13,7 +13,7 @@ export async function reportTournamentTable(env,{tournamentCode,tableNumber,...r
 }
 
 export async function acknowledgeTournamentMoves(env,{tournamentCode,tableNumber,moveIds}){
- if(!Array.isArray(moveIds)||!moveIds.length)return syncTournamentTable(env,{tournamentCode,tableNumber});
+ if(!Array.isArray(moveIds)||!moveIds.length)return syncTournamentTable(env,{tournamentCode,tableNumber,atBoundary:false});
  const stub=tournamentStub(env,tournamentCode),response=await stub.fetch(new Request(`https://tournament/tables/${Number(tableNumber)}/ack-moves`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({moveIds})}));
  return readJson(response);
 }

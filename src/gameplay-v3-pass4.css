@@ -1,40 +1,70 @@
-/* V3 pass 04 — header cleanup + lower-right seat clearance. */
-/* Keep the table metadata centered and lift it clear of the top seat. */
+/* V3 pass 05 — clean header, large left brand, aligned lower seats. */
+/* Header itself is transparent: no giant pill/container chrome. */
 .ftp3Header{
-  grid-template-columns:58px 1fr auto!important;
+  grid-template-columns:72px 1fr 96px!important;
   align-items:start!important;
-  padding-top:max(7px,env(safe-area-inset-top))!important;
+  padding:max(7px,env(safe-area-inset-top)) 14px 0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  pointer-events:none!important;
 }
+.ftp3Header:before,.ftp3Header:after{display:none!important;content:none!important}
+.ftp3Back,.ftp3Invite{pointer-events:auto!important}
+/* Metadata stays centered and high. */
 .ftp3HeaderBrand{
   position:absolute!important;
   left:50%!important;
-  top:max(7px,env(safe-area-inset-top))!important;
+  top:max(4px,env(safe-area-inset-top))!important;
   transform:translateX(-50%)!important;
-  width:46%!important;
-  gap:1px!important;
+  width:48%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  text-align:center!important;
+  gap:2px!important;
   pointer-events:none!important;
 }
+.ftp3HeaderBrand strong{font-size:clamp(12px,2.9vw,19px)!important;line-height:1!important}
+.ftp3HeaderBrand span{font-size:clamp(8px,2vw,13px)!important;line-height:1!important}
+/* Pull the actual Full Tilt mark out of the centered metadata and make it a real left-side brand. */
 .ftp3HeaderBrand img{
   position:fixed!important;
-  left:72px!important;
-  top:max(9px,env(safe-area-inset-top))!important;
-  width:42px!important;
-  height:42px!important;
+  left:82px!important;
+  top:max(4px,env(safe-area-inset-top))!important;
+  transform:none!important;
+  width:72px!important;
+  height:58px!important;
+  max-width:none!important;
   max-height:none!important;
   object-fit:contain!important;
+  object-position:left center!important;
 }
-.ftp3HeaderBrand strong{font-size:clamp(11px,2.6vw,18px)!important;line-height:1!important}
-.ftp3HeaderBrand span{font-size:clamp(8px,2vw,13px)!important;line-height:1.05!important}
 .ftp3Back{align-self:start!important}
-.ftp3Invite{align-self:start!important}
-/* Top opponent now has clean air below the lifted metadata. */
-.ftp3SeatUnit[data-seat="0"]>.ftp3Seat{top:calc(var(--seat-y) + 2%)!important}
-.ftp3SeatUnit[data-seat="0"] .ftp3SeatCards{bottom:66%!important}
-/* In the 8-player preview, seat 6 is the lower-right / River station. Nudge it upward. */
-.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:calc(var(--seat-y) - 3%)!important}
-.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Bet{top:calc(var(--bet-y) - 2%)!important}
+.ftp3Invite{
+  align-self:start!important;
+  justify-self:end!important;
+  width:auto!important;
+  min-width:92px!important;
+  background:linear-gradient(180deg,#1a131e,#0c0910)!important;
+  border:1px solid rgba(223,175,79,.62)!important;
+  border-radius:999px!important;
+  box-shadow:0 8px 22px #0008!important;
+}
+/* Top opponent sits beneath metadata, not inside it. */
+.ftp3SeatUnit[data-seat="0"]>.ftp3Seat{top:calc(var(--seat-y) + 2.5%)!important}
+.ftp3SeatUnit[data-seat="0"] .ftp3SeatCards{bottom:64%!important}
+/* 8-player lower pair: Luck + River share one clean horizontal station band. */
+.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="5"]>.ftp3Seat,
+.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:73%!important}
+.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="5"]>.ftp3Bet,
+.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Bet{top:67.5%!important}
 @media(max-width:430px){
-  .ftp3HeaderBrand{top:max(5px,env(safe-area-inset-top))!important;width:48%!important}
-  .ftp3HeaderBrand img{left:66px!important;top:max(7px,env(safe-area-inset-top))!important;width:38px!important;height:38px!important}
-  .ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:calc(var(--seat-y) - 3.5%)!important}
+  .ftp3HeaderBrand{top:max(3px,env(safe-area-inset-top))!important;width:46%!important}
+  .ftp3HeaderBrand img{left:72px!important;top:max(3px,env(safe-area-inset-top))!important;width:68px!important;height:54px!important}
+  .ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="5"]>.ftp3Seat,
+  .ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:72.5%!important}
 }

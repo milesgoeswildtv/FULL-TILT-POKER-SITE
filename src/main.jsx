@@ -25,6 +25,7 @@ import'./gameplay-v3-refinement.css';
 import'./gameplay-v3-pass2.css';
 import'./gameplay-v3-pass3.css';
 import'./gameplay-v3-pass4.css';
+import'./global-royal-grade.css';
 installSessionRouting();
 const root=createRoot(document.getElementById('root'));
 function render(){const preview=/^#\/v3-preview(?:$|\?)/i.test(location.hash),lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(preview?<V3Preview/>:lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}

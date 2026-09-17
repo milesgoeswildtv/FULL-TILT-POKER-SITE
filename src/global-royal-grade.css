@@ -1,0 +1,9 @@
+/* Pass 12 — site-wide royal/blackened-purple grade matching the approved V3 table. */
+:root{background:#050208!important;color-scheme:dark}
+html,body,#root{min-height:100%;background-color:#050208!important}
+body{background:radial-gradient(ellipse at 50% 18%,#21083a 0%,#120321 44%,#050208 78%,#020104 100%)!important}
+/* Grade every non-V3 application screen without changing its layout or interaction. */
+#root>:not(.gameplayV3Page){position:relative;isolation:isolate}
+#root>:not(.gameplayV3Page):before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.22),rgba(13,2,25,.08) 28%,rgba(4,0,12,.24) 72%,rgba(0,0,0,.68)),radial-gradient(ellipse at 50% 38%,rgba(74,18,125,.08),rgba(4,0,12,.28) 62%,rgba(0,0,0,.42));mix-blend-mode:multiply}
+.homeShell,.lobbyPage,.tablePage,.tournamentPage,.shopPage,.historyPage,.supportPage{background-color:#09030f!important;background-blend-mode:normal,multiply,normal!important}
+.panel,.hero,.inviteJoin,.hud,.modal,.sheet,.drawer,.cardPanel{background-color:rgba(10,5,16,.94)!important}

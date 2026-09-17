@@ -1,0 +1,329 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { handleAuthApi } from '../worker/auth.js';
+import { handleTelegramStarsApi, parseStarsPayload, starsCatalog } from '../worker/telegram-stars.js';
+import { PlayerAccount } from '../worker/player-account.js';
+
+const enc = new TextEncoder();
+
+async function hmac(keyBytes, message) {
+  const key = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(message)));
+}
+
+function hex(bytes) {
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function signedInitData(fields, botToken) {
+  const pairs = Object.entries(fields).sort(([a], [b]) => a.localeCompare(b));
+  const check = pairs.map(([k, v]) => `${k}=${v}`).join('\n');
+  const secret = await hmac(enc.encode('WebAppData'), botToken);
+  const hash = hex(await hmac(secret, check));
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(fields)) params.set(k, v);
+  params.set('hash', hash);
+  return params.toString();
+}
+
+class MemoryStorage {
+  constructor() { this.map = new Map(); }
+  async get(k) { return this.map.get(k); }
+  async put(k, v) { this.map.set(k, structuredClone(v)); }
+  async delete(k) { this.map.delete(k); }
+  async setAlarm() {}
+  async deleteAlarm() {}
+}
+
+class AccountNamespace {
+  constructor() { this.rows = new Map(); }
+  idFromName(name) { return String(name); }
+  get(id) {
+    id = String(id);
+    if (!this.rows.has(id)) {
+      const storage = new MemoryStorage();
+      const ctx = { storage };
+      const env = { ACCOUNTS: this };
+      this.rows.set(id, { storage, account: new PlayerAccount(ctx, env) });
+    }
+    const row = this.rows.get(id);
+    return {
+      fetch: (input, init) => row.account.fetch(input instanceof Request ? input : new Request(input, init))
+    };
+  }
+}
+
+async function telegramSession(ns, { id = 777 } = {}) {
+  const botToken = '123456:stars-test-token';
+  const authSecret = 'stars-session-secret';
+  const fields = {
+    auth_date: String(Math.floor(Date.now() / 1000)),
+    user: JSON.stringify({ id, first_name: 'Stars', username: 'starsbuyer' })
+  };
+  const initData = await signedInitData(fields, botToken);
+  const env = {
+    ACCOUNTS: ns,
+    TELEGRAM_BOT_TOKEN: botToken,
+    AUTH_SECRET: authSecret,
+    TELEGRAM_WEBHOOK_SECRET: 'stars_webhook_secret',
+    TELEGRAM_STARS_CONSTELLATION: '149',
+    TELEGRAM_STARS_DEAD_MANS_HAND: '179',
+    TELEGRAM_STARS_REGALIA: '199',
+    TELEGRAM_STARS_TRIPLE_THREAT: '399'
+  };
+  const response = await handleAuthApi(new Request('https://crashout.test/api/auth/telegram', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ initData })
+  }), env);
+  const cookie = (response.headers.get('set-cookie') || '').split(';')[0];
+  assert.equal(response.status, 200);
+  return { env, cookie };
+}
+
+function telegramApiFetch(log) {
+  return async (url, init = {}) => {
+    const method = String(url).split('/').pop();
+    const body = init.body ? JSON.parse(init.body) : {};
+    log.push({ method, body });
+    if (method === 'createInvoiceLink') return Response.json({ ok: true, result: 'https://t.me/$invoice/crashout-stars-test' });
+    if (method === 'answerPreCheckoutQuery') return Response.json({ ok: true, result: true });
+    if (method === 'refundStarPayment') return Response.json({ ok: true, result: true });
+    if (method === 'sendMessage') return Response.json({ ok: true, result: { message_id: 1 } });
+    return Response.json({ ok: false, description: 'unexpected bot method' }, { status: 400 });
+  };
+}
+
+async function withFetch(fake, fn) {
+  const original = globalThis.fetch;
+  globalThis.fetch = fake;
+  try { return await fn(); }
+  finally { globalThis.fetch = original; }
+}
+
+function webhookRequest(secret, update) {
+  return new Request('https://crashout.test/api/telegram/webhook', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-telegram-bot-api-secret-token': secret
+    },
+    body: JSON.stringify(update)
+  });
+}
+
+test('Stars catalog exposes only configured integer XTR prices', () => {
+  const catalog = starsCatalog({
+    TELEGRAM_BOT_TOKEN: 'x',
+    TELEGRAM_WEBHOOK_SECRET: 'y',
+    TELEGRAM_STARS_CONSTELLATION: '149',
+    TELEGRAM_STARS_REGALIA: 'nope'
+  });
+  assert.equal(catalog.configured, true);
+  assert.equal(catalog.currency, 'XTR');
+  assert.equal(catalog.products.find(x => x.key === 'constellation').amount, 149);
+  assert.equal(catalog.products.find(x => x.key === 'regalia').available, false);
+});
+
+test('Stars payload parser rejects malformed account and order references', () => {
+  assert.deepEqual(
+    parseStarsPayload('co1~telegram%3A777~123e4567-e89b-12d3-a456-426614174000'),
+    { accountId: 'telegram:777', orderId: '123e4567-e89b-12d3-a456-426614174000' }
+  );
+  assert.equal(parseStarsPayload('co1~bad%2Faccount~123e4567-e89b-12d3-a456-426614174000'), null);
+  assert.equal(parseStarsPayload('broken'), null);
+});
+
+test('Telegram Stars invoice -> precheckout -> successful payment -> replay -> refund is idempotent', async () => {
+  const ns = new AccountNamespace();
+  const { env, cookie } = await telegramSession(ns);
+  const calls = [];
+
+  await withFetch(telegramApiFetch(calls), async () => {
+    const invoiceRes = await handleTelegramStarsApi(new Request('https://crashout.test/api/shop/stars/invoice', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ item: 'constellation' })
+    }), env);
+    assert.equal(invoiceRes.status, 200);
+    const invoice = await invoiceRes.json();
+    assert.equal(invoice.stars, 149);
+    assert.equal(invoice.currency, 'XTR');
+    assert.match(invoice.url, /invoice/);
+
+    const create = calls.find(x => x.method === 'createInvoiceLink');
+    assert.ok(create);
+    assert.equal(create.body.currency, 'XTR');
+    assert.deepEqual(create.body.prices, [{ label: 'Constellation Booster', amount: 149 }]);
+    assert.equal('provider_token' in create.body, false);
+    const parsed = parseStarsPayload(create.body.payload);
+    assert.equal(parsed.accountId, 'telegram:777');
+
+    const preRes = await handleTelegramStarsApi(webhookRequest('stars_webhook_secret', {
+      update_id: 1,
+      pre_checkout_query: {
+        id: 'pcq_1',
+        from: { id: 777 },
+        currency: 'XTR',
+        total_amount: 149,
+        invoice_payload: create.body.payload
+      }
+    }), env);
+    assert.equal(preRes.status, 200);
+    assert.equal(calls.filter(x => x.method === 'answerPreCheckoutQuery').at(-1).body.ok, true);
+
+    const paidUpdate = {
+      update_id: 2,
+      message: {
+        message_id: 4,
+        chat: { id: 777 },
+        from: { id: 777 },
+        successful_payment: {
+          currency: 'XTR',
+          total_amount: 149,
+          invoice_payload: create.body.payload,
+          telegram_payment_charge_id: 'charge_star_001',
+          provider_payment_charge_id: ''
+        }
+      }
+    };
+
+    let paidRes = await handleTelegramStarsApi(webhookRequest('stars_webhook_secret', paidUpdate), env);
+    assert.equal(paidRes.status, 200);
+    paidRes = await handleTelegramStarsApi(webhookRequest('stars_webhook_secret', paidUpdate), env);
+    assert.equal(paidRes.status, 200);
+
+    const profileRequest = () => new Request('https://account.internal/profile', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        identity: { id: 'telegram:777', provider: 'telegram', providerId: '777', username: 'starsbuyer', displayName: 'Stars' },
+        canonicalId: 'telegram:777'
+      })
+    });
+
+    let profileRes = await ns.get('telegram:777').fetch(profileRequest());
+    let profile = await profileRes.json();
+    assert.ok(profile.account.inventory.includes('constellation'));
+    assert.equal(profile.account.purchases.length, 1);
+    assert.equal(profile.account.purchases[0].source, 'telegram_stars');
+    assert.equal(profile.account.purchases[0].currency, 'xtr');
+    assert.equal(profile.account.purchases[0].amountTotal, 149);
+
+    const purchaseId = profile.account.purchases[0].purchaseId;
+    const refundRes = await handleTelegramStarsApi(new Request('https://crashout.test/api/shop/stars/refund', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ purchaseId })
+    }), env);
+    assert.equal(refundRes.status, 200);
+    const refund = await refundRes.json();
+    assert.equal(refund.refund.source, 'telegram_stars');
+    assert.equal(refund.refund.status, 'succeeded');
+    assert.ok(calls.some(x => x.method === 'refundStarPayment' && x.body.telegram_payment_charge_id === 'charge_star_001'));
+
+    profileRes = await ns.get('telegram:777').fetch(profileRequest());
+    profile = await profileRes.json();
+    assert.equal(profile.account.inventory.includes('constellation'), false);
+    assert.equal(profile.account.purchases[0].status, 'refunded');
+  });
+});
+
+test('Stars webhook rejects wrong secret and precheckout rejects mismatched amount', async () => {
+  const ns = new AccountNamespace();
+  const { env, cookie } = await telegramSession(ns);
+  const calls = [];
+
+  await withFetch(telegramApiFetch(calls), async () => {
+    let r = await handleTelegramStarsApi(webhookRequest('wrong', {}), env);
+    assert.equal(r.status, 401);
+
+    r = await handleTelegramStarsApi(new Request('https://crashout.test/api/shop/stars/invoice', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ item: 'regalia' })
+    }), env);
+    assert.equal(r.status, 200);
+
+    const payload = calls.find(x => x.method === 'createInvoiceLink').body.payload;
+    r = await handleTelegramStarsApi(webhookRequest('stars_webhook_secret', {
+      update_id: 3,
+      pre_checkout_query: {
+        id: 'pcq_bad',
+        from: { id: 777 },
+        currency: 'XTR',
+        total_amount: 198,
+        invoice_payload: payload
+      }
+    }), env);
+    assert.equal(r.status, 200);
+    const answer = calls.filter(x => x.method === 'answerPreCheckoutQuery').at(-1);
+    assert.equal(answer.body.ok, false);
+    assert.match(answer.body.error_message, /do not match/i);
+  });
+});
+
+test('/paysupport receives a bot reply through the verified webhook', async () => {
+  const env = { TELEGRAM_BOT_TOKEN: '123:token', TELEGRAM_WEBHOOK_SECRET: 'secret' };
+  const calls = [];
+  await withFetch(telegramApiFetch(calls), async () => {
+    const r = await handleTelegramStarsApi(webhookRequest('secret', {
+      update_id: 9,
+      message: { chat: { id: 777 }, from: { id: 777 }, text: '/paysupport' }
+    }), env);
+    assert.equal(r.status, 200);
+    const send = calls.find(x => x.method === 'sendMessage');
+    assert.ok(send);
+    assert.equal(send.body.chat_id, '777');
+    assert.match(send.body.text, /payment support/i);
+  });
+});
+
+test('second overlapping Stars checkout is declined while the first is approved', async () => {
+  const ns = new AccountNamespace();
+  const { env, cookie } = await telegramSession(ns);
+  const calls = [];
+
+  await withFetch(telegramApiFetch(calls), async () => {
+    for (let i = 0; i < 2; i++) {
+      const r = await handleTelegramStarsApi(new Request('https://crashout.test/api/shop/stars/invoice', {
+        method: 'POST',
+        headers: { cookie, 'content-type': 'application/json' },
+        body: JSON.stringify({ item: 'constellation' })
+      }), env);
+      assert.equal(r.status, 200);
+    }
+
+    const payloads = calls.filter(x => x.method === 'createInvoiceLink').map(x => x.body.payload);
+    assert.equal(payloads.length, 2);
+
+    let hook = await handleTelegramStarsApi(webhookRequest('stars_webhook_secret', {
+      update_id: 20,
+      pre_checkout_query: {
+        id: 'pcq_first',
+        from: { id: 777 },
+        currency: 'XTR',
+        total_amount: 149,
+        invoice_payload: payloads[0]
+      }
+    }), env);
+    assert.equal(hook.status, 200);
+
+    hook = await handleTelegramStarsApi(webhookRequest('stars_webhook_secret', {
+      update_id: 21,
+      pre_checkout_query: {
+        id: 'pcq_second',
+        from: { id: 777 },
+        currency: 'XTR',
+        total_amount: 149,
+        invoice_payload: payloads[1]
+      }
+    }), env);
+    assert.equal(hook.status, 200);
+
+    const answers = calls.filter(x => x.method === 'answerPreCheckoutQuery');
+    assert.equal(answers.at(-2).body.ok, true);
+    assert.equal(answers.at(-1).body.ok, false);
+    assert.match(answers.at(-1).body.error_message, /already awaiting payment/i);
+  });
+});

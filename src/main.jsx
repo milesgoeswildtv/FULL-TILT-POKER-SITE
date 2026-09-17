@@ -2,6 +2,7 @@ import React from'react';
 import{createRoot}from'react-dom/client';
 import App from'./App.jsx';
 import LayoutLab from'./LayoutLab.jsx';
+import V3Preview from'./V3Preview.jsx';
 import TournamentConfig from'./TournamentConfig.jsx';
 import ActionLogPanel from'./ActionLogPanel.jsx';
 import TableChatDock from'./TableChatDock.jsx';
@@ -22,6 +23,6 @@ import'./approved-cash-felt.css';
 import'./approved-cash-felt-hotfix.css';
 installSessionRouting();
 const root=createRoot(document.getElementById('root'));
-function render(){const lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}
+function render(){const preview=/^#\/v3-preview(?:$|\?)/i.test(location.hash),lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(preview?<V3Preview/>:lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}
 addEventListener('hashchange',render);
 render();

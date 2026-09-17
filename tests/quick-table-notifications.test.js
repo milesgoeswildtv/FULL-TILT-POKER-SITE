@@ -1,0 +1,11 @@
+import test from'node:test';
+import assert from'node:assert/strict';
+import{PokerTable}from'../worker/app.js';
+
+class MemoryStorage{constructor(){this.map=new Map()}async get(k){return this.map.get(k)}async put(k,v){this.map.set(k,structuredClone(v))}async delete(k){this.map.delete(k)}async setAlarm(){}async deleteAlarm(){}}
+function harness(){const deliveries=[],storage=new MemoryStorage(),state={storage,getWebSockets:()=>[]},env={ACCOUNTS:{idFromName:x=>String(x),get:accountId=>({fetch:async req=>{deliveries.push({accountId:String(accountId),path:new URL(req.url).pathname,body:await req.json()});return Response.json({ok:true})}})}};return{table:new PokerTable(state,env),deliveries}}
+async function post(table,path,body){return table.fetch(new Request(`https://table${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}))}
+
+test('second human at a quick table sends one table-ready event to the host',async()=>{const h=harness();let r=await post(h.table,'/init',{code:'ABC123',hostName:'Host',accountId:'host-account',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]]});assert.equal(r.status,200);r=await post(h.table,'/join',{name:'Guest One',accountId:'guest-1'});assert.equal(r.status,200);assert.equal(h.deliveries.length,1);assert.equal(h.deliveries[0].accountId,'host-account');assert.equal(h.deliveries[0].path,'/notifications/enqueue');assert.equal(h.deliveries[0].body.event.kind,'table-ready');assert.equal(h.deliveries[0].body.event.code,'ABC123');assert.equal(h.deliveries[0].body.event.playerCount,2)});
+
+test('later quick-table joins send player-joined instead of another table-ready event',async()=>{const h=harness();await post(h.table,'/init',{code:'ABC123',hostName:'Host',accountId:'host-account',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]]});await post(h.table,'/join',{name:'Guest One',accountId:'guest-1'});await post(h.table,'/join',{name:'Guest Two',accountId:'guest-2'});assert.equal(h.deliveries.length,2);assert.equal(h.deliveries[0].body.event.kind,'table-ready');assert.equal(h.deliveries[1].body.event.kind,'player-joined');assert.equal(h.deliveries[1].body.event.playerName,'Guest Two');assert.equal(h.deliveries[1].body.event.playerCount,3)});

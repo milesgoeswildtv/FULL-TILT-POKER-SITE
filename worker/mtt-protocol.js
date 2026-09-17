@@ -10,18 +10,19 @@ export function validateBoundaryShape(report={}){
  if(!isNonNegativeInteger(report.handNumber))throw Error('Tournament hand number must be a non-negative integer.');
  if(report.reportGeneration!=null&&!isPositiveInteger(report.reportGeneration))throw Error('Tournament report generation must be a positive integer.');
  if(report.completedAt!=null&&!isNonNegativeInteger(report.completedAt))throw Error('Tournament boundary completion time is invalid.');
+ if(report.nextBigBlindPlayerId!=null&&typeof report.nextBigBlindPlayerId!=='string')throw Error('Tournament next big blind player id is invalid.');
  for(const row of report.players){if(!row||typeof row!=='object'||!String(row.id||''))throw Error('Tournament report player id required.');if(!isPositiveInteger(row.ownershipGeneration??1))throw Error('Tournament player ownership generation is invalid.');if(!isNonNegativeInteger(row.chips))throw Error('Tournament player chips must be a non-negative integer.');if(row.handStartChips!=null&&!isNonNegativeInteger(row.handStartChips))throw Error('Tournament hand-start chips must be a non-negative integer.');}
  return true;
 }
 
 export function normalizeBoundaryReport(report={},fallbackGeneration=1){
- validateBoundaryShape(report);const rows=report.players.map(canonicalRow);
- return{reportGeneration:Math.max(1,int(report.reportGeneration,fallbackGeneration)),boundarySequence:Math.max(1,int(report.boundarySequence,report.handNumber)),handNumber:Math.max(0,int(report.handNumber)),completedAt:Math.max(0,int(report.completedAt)),status:String(report.status||'running'),players:rows};
+ validateBoundaryShape(report);const rows=report.players.map(canonicalRow),nextBigBlindPlayerId=String(report.nextBigBlindPlayerId||'')||null;
+ return{reportGeneration:Math.max(1,int(report.reportGeneration,fallbackGeneration)),boundarySequence:Math.max(1,int(report.boundarySequence,report.handNumber)),handNumber:Math.max(0,int(report.handNumber)),completedAt:Math.max(0,int(report.completedAt)),status:String(report.status||'running'),nextBigBlindPlayerId,players:rows};
 }
 
 export function boundaryFingerprint(report){
  const r=normalizeBoundaryReport(report,report?.reportGeneration||1),players=[...(r.players||[])].sort((a,b)=>a.id.localeCompare(b.id));
- return JSON.stringify({reportGeneration:r.reportGeneration,boundarySequence:r.boundarySequence,handNumber:r.handNumber,completedAt:r.completedAt,status:r.status,players});
+ return JSON.stringify({reportGeneration:r.reportGeneration,boundarySequence:r.boundarySequence,handNumber:r.handNumber,completedAt:r.completedAt,status:r.status,nextBigBlindPlayerId:r.nextBigBlindPlayerId,players});
 }
 
 export function validateBoundaryHeader(table,rawReport){
@@ -40,6 +41,11 @@ export function validateCompleteRoster(expectedPlayers,rows){
  const seen=new Set();for(const row of rows||[]){if(!row.id)throw Error('Tournament report player id required.');if(seen.has(row.id))throw Error('Tournament report contains duplicate player rows.');seen.add(row.id);const expectedPlayer=byId.get(row.id);if(!expectedPlayer)throw Error('Table reported a player it does not own.');if(Math.max(1,int(row.ownershipGeneration,1))!==Math.max(1,int(expectedPlayer.ownershipGeneration,1)))throw Error('Tournament player ownership generation is stale.');}
  if(seen.size!==byId.size||[...byId.keys()].some(id=>!seen.has(id)))throw Error('Tournament boundary report must contain the complete owned roster.');
  return true;
+}
+
+export function validateNextBigBlind(report){
+ const active=(report?.players||[]).filter(row=>row.chips>0&&!row.eliminated);if(active.length<2){if(report.nextBigBlindPlayerId)throw Error('Singleton tournament table cannot report a next big blind player.');return true}
+ if(!report.nextBigBlindPlayerId||!active.some(row=>row.id===report.nextBigBlindPlayerId))throw Error('Tournament boundary must identify the active player due the next big blind.');return true;
 }
 
 export function assertBoundaryChipConservation(expectedPlayers,rows){

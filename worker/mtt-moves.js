@@ -4,16 +4,18 @@ function tableCapacity(table){return Math.max(1,Math.trunc(Number(table?.capacit
 function activePlayers(tournament,table){return (table?.playerIds||[]).map(id=>tournament.players.find(p=>p.id===id)).filter(p=>p&&!p.eliminated&&p.chips>0)}
 function openSeat(tournament,table){const used=new Set(activePlayers(tournament,table).map(p=>Number(p.seat)));for(let seat=1;seat<=tableCapacity(table);seat++)if(!used.has(seat))return seat;return null}
 export function activeTournamentTables(tournament){return (tournament?.tables||[]).filter(t=>t.status!=='closed'&&activePlayers(tournament,t).length>0)}
-export function movePlayer(tournament,{playerId,fromTable,toTable,toSeat,kind='balance',reason=''}){ 
+export function movePlayer(tournament,{playerId,fromTable,toTable,toSeat,kind='balance',reason=''}){
  const from=tournament.tables.find(t=>t.tableNumber===Number(fromTable)),to=tournament.tables.find(t=>t.tableNumber===Number(toTable)),player=tournament.players.find(p=>p.id===playerId);
  if(!from||!to||!player||from===to||!from.playerIds.includes(playerId))throw Error('Invalid tournament table move.');
+ if(player.reportOwnerTable!=null&&Number(player.reportOwnerTable)!==from.tableNumber)throw Error('Player report ownership does not match move source.');
  const capacity=tableCapacity(to);if(activePlayers(tournament,to).length>=capacity)throw Error('Destination table is full.');
  const requested=Math.trunc(Number(toSeat)||0),seat=requested||openSeat(tournament,to);if(!seat||seat<1||seat>capacity)throw Error('Destination seat unavailable.');
  if(activePlayers(tournament,to).some(p=>Number(p.seat)===seat))throw Error('Destination seat is occupied.');
+ const oldGeneration=Math.max(1,Math.trunc(Number(player.ownershipGeneration)||1)),newGeneration=oldGeneration+1;
  from.playerIds=from.playerIds.filter(id=>id!==playerId);if(!to.playerIds.includes(playerId))to.playerIds.push(playerId);
- player.tableNumber=to.tableNumber;player.seat=seat;player.moveCount=Number(player.moveCount||0)+1;
- const move={id:`move-${Date.now()}-${player.id}`,kind,playerId:player.id,playerName:player.name,playerToken:player.token||null,fromTable:from.tableNumber,fromTableKey:from.tableKey||null,toTable:to.tableNumber,toTableKey:to.tableKey||null,toSeat:seat,stack:player.chips,reason,createdAt:Date.now(),acknowledged:false};
- tournament.pendingMoves??=[];tournament.pendingMoves.push(move);return move;
+ player.tableNumber=to.tableNumber;player.seat=seat;player.moveCount=Number(player.moveCount||0)+1;player.ownershipGeneration=newGeneration;player.reportOwnerTable=null;
+ const move={id:`move-${Date.now()}-${player.id}-${newGeneration}`,kind,playerId:player.id,playerName:player.name,playerToken:player.token||null,fromTable:from.tableNumber,fromTableKey:from.tableKey||null,toTable:to.tableNumber,toTableKey:to.tableKey||null,toSeat:seat,stack:player.chips,fromOwnershipGeneration:oldGeneration,toOwnershipGeneration:newGeneration,reason,createdAt:Date.now(),acknowledged:false};
+ player.pendingMoveId=move.id;tournament.pendingMoves??=[];tournament.pendingMoves.push(move);return move;
 }
 export function planBalanceMove(tournament){
  const tables=activeTournamentTables(tournament).map(t=>({tableNumber:t.tableNumber,players:activePlayers(tournament,t).map(p=>({playerId:p.id,seat:p.seat,moveCount:p.moveCount||0,sittingOut:!!p.sittingOut}))}));

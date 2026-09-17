@@ -45,13 +45,13 @@ TELEGRAM_BOT_USERNAME=<bot username without @>
 TELEGRAM_APP_SHORT_NAME=<optional named Mini App short name>
 TELEGRAM_INITDATA_MAX_AGE=900
 
-TELEGRAM_STARS_CONSTELLATION=<positive integer Star price>
-TELEGRAM_STARS_DEAD_MANS_HAND=<positive integer Star price>
-TELEGRAM_STARS_REGALIA=<positive integer Star price>
-TELEGRAM_STARS_TRIPLE_THREAT=<positive integer Star price>
+TELEGRAM_STARS_CONSTELLATION=385
+TELEGRAM_STARS_DEAD_MANS_HAND=385
+TELEGRAM_STARS_REGALIA=385
+TELEGRAM_STARS_TRIPLE_THREAT=1000
 ```
 
-No Stars product is purchasable until its Star price is configured. The Stars catalog also remains disabled until both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` are present.
+Production Star pricing is locked to ⭐385 for each individual $4.99 booster and ⭐1,000 for the $12.99 Triple Threat bundle. The Stars catalog remains disabled until both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` are present.
 
 ## Telegram Stars webhook
 

@@ -4,8 +4,8 @@
 html,body,button,input,select,textarea{font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue Condensed",Arial,sans-serif!important}h1,h2,h3,h4,.brand,.eyebrow,.ftp3HeaderBrand,.ftp3SeatCopy,.ftp3HeroPlaque,.ftp3ActionDock,.ftp3UtilityBar{font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue Condensed",Arial,sans-serif!important;font-stretch:condensed}
 
 /* Pass 17 — Crashout dirty display type. Readable data stays condensed. */
-@import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Oswald:wght@400;500;600;700&display=swap");
-:root{--crash-display:"Black Ops One",Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;--crash-ui:"Oswald","Arial Narrow",Arial,sans-serif}
+@import url("https://fonts.googleapis.com/css2?family=Metal+Mania&family=Oswald:wght@400;500;600;700&display=swap");
+:root{--crash-display:"Metal Mania",Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;--crash-ui:"Oswald","Arial Narrow",Arial,sans-serif}
 html,body,input,select,textarea{font-family:var(--crash-ui)!important}
 button,h1,h2,h3,h4,.brand,.eyebrow,.entryEyebrow,.sectionHead>div>span,.gamePanelHead span,.ftp3HeaderBrand,.ftp3ActionDock button,.ftp3UtilityBar button{font-family:var(--crash-display)!important;letter-spacing:.035em}
 .ftp3SeatCopy,.ftp3HeroPlaque,.ftp3Bet,.ftp3Pot,.ftp3SidePots,.ftp3Strength{font-family:var(--crash-ui)!important}

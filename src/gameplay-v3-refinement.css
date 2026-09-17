@@ -1,0 +1,59 @@
+/* Gameplay V3 refinement 01 — deliberate geometry cleanup.
+   This layer only tunes the fresh V3 system; it does not restore legacy gameplay CSS. */
+
+/* Give the table content more breathing room without shrinking the table itself. */
+.ftp3CenterMark{top:35%;width:34%;opacity:.34}
+
+/* Opponent clusters: smaller, cleaner plaques with cards clearly behind them. */
+.ftp3Seat{width:21.5%}
+.ftp3SeatCards{bottom:74%;width:52%;height:4.25dvh;min-height:34px}
+.ftp3SeatPlaque{
+  min-height:4.35dvh;
+  padding:.5dvh 1vw .5dvh 5.8vw;
+  border-radius:11px;
+}
+.ftp3Avatar{left:-1vw;width:7.8vw;max-width:52px}
+.ftp3SeatCopy b{font-size:clamp(7px,1.72vw,12px)}
+.ftp3SeatCopy strong{font-size:clamp(9px,2vw,14px)}
+.ftp3Pos{right:-5px;bottom:-8px;min-width:25px;height:25px;font-size:8px}
+.ftp3Bet{padding:1px 6px 1px 2px;font-size:8px;gap:3px}
+.ftp3Bet img{width:19px;height:19px}
+
+/* Community cards should read clearly but not consume the center of the table. */
+.ftp3Board{top:42.8%;width:61%;height:6.7dvh;min-height:48px;gap:4px}
+.ftp3Board .card{padding:6px 4px!important;font-size:clamp(16px,3.6vw,25px)!important}
+
+/* Keep the pot stack compact and separated from board / lower seats. */
+.ftp3Pot{top:53%;min-width:29%;padding:6px 16px}
+.ftp3Pot strong{font-size:clamp(17px,3.7vw,26px)}
+.ftp3SidePots{top:59.6%;width:68%;gap:4px}
+.ftp3SidePots span{padding:4px 3px}
+
+/* Hero remains attached to the bottom rail, but gets a cleaner gap before controls. */
+.ftp3Hero{bottom:19.25dvh;width:min(39vw,205px)}
+.ftp3HeroCards{height:7.7dvh;min-height:58px;margin-bottom:-7px}
+.ftp3HeroCards .card{width:47px!important}
+.ftp3HeroPlaque{min-height:54px;padding:7px 27px 7px 52px}
+.ftp3HeroCrown{width:50px;height:50px;font-size:24px}
+.ftp3HeroPlaque b{font-size:17px}
+
+.ftp3UtilityBar{bottom:18.25dvh;left:16px;right:16px}
+.ftp3UtilityBar button{min-width:104px;height:40px}
+
+/* Eight-handed portrait placement: keep every opponent on the rail and out of the board. */
+.ftp3Stage[data-player-count="9"] .ftp3Seat:nth-of-type(4),
+.ftp3Stage[data-player-count="8"] .ftp3Seat:nth-of-type(4){ }
+
+@media(max-width:430px){
+  .ftp3Seat{width:20.5%}
+  .ftp3SeatPlaque{padding-left:6vw}
+  .ftp3Avatar{width:8.1vw}
+  .ftp3Board{width:60%}
+  .ftp3SidePots{width:66%}
+}
+
+@media(max-height:700px){
+  .ftp3Board{height:6.4dvh}
+  .ftp3Hero{bottom:20dvh}
+  .ftp3UtilityBar{bottom:18.8dvh}
+}

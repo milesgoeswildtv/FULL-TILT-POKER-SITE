@@ -1,6 +1,6 @@
 import test from'node:test';
 import assert from'node:assert/strict';
-import{frozenTurnRemaining,resumeTurnDeadline,shiftedLevelStart,showdownExpired,blindAdvance}from'../worker/lifecycle.js';
+import{frozenTurnRemaining,resumeDeadline,resumeTurnDeadline,resumePhaseDeadline,shiftedLevelStart,showdownExpired,blindAdvance}from'../worker/lifecycle.js';
 
 const LEVELS=[[10,20],[20,40],[30,60],[50,100]];
 
@@ -10,10 +10,22 @@ test('pause freezes only the remaining turn time',()=>{
  assert.equal(frozenTurnRemaining(9000,10000),0);
 });
 
-test('resume restores deadline with a one-second floor',()=>{
+test('generic resume deadline clamps negative values and honors configured grace',()=>{
+ assert.equal(resumeDeadline(5000,10000,250),15000);
+ assert.equal(resumeDeadline(-50,10000,250),10250);
+ assert.equal(resumeDeadline(null,10000,250),null);
+});
+
+test('turn resume restores deadline with a one-second floor',()=>{
  assert.equal(resumeTurnDeadline(5000,10000),15000);
  assert.equal(resumeTurnDeadline(0,10000),11000);
  assert.equal(resumeTurnDeadline(null,10000),null);
+});
+
+test('showdown phase resume receives a short nonzero transition floor',()=>{
+ assert.equal(resumePhaseDeadline(5000,10000),15000);
+ assert.equal(resumePhaseDeadline(0,10000),10250);
+ assert.equal(resumePhaseDeadline(null,10000),null);
 });
 
 test('blind clock shifts by the exact pause duration',()=>{

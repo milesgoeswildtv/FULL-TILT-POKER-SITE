@@ -1,7 +1,6 @@
 import React,{useEffect,useMemo,useRef,useState}from'react';
 import{subscribeTableState}from'./table-state-bus.js';
 import{sessionToken,tournamentSessionToken}from'./session.js';
-import'./gameplay-v3-docks.css';
 
 function currentRoute(){let m=location.hash.match(/^#\/tournament\/([A-Z0-9]{6})/i);if(m)return{kind:'tournament',code:m[1].toUpperCase()};m=location.hash.match(/^#\/table\/([A-Z0-9]{6})/i);if(m)return{kind:'table',code:m[1].toUpperCase()};return null}
 function messagesForScope(scope,state,globalMessages){return scope==='global'?globalMessages:(state?.chat||[])}

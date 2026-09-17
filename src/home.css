@@ -11,3 +11,39 @@
 .miniBrand{min-height:92px!important}
 .miniBrand img{width:clamp(108px,15vw,164px)!important;height:92px!important;animation:none!important;transform:none!important}
 @media(max-width:600px){.miniBrand img{width:126px!important;height:82px!important}.homeTop{min-height:82px!important}}
+
+/* Pass 18 — generated Crashout home composition translated into the real UI. */
+.homeShell:before{background-image:linear-gradient(180deg,rgba(2,0,5,.40),rgba(6,1,10,.90) 68%,#030105),var(--desktop-bg)!important;filter:saturate(.82) contrast(1.12)}
+.homeFrame{width:min(1040px,calc(100% - 28px))!important;padding-top:10px!important}
+.homeTop{min-height:132px!important;align-items:center!important}
+.miniBrand{min-height:118px!important;flex:0 0 auto}
+.miniBrand img{width:clamp(210px,31vw,350px)!important;height:126px!important;object-fit:contain!important;object-position:left center!important;animation:none!important;transform:none!important;filter:drop-shadow(0 16px 24px #000d) saturate(1.15)!important}
+.homeHero{grid-template-columns:1fr!important;gap:18px!important;min-height:0!important;margin-top:0!important;padding:28px!important;border-color:rgba(143,72,164,.48)!important;border-radius:28px!important;background:radial-gradient(circle at 50% 16%,rgba(91,22,121,.20),transparent 38%),linear-gradient(180deg,rgba(10,5,15,.94),rgba(4,2,8,.97))!important}
+.homeHero:after{background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.18))!important}
+.heroWordmark{display:block!important;text-align:center!important;padding:4px 8px 2px!important}
+.heroWordmark>div{width:100%!important}
+.heroWordmark span{display:block!important;margin-bottom:12px!important;color:#d5ae50!important}
+.heroWordmark h1{margin:0 auto 12px!important;font-family:var(--crash-display)!important;font-size:clamp(54px,10vw,102px)!important;line-height:.78!important;letter-spacing:-.035em!important;text-shadow:0 3px 0 #000,0 0 24px rgba(139,45,170,.22)!important}
+.heroWordmark h1 strong{color:#b88b2f!important;text-shadow:0 3px 0 #000!important}
+.heroWordmark p{max-width:650px!important;margin:0 auto!important;font-size:14px!important}
+.homeEntry{padding:30px!important;border-color:rgba(111,65,128,.62)!important;border-radius:22px!important;background:rgba(6,3,10,.90)!important}
+.homeEntry h2{font-family:var(--crash-display)!important;font-size:clamp(34px,7vw,58px)!important;line-height:.95!important;margin:10px 0 14px!important}
+.entryActions{grid-template-columns:1fr!important;gap:12px!important}
+.entryActions button,.shopLaunch{min-height:82px!important;border-radius:14px!important;font-family:var(--crash-display)!important;font-size:19px!important;letter-spacing:.025em!important}
+.entryActions button small,.shopLaunch small{font-family:var(--crash-ui)!important;font-size:10px!important;letter-spacing:.06em!important}
+.shopLaunch{width:100%!important;margin-top:12px!important}
+.homeFooter{padding-top:30px!important}
+@media(max-width:600px){
+ .homeFrame{width:calc(100% - 22px)!important}
+ .homeTop{min-height:116px!important}
+ .miniBrand{min-height:104px!important}
+ .miniBrand img{width:230px!important;height:108px!important}
+ .accountChip{max-width:48%!important;padding:6px 8px!important}
+ .accountChip b{max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .homeHero{padding:20px 16px!important;border-radius:24px!important}
+ .heroWordmark{padding-top:8px!important}
+ .heroWordmark h1{font-size:clamp(50px,16vw,72px)!important}
+ .heroWordmark p{font-size:12px!important}
+ .homeEntry{padding:24px 18px!important}
+ .entryActions button,.shopLaunch{min-height:76px!important}
+}

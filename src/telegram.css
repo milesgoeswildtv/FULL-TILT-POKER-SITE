@@ -1,6 +1,30 @@
-html.telegramMiniApp,html.telegramMiniApp body{background:#09060d;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
-html.telegramMiniApp body{padding-top:var(--telegram-safe-top,0px);padding-right:var(--telegram-safe-right,0px);padding-bottom:var(--telegram-safe-bottom,0px);padding-left:var(--telegram-safe-left,0px)}
-.telegramBoot{min-height:100dvh;display:grid;place-items:center;background:#09060d;color:#d9c9e3;font:800 12px/1.3 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.16em;text-transform:uppercase}
+html.telegramMiniApp,html.telegramMiniApp body{background:var(--telegram-bg,#09060d);overscroll-behavior:none;-webkit-tap-highlight-color:transparent;min-height:var(--telegram-viewport-stable-height,100dvh)}
+html.telegramMiniApp body{padding-top:max(var(--telegram-safe-top,0px),env(safe-area-inset-top));padding-right:max(var(--telegram-safe-right,0px),env(safe-area-inset-right));padding-bottom:max(var(--telegram-safe-bottom,0px),env(safe-area-inset-bottom));padding-left:max(var(--telegram-safe-left,0px),env(safe-area-inset-left));color:var(--telegram-text,#f6f0ff)}
+.telegramBoot{min-height:var(--telegram-viewport-stable-height,100dvh);display:grid;place-items:center;background:var(--telegram-bg,#09060d);color:var(--telegram-text,#d9c9e3);font:800 12px/1.3 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.16em;text-transform:uppercase}
 .telegramMiniApp .globalLegal{display:none!important}
+.telegramMiniApp .homeShell,.telegramMiniApp .tablePage{min-height:var(--telegram-viewport-stable-height,100dvh)}
+.telegramMiniApp .homeFrame{width:min(1180px,calc(100% - 20px));padding-top:8px;padding-bottom:max(24px,var(--telegram-safe-bottom,0px))}
+.telegramMiniApp .homeTop{position:sticky;top:0;z-index:80;margin:0 -10px;padding:6px 10px;min-height:58px;background:linear-gradient(180deg,color-mix(in srgb,var(--telegram-bg,#09060d) 94%,transparent),color-mix(in srgb,var(--telegram-bg,#09060d) 78%,transparent) 72%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.telegramMiniApp .homeEntry,.telegramMiniApp .homeGamePanel,.telegramMiniApp .profileDrawer{background:linear-gradient(180deg,color-mix(in srgb,var(--telegram-secondary-bg,#120b18) 88%,#09060d 12%),color-mix(in srgb,var(--telegram-bg,#09060d) 94%,#09060d 6%));border-color:color-mix(in srgb,var(--telegram-hint,#97899e) 28%,transparent)}
+.telegramMiniApp .profileShade{padding-top:var(--telegram-safe-top,0px);padding-bottom:var(--telegram-safe-bottom,0px)}
+.telegramMiniApp .profileDrawer{padding-bottom:max(18px,var(--telegram-safe-bottom,0px))}
+.telegramMiniApp .profileDrawer>header{padding-top:max(38px,calc(var(--telegram-safe-top,0px) + 18px))}
+.telegramMiniApp button,.telegramMiniApp a,.telegramMiniApp [role="button"]{touch-action:manipulation}
+.telegramMiniApp input,.telegramMiniApp select,.telegramMiniApp textarea{font-size:16px!important}
 .telegramMiniApp .telegramShopNotice{margin-top:12px;padding:12px 14px;border:1px solid rgba(215,183,84,.24);border-radius:12px;background:rgba(12,7,18,.78);color:#b8aebd;font:700 11px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:center}
 .telegramMiniApp .telegramShopNotice b{display:block;color:#dbc76f;letter-spacing:.06em;margin-bottom:3px}
+.telegramMiniApp .accountChip,.telegramMiniApp .entryActions button,.telegramMiniApp .createChoice button,.telegramMiniApp .notificationToggle,.telegramMiniApp .discordLogin,.telegramMiniApp .primary{min-height:44px}
+.telegramMiniApp .toast{bottom:max(18px,calc(var(--telegram-safe-bottom,0px) + 10px))}
+.telegramMiniApp.telegramGameRoute .tablePage{padding-bottom:max(8px,var(--telegram-safe-bottom,0px))}
+@media(max-width:620px){
+ html.telegramMiniApp .homeFrame{width:min(100% - 12px,1180px)}
+ .telegramMiniApp .homeTop{margin:0 -6px;padding-left:8px;padding-right:8px}
+ .telegramMiniApp .miniBrand img{width:46px;height:46px}
+ .telegramMiniApp .miniBrand span{display:none}
+ .telegramMiniApp .accountChip{max-width:72vw}
+ .telegramMiniApp .accountChip span{min-width:0}
+ .telegramMiniApp .accountChip b,.telegramMiniApp .accountChip small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .telegramMiniApp .profileShade{justify-content:stretch}
+ .telegramMiniApp .profileDrawer{width:100vw;max-width:none;border-left:0}
+ .telegramMiniApp .homeHero{margin-top:2px}
+}

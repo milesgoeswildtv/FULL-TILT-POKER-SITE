@@ -7,44 +7,42 @@ import{createTournamentClock,blindsForNewHand,tournamentClockState,pauseTourname
 const STARTING_CHIPS=2500;
 const TOTAL_CHIPS=STARTING_CHIPS*MTT_MAX_PLAYERS;
 const BLINDS=[[10,20],[15,30],[25,50],[50,100],[75,150],[100,200],[150,300],[200,400],[300,600],[500,1000],[750,1500],[1000,2000],[1500,3000],[2500,5000],[5000,10000],[10000,20000],[25000,50000],[50000,100000]];
-const EMPTY_STATS=()=>({handsPlayed:0,handsWon:0,vpipHands:0,pfrHands:0,biggestPotWon:0,knockouts:0});
+const EMPTY_STATS=()=>({handsPlayed:0,handsWon:0,vpipHands:0,pfrHands:0,biggestPotWon:0,knockouts:0,chipsWon:0});
 
 function rngFor(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function randInt(rng,max){return Math.floor(rng()*max)}
 function shuffled(rng,list){const a=[...list];for(let i=a.length-1;i>0;i--){const j=randInt(rng,i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function activePlayer(p){return!p.eliminated&&p.chips>0}
 function activeAt(coordinator,tableNumber){const t=coordinator.table(tableNumber);return(t?.playerIds||[]).map(id=>coordinator.player(id)).filter(p=>p&&activePlayer(p))}
+function reportRow(p,{chips=p.chips,handStartChips=p.handStartChips,stats=p.stats}={}){return{id:p.id,ownershipGeneration:p.ownershipGeneration,name:p.name,chips,handStartChips,stats,cosmetic:p.cosmetic}}
 
 function buildTournament(seed){
- const players=Array.from({length:MTT_MAX_PLAYERS},(_,i)=>({id:`p${String(i+1).padStart(2,'0')}`,token:`sim-${seed}-${i+1}`,name:`Player ${String(i+1).padStart(2,'0')}`,chips:STARTING_CHIPS,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:STARTING_CHIPS,stats:EMPTY_STATS(),cosmetic:['default','constellation','deadMansHand','regalia'][i%4],host:i===0}));
- const seating=initialAssignments(players);for(const a of seating.assignments){const p=players.find(x=>x.id===a.playerId);p.tableNumber=a.tableNumber;p.seat=a.seat}
- const tables=seating.tables.map(t=>({tableNumber:t.tableNumber,tableKey:`SIM${seed}-T${t.tableNumber}`,capacity:MTT_TABLE_CAPACITY,playerIds:t.players.map(p=>p.playerId),status:'running',handNumber:0,lastReportAt:null,provisioned:true}));
- const coordinator=new TournamentCoordinator({storage:{}},{});coordinator.data={code:`SIM${seed}`,status:'running',startingChips:STARTING_CHIPS,players,tables,pendingMoves:[],clock:createTournamentClock({blindStructure:BLINDS,levelDurationMs:30000,now:1000000}),createdAt:1000000,startedAt:1000000,finishedAt:null};
+ const players=Array.from({length:MTT_MAX_PLAYERS},(_,i)=>({id:`p${String(i+1).padStart(2,'0')}`,token:`sim-${seed}-${i+1}`,name:`Player ${String(i+1).padStart(2,'0')}`,chips:STARTING_CHIPS,eliminated:false,finishPlace:null,moveCount:0,tableNumber:null,seat:null,handStartChips:STARTING_CHIPS,stats:EMPTY_STATS(),cosmetic:['default','constellation','deadMansHand','regalia'][i%4],host:i===0,ownershipGeneration:1,reportOwnerTable:null,pendingMoveId:null}));
+ const seating=initialAssignments(players);for(const a of seating.assignments){const p=players.find(x=>x.id===a.playerId);p.tableNumber=a.tableNumber;p.seat=a.seat;p.reportOwnerTable=a.tableNumber}
+ const tables=seating.tables.map(t=>({tableNumber:t.tableNumber,tableKey:`SIM${seed}-T${t.tableNumber}`,capacity:MTT_TABLE_CAPACITY,playerIds:t.players.map(p=>p.playerId),status:'running',handNumber:0,reportGeneration:1,lastBoundarySequence:0,lastBoundaryFingerprint:null,lastReportAt:null,provisioned:true}));
+ const coordinator=new TournamentCoordinator({storage:{}},{});coordinator.data={code:`SIM${seed}`,status:'running',startingChips:STARTING_CHIPS,players,tables,pendingMoves:[],eliminationLedger:[],clock:createTournamentClock({blindStructure:BLINDS,levelDurationMs:30000,now:1000000}),createdAt:1000000,startedAt:1000000,finishedAt:null,endedAt:null,endedByHost:false,resultsSyncedAt:null};
  const childRosters=new Map(tables.map(t=>[t.tableNumber,new Set(t.playerIds)]));return{coordinator,childRosters,now:1000000};
 }
 
-function recordMoves(coordinator,moves,stats,now){for(const move of moves||[]){stats.moves++;if(move.kind==='break')stats.breakMoves++;else stats.balanceMoves++;const p=coordinator.player(move.playerId);assert.equal(move.stack,p.chips,'move must preserve exact stack');const session=coordinator.sessionState(move.playerToken,now).session;assert.equal(session.playerId,move.playerId);assert.equal(session.tableNumber,move.toTable,'reconnect must resolve to destination immediately');assert.equal(session.seat,move.toSeat);stats.reconnectChecks++}}
+function recordMoves(coordinator,moves,stats,now){for(const move of moves||[]){stats.moves++;if(move.kind==='break')stats.breakMoves++;else stats.balanceMoves++;const p=coordinator.player(move.playerId);assert.equal(move.stack,p.chips,'move must preserve exact stack');assert.equal(p.reportOwnerTable,null,'in-transit player must not be report-owned by either table');assert.equal(p.pendingMoveId,move.id);const session=coordinator.sessionState(move.playerToken,now).session;assert.equal(session.playerId,move.playerId);assert.equal(session.tableNumber,move.toTable,'reconnect must resolve to destination immediately');assert.equal(session.seat,move.toSeat);stats.reconnectChecks++}}
 
 function syncBoundary(coordinator,childRosters,tableNumber,stats,now){
  const table=coordinator.table(tableNumber);if(!table)return;
  let snapshot=coordinator.tableSnapshot(tableNumber,now);childRosters.set(tableNumber,new Set(snapshot.players.map(p=>p.id)));
  const incoming=(coordinator.data.pendingMoves||[]).filter(m=>!m.acknowledged&&m.toTable===tableNumber&&childRosters.get(tableNumber).has(m.playerId));
- if(incoming.length){for(const move of incoming){const s=coordinator.sessionState(move.playerToken,now).session;assert.equal(s.tableNumber,tableNumber);stats.reconnectChecks++}const acked=coordinator.acknowledgeMoves(tableNumber,incoming.map(m=>m.id));assert.equal(acked.length,incoming.length);stats.moveAcks+=acked.length;const follow=coordinator.maybeScheduleMoves(tableNumber);recordMoves(coordinator,follow,stats,now);snapshot=coordinator.tableSnapshot(tableNumber,now);childRosters.set(tableNumber,new Set(snapshot.players.map(p=>p.id)))}
+ if(incoming.length){for(const move of incoming){const s=coordinator.sessionState(move.playerToken,now).session;assert.equal(s.tableNumber,tableNumber);stats.reconnectChecks++}const acked=coordinator.acknowledgeMoves(tableNumber,incoming.map(m=>m.id));assert.equal(acked.length,incoming.length);stats.moveAcks+=acked.length;snapshot=coordinator.tableSnapshot(tableNumber,now);childRosters.set(tableNumber,new Set(snapshot.players.map(p=>p.id));for(const move of incoming){const p=coordinator.player(move.playerId);assert.equal(p.reportOwnerTable,tableNumber);assert.equal(p.pendingMoveId,null)}}
  if(table.status==='closed')assert.equal(childRosters.get(tableNumber).size,0,'closed child table must reconcile empty');
 }
 
-function reportIdleBoundary(coordinator,childRosters,tableNumber,stats,now){
- const ids=[...(childRosters.get(tableNumber)||[])],rows=ids.map(id=>coordinator.player(id)).filter(Boolean).map(p=>({id:p.id,name:p.name,chips:p.chips,handStartChips:p.chips,stats:p.stats,cosmetic:p.cosmetic}));
- coordinator.reportTable(tableNumber,{handNumber:coordinator.table(tableNumber)?.handNumber||0,status:'running',players:rows});const moves=coordinator.maybeScheduleMoves(tableNumber);recordMoves(coordinator,moves,stats,now);syncBoundary(coordinator,childRosters,tableNumber,stats,now);
-}
+function settleWaitingTable(coordinator,childRosters,tableNumber,stats,now){syncBoundary(coordinator,childRosters,tableNumber,stats,now)}
 
 function simulateHand(coordinator,childRosters,tableNumber,rng,stats,now,forceBust=false){
- const localIds=[...(childRosters.get(tableNumber)||[])],players=localIds.map(id=>coordinator.player(id)).filter(p=>p&&activePlayer(p));if(players.length<2){reportIdleBoundary(coordinator,childRosters,tableNumber,stats,now);return{now,busts:0}}
+ const localIds=[...(childRosters.get(tableNumber)||[])],players=localIds.map(id=>coordinator.player(id)).filter(p=>p&&activePlayer(p));if(players.length<2){settleWaitingTable(coordinator,childRosters,tableNumber,stats,now);return{now,busts:0}}
  const handBlinds=blindsForNewHand(coordinator.data.clock,now),startLevel=handBlinds.blindLevel,start=new Map(players.map(p=>[p.id,p.chips])),next=new Map(start),winner=players[randInt(rng,players.length)],others=shuffled(rng,players.filter(p=>p!==winner)),loserCount=1+randInt(rng,Math.min(3,others.length)),losers=others.slice(0,loserCount);let pot=0,busts=0;
  for(let i=0;i<losers.length;i++){const loser=losers[i],stack=next.get(loser.id),bust=stack<=1||forceBust&&i===0||rng()<.20;let amount;if(bust)amount=stack;else amount=Math.max(1,Math.floor(stack*(.04+rng()*.32)));if(!bust)amount=Math.min(stack-1,amount);next.set(loser.id,stack-amount);pot+=amount;if(amount===stack)busts++}
  next.set(winner.id,next.get(winner.id)+pot);
- const rows=players.map(p=>{const statsNext={...p.stats,handsPlayed:(p.stats?.handsPlayed||0)+1};if(p===winner){statsNext.handsWon=(statsNext.handsWon||0)+1;statsNext.biggestPotWon=Math.max(statsNext.biggestPotWon||0,pot)}if(rng()<.55)statsNext.vpipHands=Math.min(statsNext.handsPlayed,(statsNext.vpipHands||0)+1);if(rng()<.18)statsNext.pfrHands=Math.min(statsNext.handsPlayed,(statsNext.pfrHands||0)+1);return{id:p.id,name:p.name,chips:next.get(p.id),handStartChips:start.get(p.id),stats:statsNext,cosmetic:p.cosmetic}});
- const duration=2000+randInt(rng,43001),endNow=now+duration,newlyBusted=coordinator.reportTable(tableNumber,{handNumber:(coordinator.table(tableNumber)?.handNumber||0)+1,status:'running',players:rows});assert.equal(newlyBusted.length,busts);stats.hands++;stats.eliminations+=busts;
+ const rows=players.map(p=>{const statsNext={...p.stats,handsPlayed:(p.stats?.handsPlayed||0)+1};if(p===winner){statsNext.handsWon=(statsNext.handsWon||0)+1;statsNext.biggestPotWon=Math.max(statsNext.biggestPotWon||0,pot);statsNext.chipsWon=(statsNext.chipsWon||0)+pot}if(rng()<.55)statsNext.vpipHands=Math.min(statsNext.handsPlayed,(statsNext.vpipHands||0)+1);if(rng()<.18)statsNext.pfrHands=Math.min(statsNext.handsPlayed,(statsNext.pfrHands||0)+1);return reportRow(p,{chips:next.get(p.id),handStartChips:start.get(p.id),stats:statsNext})});
+ const duration=2000+randInt(rng,43001),endNow=now+duration,table=coordinator.table(tableNumber),outcome=coordinator.reportTable(tableNumber,{reportGeneration:table.reportGeneration,boundarySequence:table.lastBoundarySequence+1,handNumber:table.handNumber+1,completedAt:endNow,status:'running',players:rows});assert.equal(outcome.kind,'new');assert.equal(outcome.newlyBusted.length,busts);stats.hands++;stats.eliminations+=busts;
  const moves=coordinator.maybeScheduleMoves(tableNumber);recordMoves(coordinator,moves,stats,endNow);syncBoundary(coordinator,childRosters,tableNumber,stats,endNow);const nextBlinds=blindsForNewHand(coordinator.data.clock,endNow);if(nextBlinds.blindLevel!==startLevel)stats.levelCrossingHands++;assert.equal(handBlinds.blindLevel,startLevel,'live hand blind snapshot mutated');return{now:endNow,busts};
 }
 

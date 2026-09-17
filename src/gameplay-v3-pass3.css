@@ -1,0 +1,26 @@
+/* V3 pass 03 — seat system correction. No nth-of-type positioning. */
+.ftp3SeatUnit{position:absolute!important;inset:0!important;z-index:22!important;pointer-events:none!important}
+.ftp3SeatUnit>.ftp3Seat{left:var(--seat-x)!important;top:var(--seat-y)!important;width:20%!important;z-index:22!important}
+.ftp3SeatUnit>.ftp3Bet{left:var(--bet-x)!important;top:var(--bet-y)!important;z-index:15!important;transform:translate(-50%,-50%)!important}
+/* Kill the pass-2 DOM-order hacks completely. */
+.ftp3Stage[data-player-count] .ftp3SeatUnit .ftp3Seat{position:absolute!important}
+.ftp3Stage[data-player-count] .ftp3SeatUnit .ftp3Bet{position:absolute!important}
+/* Top station is intentionally narrower so it clears table metadata. */
+.ftp3SeatUnit[data-seat="0"]>.ftp3Seat{width:18%!important}
+.ftp3SeatUnit[data-seat="0"] .ftp3SeatCards{bottom:70%!important}
+/* Side stations face inward with enough room for the avatar medallion. */
+.ftp3SeatUnit[data-seat="1"]>.ftp3Seat,.ftp3SeatUnit[data-seat="3"]>.ftp3Seat,.ftp3SeatUnit[data-seat="5"]>.ftp3Seat{transform:translate(-42%,-50%)!important}
+.ftp3SeatUnit[data-seat="2"]>.ftp3Seat,.ftp3SeatUnit[data-seat="4"]>.ftp3Seat,.ftp3SeatUnit[data-seat="6"]>.ftp3Seat{transform:translate(-58%,-50%)!important}
+/* Make player identity readable instead of microscopic. */
+.ftp3SeatPlaque{min-width:78px!important;min-height:38px!important;padding-left:34px!important;padding-right:7px!important}
+.ftp3Avatar{width:42px!important;max-width:none!important;left:-8px!important}
+.ftp3SeatCopy{min-width:0!important;width:100%!important}
+.ftp3SeatCopy b{font-size:10px!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.ftp3SeatCopy strong{font-size:12px!important}
+.ftp3SeatCards{height:34px!important;min-height:34px!important;width:48%!important;bottom:72%!important}
+.ftp3Pos{min-width:25px!important;height:25px!important;font-size:8px!important}
+/* Center geometry from pass 2 is retained, with slightly more room around the lower seats. */
+.ftp3Board{top:39.5%!important}
+.ftp3Pot{top:49.2%!important}
+.ftp3SidePots{top:56.4%!important}
+@media(max-width:430px){.ftp3SeatUnit>.ftp3Seat{width:19%!important}.ftp3SeatUnit[data-seat="0"]>.ftp3Seat{width:17.5%!important}.ftp3SeatPlaque{min-width:74px!important}.ftp3Avatar{width:40px!important}}

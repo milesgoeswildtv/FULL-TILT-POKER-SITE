@@ -1,0 +1,40 @@
+/* V3 pass 04 — header cleanup + lower-right seat clearance. */
+/* Keep the table metadata centered and lift it clear of the top seat. */
+.ftp3Header{
+  grid-template-columns:58px 1fr auto!important;
+  align-items:start!important;
+  padding-top:max(7px,env(safe-area-inset-top))!important;
+}
+.ftp3HeaderBrand{
+  position:absolute!important;
+  left:50%!important;
+  top:max(7px,env(safe-area-inset-top))!important;
+  transform:translateX(-50%)!important;
+  width:46%!important;
+  gap:1px!important;
+  pointer-events:none!important;
+}
+.ftp3HeaderBrand img{
+  position:fixed!important;
+  left:72px!important;
+  top:max(9px,env(safe-area-inset-top))!important;
+  width:42px!important;
+  height:42px!important;
+  max-height:none!important;
+  object-fit:contain!important;
+}
+.ftp3HeaderBrand strong{font-size:clamp(11px,2.6vw,18px)!important;line-height:1!important}
+.ftp3HeaderBrand span{font-size:clamp(8px,2vw,13px)!important;line-height:1.05!important}
+.ftp3Back{align-self:start!important}
+.ftp3Invite{align-self:start!important}
+/* Top opponent now has clean air below the lifted metadata. */
+.ftp3SeatUnit[data-seat="0"]>.ftp3Seat{top:calc(var(--seat-y) + 2%)!important}
+.ftp3SeatUnit[data-seat="0"] .ftp3SeatCards{bottom:66%!important}
+/* In the 8-player preview, seat 6 is the lower-right / River station. Nudge it upward. */
+.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:calc(var(--seat-y) - 3%)!important}
+.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Bet{top:calc(var(--bet-y) - 2%)!important}
+@media(max-width:430px){
+  .ftp3HeaderBrand{top:max(5px,env(safe-area-inset-top))!important;width:48%!important}
+  .ftp3HeaderBrand img{left:66px!important;top:max(7px,env(safe-area-inset-top))!important;width:38px!important;height:38px!important}
+  .ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:calc(var(--seat-y) - 3.5%)!important}
+}

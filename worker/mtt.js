@@ -51,8 +51,6 @@ export function chooseBalanceMove(tables){
  if(!Array.isArray(tables)||tables.length<2)return null;
  const ordered=[...tables].sort((a,b)=>b.players.length-a.players.length||a.tableNumber-b.tableNumber),from=ordered[0],to=ordered.at(-1);
  if(from.players.length-to.players.length<=1)return null;
- const candidates=[...from.players].sort((a,b)=>(Number(a.moveCount||0)-Number(b.moveCount||0))||(Number(!!b.sittingOut)-Number(!!a.sittingOut))||(a.seat-b.seat));
- const player=candidates[0];if(!player)return null;
- const used=new Set(to.players.map(p=>p.seat));let seat=1;while(used.has(seat)&&seat<=MTT_TABLE_CAPACITY)seat++;
- return{kind:'balance',playerId:player.playerId,fromTable:from.tableNumber,toTable:to.tableNumber,toSeat:seat,reason:'Keep active tables as even as possible.'};
+ const player=from.players.find(p=>p.playerId===from.nextBigBlindPlayerId);if(!player)return null;
+ return{kind:'balance',playerId:player.playerId,fromTable:from.tableNumber,toTable:to.tableNumber,toSeat:null,reason:'Balance tables by moving the player due the next big blind to the worst available destination position.'};
 }

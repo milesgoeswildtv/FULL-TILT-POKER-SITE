@@ -30,7 +30,7 @@ function syncBoundary(coordinator,childRosters,tableNumber,stats,now){
  const table=coordinator.table(tableNumber);if(!table)return;
  let snapshot=coordinator.tableSnapshot(tableNumber,now);childRosters.set(tableNumber,new Set(snapshot.players.map(p=>p.id)));
  const incoming=(coordinator.data.pendingMoves||[]).filter(m=>!m.acknowledged&&m.toTable===tableNumber&&childRosters.get(tableNumber).has(m.playerId));
- if(incoming.length){for(const move of incoming){const s=coordinator.sessionState(move.playerToken,now).session;assert.equal(s.tableNumber,tableNumber);stats.reconnectChecks++}const acked=coordinator.acknowledgeMoves(tableNumber,incoming.map(m=>m.id));assert.equal(acked.length,incoming.length);stats.moveAcks+=acked.length;snapshot=coordinator.tableSnapshot(tableNumber,now);childRosters.set(tableNumber,new Set(snapshot.players.map(p=>p.id));for(const move of incoming){const p=coordinator.player(move.playerId);assert.equal(p.reportOwnerTable,tableNumber);assert.equal(p.pendingMoveId,null)}}
+ if(incoming.length){for(const move of incoming){const s=coordinator.sessionState(move.playerToken,now).session;assert.equal(s.tableNumber,tableNumber);stats.reconnectChecks++}const acked=coordinator.acknowledgeMoves(tableNumber,incoming.map(m=>m.id));assert.equal(acked.length,incoming.length);stats.moveAcks+=acked.length;snapshot=coordinator.tableSnapshot(tableNumber,now);childRosters.set(tableNumber,new Set(snapshot.players.map(p=>p.id)));for(const move of incoming){const p=coordinator.player(move.playerId);assert.equal(p.reportOwnerTable,tableNumber);assert.equal(p.pendingMoveId,null)}}
  if(table.status==='closed')assert.equal(childRosters.get(tableNumber).size,0,'closed child table must reconcile empty');
 }
 

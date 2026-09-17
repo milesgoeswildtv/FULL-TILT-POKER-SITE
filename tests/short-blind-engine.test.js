@@ -37,3 +37,13 @@ test('minimum full raise is measured from nominal opening bet after a short big 
  const table=new PokerTable(fakeState(),{});table.data=game([player('a','A'),player('b','B'),player('c','C',5)],2);table.newHand();
  const actor=table.data.players[0];table.act(actor,'raise',40);assert.equal(actor.bet,40);assert.equal(table.data.minRaise,20);assert.equal(table.betToMatch(),40);
 });
+
+test('a lone actionable player cannot raise into all-in opponents',()=>{
+ const table=new PokerTable(fakeState(),{});table.data=game([player('a','A'),player('b','B',5),player('c','C',7)],2);table.newHand();const actor=table.data.players[0],chips=actor.chips;
+ assert.throws(()=>table.act(actor,'raise',40),/No opponent can call a raise/);assert.equal(actor.chips,chips);assert.equal(actor.vpipThisHand,false);assert.equal(actor.pfrThisHand,false);
+});
+
+test('rejected undersized raise does not dirty VPIP or PFR flags',()=>{
+ const table=new PokerTable(fakeState(),{});table.data=game([player('a','A'),player('b','B'),player('c','C')],2);table.newHand();const actor=table.data.players[0],chips=actor.chips;
+ assert.throws(()=>table.act(actor,'raise',30),/Minimum raise/);assert.equal(actor.chips,chips);assert.equal(actor.vpipThisHand,false);assert.equal(actor.pfrThisHand,false);
+});

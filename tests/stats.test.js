@@ -1,6 +1,7 @@
 import test from'node:test';
 import assert from'node:assert/strict';
 import{handAwards,knockoutCredits,cleanKnockoutCount}from'../worker/stats.js';
+import{settleContributions}from'../worker/settlement.js';
 
 test('biggest pot tracks largest single pot, not total winnings across side pots',()=>{
  const{winnings,biggestPot}=handAwards([{amount:300,winnerIds:['A']},{amount:500,winnerIds:['A']}]);
@@ -10,6 +11,11 @@ test('biggest pot tracks largest single pot, not total winnings across side pots
 test('split pot winnings preserve odd chip distribution while biggest pot is full pot size',()=>{
  const{winnings,biggestPot}=handAwards([{amount:101,winnerIds:['A','B']}]);
  assert.equal(winnings.get('A'),51);assert.equal(winnings.get('B'),50);assert.equal(biggestPot.get('A'),101);assert.equal(biggestPot.get('B'),101);
+});
+
+test('uncalled returns are excluded from winnings and biggest-pot statistics',()=>{
+ const players=[{id:'A',name:'A',contributed:1000,folded:false,cards:['A♠','A♥']},{id:'B',name:'B',contributed:100,folded:false,cards:['K♠','K♥']}],settlement=settleContributions(players,['2♣','3♦','7♠','8♥','9♣'],0),{winnings,biggestPot}=handAwards(settlement.pots);
+ assert.equal(settlement.returns.get('A'),900);assert.equal(winnings.get('A'),200);assert.equal(biggestPot.get('A'),200);assert.equal(winnings.has('B'),false);
 });
 
 test('one victim produces exactly one total knockout credit on a split winning pot',()=>{

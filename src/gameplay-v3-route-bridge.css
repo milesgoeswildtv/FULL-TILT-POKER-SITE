@@ -1,0 +1,28 @@
+.tablePage.gameplayV2Page{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  isolation:isolate!important;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(104,18,149,.18),transparent 35%),
+    linear-gradient(180deg,rgba(4,2,6,.24),rgba(4,2,6,.6)),
+    var(--mobile-bg)!important;
+  background-size:cover!important;
+  background-position:center top!important;
+  background-repeat:no-repeat!important;
+}
+.tablePage.gameplayV2Page>.pregameRoom{display:none!important}
+.tablePage.gameplayV2Page>.belowTable{position:fixed!important;inset:11dvh 10px 19dvh!important;margin:0!important;padding:0!important;z-index:130!important;pointer-events:none!important;background:transparent!important}
+.tablePage.gameplayV2Page>.belowTable>.tablePanels,.tablePage.gameplayV2Page>.belowTable>.chatPanel{pointer-events:auto!important;position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;background:transparent!important}
+.tablePage.gameplayV2Page>.belowTable .historyPanel,.tablePage.gameplayV2Page>.belowTable .statsPanel,.tablePage.gameplayV2Page>.belowTable>.chatPanel{width:min(94vw,680px)!important;max-height:100%!important;overflow:auto!important;border-radius:18px!important;border:1px solid rgba(233,184,85,.55)!important;background:rgba(11,8,15,.98)!important;box-shadow:0 22px 60px #000d!important;backdrop-filter:blur(18px)!important}
+.tablePage.gameplayV2Page>.belowTable>.tablePanels:empty{display:none!important}
+.tablePage.gameplayV2Page>.spectatorRibbon{position:absolute!important;top:10.1dvh!important;left:50%!important;transform:translateX(-50%)!important;width:auto!important;min-height:0!important;padding:5px 12px!important;border-radius:999px!important;background:rgba(12,8,16,.9)!important;border:1px solid rgba(225,177,79,.48)!important;color:#f0ce76!important;font-size:8px!important;z-index:90!important}
+.tablePage.gameplayV2Page>.mttFieldBar{position:absolute!important;top:10.1dvh!important;left:50%!important;transform:translateX(-50%)!important;width:min(62vw,430px)!important;min-height:0!important;padding:5px 12px!important;border-radius:999px!important;background:rgba(12,8,16,.9)!important;z-index:89!important;font-size:8px!important}
+.tablePage.gameplayV2Page>.mttHostBar{position:absolute!important;left:50%!important;bottom:18.2dvh!important;transform:translateX(-50%)!important;z-index:91!important;min-height:0!important;padding:4px 8px!important;border-radius:999px!important;background:rgba(12,8,16,.92)!important}
+.tablePage.gameplayV2Page>.toast{z-index:150!important}
+@media(min-width:761px){.tablePage.gameplayV2Page{left:50%!important;right:auto!important;width:min(76vw,980px)!important;transform:translateX(-50%);box-shadow:0 0 90px #000d}}

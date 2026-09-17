@@ -1,0 +1,37 @@
+import React from'react';
+import'./fairness-page.css';
+import{assets}from'./assets.js';
+
+const Step=({n,title,children})=><article className="fairStep"><span>{n}</span><div><h3>{title}</h3><p>{children}</p></div></article>;
+
+export default function FairnessPage({onBack,pageStyle}){
+ return <main className="fairnessPage" style={pageStyle}>
+  <div className="fairnessFrame">
+   <header className="fairnessTop"><button onClick={onBack}>← Back to Full Tilt</button><div><img src={assets.default.logoDesktop} alt=""/><span>FULL TILT POKER</span></div></header>
+   <section className="fairnessHero"><span className="fairEyebrow">OUR SHUFFLE & FAIRNESS</span><h1>The deck does not<br/><strong>know who you are.</strong></h1><p>Full Tilt does not weight cards, protect hosts, punish winning streaks, rescue short stacks, manufacture bad beats, or choose who should win. Every hand begins with a fresh deck, shuffled before the deal by a cryptographically secure random source.</p><div className="fairHeroFacts"><div><b>52</b><span>fresh cards every hand</span></div><div><b>CSPRNG</b><span>cryptographic randomness</span></div><div><b>SHA-256</b><span>pre-deal deck commitment</span></div></div></section>
+
+   <section className="fairIntro"><div><span>WHY THIS MATTERS</span><h2>Random is not the same thing as “looks random.”</h2></div><p>A weak shuffle can appear chaotic while still favoring some outcomes because of biased random-number mapping, predictable seeds, repeated state, or logic that knows something about the players. Our shuffle path is deliberately narrow: build one canonical deck, generate unbiased random indexes, shuffle once, commit to that order, then deal from it.</p></section>
+
+   <section className="fairSteps">
+    <Step n="01" title="A brand-new canonical deck is created">Before each hand, the server constructs a clean 52-card deck from the standard ranks and suits. Nothing is recycled from the previous hand. No previous board, muck, streak, result, or player history is fed into the shuffle.</Step>
+    <Step n="02" title="Randomness comes from Web Crypto">Full Tilt uses Cloudflare Workers’ crypto.getRandomValues(), a cryptographically secure random-number generator. We do not use Math.random(), timestamps, browser randomness, or a player-controlled seed to decide card order.</Step>
+    <Step n="03" title="Fisher–Yates shuffles every position">The deck is shuffled using Fisher–Yates. Working backward through the deck, each card position is exchanged with one randomly selected position from the remaining range. Done with unbiased indexes, every possible deck ordering has the same intended chance of being produced.</Step>
+    <Step n="04" title="Rejection sampling removes modulo bias">A common shortcut is randomNumber % range. When the random-number space is not evenly divisible by that range, some indexes can become microscopically more likely than others. Full Tilt rejects out-of-range source values and redraws before mapping them into 0–51, 0–50, 0–49 and so on.</Step>
+    <Step n="05" title="The deck is fixed before anyone sees a card">The shuffle function receives ranks and suits—not player IDs, chip stacks, host status, recent wins, losses, hand strength, tournament position, betting style, or who deposited what. Once shuffled, the game consumes that fixed order. The engine is not choosing the next card based on what would make a dramatic hand.</Step>
+    <Step n="06" title="Normal Hold’em burns are part of the same deck">One card is burned before the flop, one before the turn, and one before the river. Burn cards remain privately tracked by the server. They are not regenerated, skipped, replaced, or pulled from a second source.</Step>
+   </section>
+
+   <section className="fairIntegrity"><div className="fairIntegrityLead"><span>DECK INTEGRITY</span><h2>All 52 cards have to exist exactly once.</h2><p>During a hand the backend can account for the entire deck across four places: undealt cards, players’ hole cards, community cards, and burn cards.</p></div><div className="fairIntegrityGrid"><div><b>UNDEALT</b><span>Cards still waiting in the shuffled deck.</span></div><div><b>HOLE CARDS</b><span>Every card currently assigned to a player.</span></div><div><b>BOARD</b><span>The flop, turn and river already exposed.</span></div><div><b>BURNS</b><span>The privately tracked cards burned before streets.</span></div></div><p className="fairFailClosed">If a new-format hand contains a duplicate card, an invalid card, a missing card, or an impossible total, Full Tilt throws a deck-integrity error instead of quietly continuing the hand.</p></section>
+
+   <section className="fairCommit"><div><span>SHA-256 HAND COMMITMENT</span><h2>We fingerprint the shuffled order before dealing.</h2><p>Each shuffled hand receives a SHA-256 commitment derived from the completed deck order before the first card is dealt. That commitment can be shown publicly without revealing the deck itself. If the underlying committed order changed, its fingerprint would change too.</p></div><aside><b>Why not publish the full deck after every hand?</b><p>Because a full post-hand deck reveal would also expose cards that players folded face-down. Preserving muck privacy matters. Today, Full Tilt retains the commitment as audit metadata rather than publishing every hidden card.</p></aside></section>
+
+   <section className="fairHonesty"><span>THE PART WE WILL NOT BULLSHIT YOU ABOUT</span><h2>This is a strong server-side fairness design. It is not the same thing as independently verifiable “provably fair” poker.</h2><p>A commitment proves that a particular hidden value corresponds to a particular fingerprint only when the underlying value can later be independently checked. Because we intentionally do not publish the entire hidden deck after the hand, players cannot reconstruct every mucked card and independently verify the complete committed order themselves.</p><p>So we do not call this system independently provably fair. What we can say precisely is that the shuffle uses cryptographically secure randomness, unbiased index generation, a fixed pre-deal deck, full server-side card accounting, and a pre-deal cryptographic commitment—with no player-specific inputs in the shuffle path.</p></section>
+
+   <section className="fairCompare"><div><span>WHAT WE REFUSE TO BUILD</span><h2>No “engagement” logic inside the deck.</h2></div><div className="fairNoList"><p>✕ No hot-seat or cold-seat weighting</p><p>✕ No host advantage</p><p>✕ No new-player protection</p><p>✕ No loss-streak compensation</p><p>✕ No dramatic-river selection</p><p>✕ No chip-stack-based card weighting</p><p>✕ No previous-hand influence</p><p>✕ No player-controlled shuffle seed</p></div></section>
+
+   <section className="fairAudit"><span>TESTED, NOT JUST DESCRIBED</span><h2>The same rules are exercised by automated tests.</h2><p>Our test suite checks secure integer generation behavior, deck uniqueness and 52-card accounting, poker-hand evaluation, settlement and chip conservation, short blinds, all-ins, side pots, odd chips, tournament movement, coordinator races and full multi-table tournament simulations. The production Worker is also built and dry-run checked in CI before release.</p></section>
+
+   <footer className="fairnessFooter"><div><img src={assets.default.logoDesktop} alt=""/><span>FULL TILT POKER</span></div><button onClick={onBack}>Back to the tables →</button></footer>
+  </div>
+ </main>
+}

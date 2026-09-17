@@ -12,6 +12,7 @@ function playerId(i){return`p${String(i+1).padStart(2,'0')}`}
 function sessionToken(){return crypto.randomUUID().replace(/-/g,'')}
 function nonNegativeInt(v){return Math.max(0,Math.trunc(Number(v)||0))}
 function positiveInt(v,fallback=1){const n=Math.trunc(Number(v));return Number.isInteger(n)&&n>0?n:fallback}
+function validSeat(v){return v!=null&&Number.isInteger(Number(v))&&Number(v)>=1}
 function cleanStats(stats={}){return{handsPlayed:nonNegativeInt(stats.handsPlayed),handsWon:nonNegativeInt(stats.handsWon),vpipHands:nonNegativeInt(stats.vpipHands),pfrHands:nonNegativeInt(stats.pfrHands),biggestPotWon:nonNegativeInt(stats.biggestPotWon),knockouts:Math.max(0,Number(stats.knockouts)||0),chipsWon:nonNegativeInt(stats.chipsWon)}}
 function activeField(d){return d.players.filter(p=>!p.eliminated&&p.chips>0)}
 function publicState(d,now=Date.now()){
@@ -41,7 +42,7 @@ export class TournamentCoordinator{
  busy(type){if(!this.transitionInFlight)return null;return json({error:`Tournament ${this.transitionInFlight} is already in progress.`,requested:type,state:publicState(this.data)},409)}
  sessionState(token,now=Date.now()){
   const p=this.sessionPlayer(token);if(!p)throw Error('Invalid tournament session.');const table=this.table(p.tableNumber);
-  return{tournament:publicState(this.data,now),session:{playerId:p.id,name:p.name,host:!!p.host,chips:p.chips,eliminated:!!p.eliminated,finishPlace:p.finishPlace,tableNumber:p.tableNumber,seat:Number.isInteger(Number(p.seat))?Number(p.seat):null,tableKey:table?.tableKey||null,tableStatus:table?.status||null,provisioned:!!table?.provisioned}};
+  return{tournament:publicState(this.data,now),session:{playerId:p.id,name:p.name,host:!!p.host,chips:p.chips,eliminated:!!p.eliminated,finishPlace:p.finishPlace,tableNumber:p.tableNumber,seat:validSeat(p.seat)?Number(p.seat):null,tableKey:table?.tableKey||null,tableStatus:table?.status||null,provisioned:!!table?.provisioned}};
  }
  rebuildLobbySeating(){
   if(this.data.status!=='lobby')throw Error('Tournament seating is locked.');if(this.data.tables?.some(t=>t.provisioned))throw Error('Tournament tables are already provisioned.');
@@ -55,7 +56,7 @@ export class TournamentCoordinator{
  }
  tableSnapshot(tableNumber,now=Date.now()){
   const table=this.table(tableNumber);if(!table)throw Error('Tournament table not found.');
-  const players=table.playerIds.map(id=>this.player(id)).filter(p=>p&&!p.eliminated&&p.chips>0).sort((a,b)=>(Number.isInteger(Number(a.seat))?Number(a.seat):99)-(Number.isInteger(Number(b.seat))?Number(b.seat):99)).map(p=>({id:p.id,token:p.token,accountId:p.accountId||null,name:p.name,chips:p.chips,eliminated:false,finishPlace:p.finishPlace,moveCount:p.moveCount,tableNumber:p.tableNumber,seat:Number.isInteger(Number(p.seat))?Number(p.seat):null,ownershipGeneration:positiveInt(p.ownershipGeneration),stats:cleanStats(p.stats),cosmetic:cleanCosmetic(p.cosmetic)}));
+  const players=table.playerIds.map(id=>this.player(id)).filter(p=>p&&!p.eliminated&&p.chips>0).sort((a,b)=>(validSeat(a.seat)?Number(a.seat):99)-(validSeat(b.seat)?Number(b.seat):99)).map(p=>({id:p.id,token:p.token,accountId:p.accountId||null,name:p.name,chips:p.chips,eliminated:false,finishPlace:p.finishPlace,moveCount:p.moveCount,tableNumber:p.tableNumber,seat:validSeat(p.seat)?Number(p.seat):null,ownershipGeneration:positiveInt(p.ownershipGeneration),stats:cleanStats(p.stats),cosmetic:cleanCosmetic(p.cosmetic)}));
   const moves=(this.data.pendingMoves||[]).filter(m=>!m.acknowledged&&(m.fromTable===table.tableNumber||m.toTable===table.tableNumber)).map(m=>({...m}));
   return{tournamentCode:this.data.code,tableNumber:table.tableNumber,tableKey:table.tableKey,capacity:table.capacity,reportGeneration:positiveInt(table.reportGeneration),status:this.data.status,tableStatus:table.status,fieldRemaining:activeField(this.data).length,players,moves,clock:tournamentClockState(this.data.clock,now),handBlinds:blindsForNewHand(this.data.clock,now)};
  }
@@ -79,7 +80,7 @@ export class TournamentCoordinator{
  acknowledgeMoves(tableNumber,acks){
   const items=Array.isArray(acks)?acks:[],byId=new Map(items.map(item=>typeof item==='string'?[item,{id:item}]:[String(item?.id||''),item]).filter(([id])=>id)),acked=[],table=this.table(tableNumber);if(!table)throw Error('Tournament table not found.');
   for(const move of this.data.pendingMoves||[]){if(move.acknowledged||move.toTable!==Number(tableNumber)||!byId.has(move.id))continue;const p=this.player(move.playerId),ack=byId.get(move.id);if(!p||p.pendingMoveId!==move.id||positiveInt(p.ownershipGeneration)!==positiveInt(move.toOwnershipGeneration))throw Error('Tournament move ownership acknowledgement is stale.');
-   if(move.toSeat==null){const seat=Number(ack?.seat);if(!Number.isInteger(seat)||seat<1||seat>table.capacity)throw Error('Balancing move acknowledgement requires a valid destination seat.');const occupied=table.playerIds.map(id=>this.player(id)).filter(x=>x&&x.id!==p.id&&!x.eliminated&&x.chips>0).some(x=>Number(x.seat)===seat);if(occupied)throw Error('Balancing move destination seat is occupied.');move.toSeat=seat;p.seat=seat}
+   if(move.toSeat==null){const seat=Number(ack?.seat);if(!Number.isInteger(seat)||seat<1||seat>table.capacity)throw Error('Balancing move acknowledgement requires a valid destination seat.');const occupied=table.playerIds.map(id=>this.player(id)).filter(x=>x&&x.id!==p.id&&!x.eliminated&&x.chips>0).some(x=>validSeat(x.seat)&&Number(x.seat)===seat);if(occupied)throw Error('Balancing move destination seat is occupied.');move.toSeat=seat;p.seat=seat}
    else if(ack?.seat!=null&&Number(ack.seat)!==Number(move.toSeat))throw Error('Tournament move acknowledgement seat does not match its assigned seat.');
    move.acknowledged=true;move.acknowledgedAt=Date.now();p.reportOwnerTable=Number(tableNumber);p.pendingMoveId=null;acked.push(move.id)}if(acked.length)this.bumpReportGeneration(tableNumber);return acked;
  }

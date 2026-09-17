@@ -140,7 +140,7 @@ export class TournamentCoordinator{
   if(u.pathname==='/clock'&&req.method==='GET')return json(tournamentClockState(this.data.clock));
   if(u.pathname==='/hand-blinds'&&req.method==='GET')return json(blindsForNewHand(this.data.clock));
   const tableMatch=u.pathname.match(/^\/tables\/(\d+)\/(sync|report|ack-moves)$/);
-  if(tableMatch&&tableMatch[2]==='sync'&&req.method==='GET'){try{return json(this.tableSnapshot(Number(tableMatch[1])))}catch(e){return json({error:e.message},404)}}
+  if(tableMatch&&tableMatch[2]==='sync'&&req.method==='GET'){try{const n=Number(tableMatch[1]);if(u.searchParams.get('atBoundary')==='1'&&this.data.status==='running'){const moves=this.maybeScheduleMoves(n);if(moves.length){this.assertTournamentChipSupply();await this.save()}}return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},404)}}
   if(tableMatch&&tableMatch[2]==='report'&&req.method==='POST'){try{const n=Number(tableMatch[1]),outcome=this.reportTable(n,await req.json());if(outcome.kind==='new'&&this.data.status==='running')this.maybeScheduleMoves(n);await this.save();if(this.data.status==='finished')await this.syncTournamentResults();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(tableMatch&&tableMatch[2]==='ack-moves'&&req.method==='POST'){try{const n=Number(tableMatch[1]),b=await req.json();this.acknowledgeMoves(n,b.moveIds);this.assertTournamentChipSupply();await this.save();return json(this.tableSnapshot(n))}catch(e){return json({error:e.message},400)}}
   if(u.pathname==='/pause'&&req.method==='POST'){

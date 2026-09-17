@@ -3,25 +3,11 @@ import{createRoot}from'react-dom/client';
 import App from'./App.jsx';
 import LayoutLab from'./LayoutLab.jsx';
 import TournamentConfig from'./TournamentConfig.jsx';
-import ActionLogPanel from'./ActionLogPanel.jsx';
-import TableChatDock from'./TableChatDock.jsx';
 import{installSessionRouting}from'./session.js';
 import'./fx-runtime.js';
-import'./cash-table-v2-route.js';
 import'./tournament-config.css';
-import'./fixed-gameplay.css';
-import'./chat-dock-override.css';
-import'./fixed-gameplay-polish.css';
-import'./gameplay-v2-rebuild.css';
-import'./gameplay-v2-art.css';
-import'./cash-table-v2.css';
-import'./cash-table-v2-polish.css';
-import'./cash-table-v2-polish-v2.css';
-import'./cash-table-approved-layout.css';
-import'./approved-cash-felt.css';
-import'./approved-cash-felt-hotfix.css';
 installSessionRouting();
 const root=createRoot(document.getElementById('root'));
-function render(){const lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}
+function render(){const lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/></>)}
 addEventListener('hashchange',render);
 render();

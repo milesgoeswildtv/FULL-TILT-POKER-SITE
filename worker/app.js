@@ -29,7 +29,7 @@ async save(){await super.save();if(this.data?.accountStatsDirty){if(await this.s
 isMTT(){return!!(this.data?.tournamentCode&&this.data?.tournamentTableNumber)}
 async syncMTT(){if(!this.isMTT())return null;const snapshot=await syncTournamentTable(this.env,{tournamentCode:this.data.tournamentCode,tableNumber:this.data.tournamentTableNumber});this.data.tournamentClock=snapshot.clock;return snapshot}
 async reportMTT(){if(!this.isMTT())return null;return reportTournamentTable(this.env,{tournamentCode:this.data.tournamentCode,tableNumber:this.data.tournamentTableNumber,...tournamentTableReport(this.data)})}
-async acknowledgeMTTMoves(moveIds){if(!this.isMTT()||!moveIds?.length)return null;return acknowledgeTournamentMoves(this.env,{tournamentCode:this.data.tournamentCode,tableNumber:this.data.tournamentTableNumber,moveIds})}
+async acknowledgeMTTMoves(moves){if(!this.isMTT()||!moves?.length)return null;return acknowledgeTournamentMoves(this.env,{tournamentCode:this.data.tournamentCode,tableNumber:this.data.tournamentTableNumber,moves})}
 closeMTT(message){const d=this.data;abortActiveHand(d);d.started=false;d.paused=false;d.pausedAt=null;d.turnRemainingMs=null;d.phaseRemainingMs=null;d.mttBoundaryReportedSequence=0;d.street='finished';d.phaseDeadline=null;d.turnDeadline=null;this.state.storage.deleteAlarm();d.message=message}
 async provisionMTT(body){
  const snapshot=body?.snapshot,config=body?.config||{},players=snapshot?.players;
@@ -48,7 +48,7 @@ async finishMTTBoundary(){
   const boundarySequence=Math.max(0,Math.trunc(Number(d.handNumber)||0)),alreadyReported=boundarySequence>0&&Number(d.mttBoundaryReportedSequence)===boundarySequence;
   let snapshot=alreadyReported?await this.syncMTT():await this.reportMTT();if(!alreadyReported)d.mttBoundaryReportedSequence=boundarySequence;
   applyTournamentBlinds(d,snapshot);let reconciled=reconcileTournamentRoster(d,snapshot);
-  if(reconciled.acceptedMoveIds.length){snapshot=await this.acknowledgeMTTMoves(reconciled.acceptedMoveIds);applyTournamentBlinds(d,snapshot);reconciled=reconcileTournamentRoster(d,snapshot)}
+  if(reconciled.acceptedMoves.length){snapshot=await this.acknowledgeMTTMoves(reconciled.acceptedMoves);applyTournamentBlinds(d,snapshot);reconciled=reconcileTournamentRoster(d,snapshot)}
   d.tournamentClock=snapshot.clock||d.tournamentClock;
   if(snapshot.status==='finished'){const winner=d.players.find(p=>!p.eliminated&&p.chips>0);this.closeMTT(winner?`${winner.name} wins the tournament!`:'Tournament finished.');await this.save();this.broadcast();return true}
   if(snapshot.tableStatus==='closed'){this.closeMTT('Table closed. Remaining players have been moved.');await this.save();this.broadcast();return true}

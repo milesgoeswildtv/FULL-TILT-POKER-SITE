@@ -1,10 +1,22 @@
 function int(v,fallback=0){const n=Math.trunc(Number(v));return Number.isFinite(n)?n:fallback}
+function isNonNegativeInteger(v){const n=Number(v);return Number.isInteger(n)&&n>=0}
+function isPositiveInteger(v){const n=Number(v);return Number.isInteger(n)&&n>=1}
 function rowStats(stats={}){return{handsPlayed:Math.max(0,int(stats.handsPlayed)),handsWon:Math.max(0,int(stats.handsWon)),vpipHands:Math.max(0,int(stats.vpipHands)),pfrHands:Math.max(0,int(stats.pfrHands)),biggestPotWon:Math.max(0,int(stats.biggestPotWon)),knockouts:Math.max(0,Number(stats.knockouts)||0),chipsWon:Math.max(0,int(stats.chipsWon))}}
 function canonicalRow(row={}){return{id:String(row.id||''),ownershipGeneration:Math.max(1,int(row.ownershipGeneration,1)),chips:Math.max(0,int(row.chips)),eliminated:!!row.eliminated,handStartChips:Math.max(0,int(row.handStartChips)),stats:rowStats(row.stats),cosmetic:String(row.cosmetic||'default')}}
 
+export function validateBoundaryShape(report={}){
+ if(!Array.isArray(report.players))throw Error('Table report players required.');
+ const sequence=report.boundarySequence??report.handNumber;if(!isPositiveInteger(sequence))throw Error('Tournament boundary sequence must be a positive integer.');
+ if(!isNonNegativeInteger(report.handNumber))throw Error('Tournament hand number must be a non-negative integer.');
+ if(report.reportGeneration!=null&&!isPositiveInteger(report.reportGeneration))throw Error('Tournament report generation must be a positive integer.');
+ if(report.completedAt!=null&&!isNonNegativeInteger(report.completedAt))throw Error('Tournament boundary completion time is invalid.');
+ for(const row of report.players){if(!row||typeof row!=='object'||!String(row.id||''))throw Error('Tournament report player id required.');if(!isPositiveInteger(row.ownershipGeneration??1))throw Error('Tournament player ownership generation is invalid.');if(!isNonNegativeInteger(row.chips))throw Error('Tournament player chips must be a non-negative integer.');if(row.handStartChips!=null&&!isNonNegativeInteger(row.handStartChips))throw Error('Tournament hand-start chips must be a non-negative integer.');}
+ return true;
+}
+
 export function normalizeBoundaryReport(report={},fallbackGeneration=1){
- const rows=Array.isArray(report.players)?report.players.map(canonicalRow):null;
- return{reportGeneration:Math.max(1,int(report.reportGeneration,fallbackGeneration)),boundarySequence:Math.max(0,int(report.boundarySequence,report.handNumber)),handNumber:Math.max(0,int(report.handNumber)),completedAt:Math.max(0,int(report.completedAt)),status:String(report.status||'running'),players:rows};
+ validateBoundaryShape(report);const rows=report.players.map(canonicalRow);
+ return{reportGeneration:Math.max(1,int(report.reportGeneration,fallbackGeneration)),boundarySequence:Math.max(1,int(report.boundarySequence,report.handNumber)),handNumber:Math.max(0,int(report.handNumber)),completedAt:Math.max(0,int(report.completedAt)),status:String(report.status||'running'),players:rows};
 }
 
 export function boundaryFingerprint(report){
@@ -14,9 +26,7 @@ export function boundaryFingerprint(report){
 
 export function validateBoundaryHeader(table,rawReport){
  if(!table)throw Error('Tournament table not found.');
- const report=normalizeBoundaryReport(rawReport,table.reportGeneration||1);if(!report.players)throw Error('Table report players required.');
- const last=Math.max(0,int(table.lastBoundarySequence));
- const fingerprint=boundaryFingerprint(report);
+ const report=normalizeBoundaryReport(rawReport,table.reportGeneration||1),last=Math.max(0,int(table.lastBoundarySequence)),fingerprint=boundaryFingerprint(report);
  if(report.boundarySequence===last){if(last>0&&fingerprint===table.lastBoundaryFingerprint)return{kind:'duplicate',report,fingerprint};throw Error('Conflicting duplicate tournament boundary report.');}
  if(report.boundarySequence<last)throw Error('Stale tournament boundary report.');
  if(report.boundarySequence!==last+1)throw Error(`Tournament boundary sequence gap: expected ${last+1}, received ${report.boundarySequence}.`);

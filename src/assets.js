@@ -5,10 +5,10 @@ const plaqueSet=(base,prefix,foldName='folded')=>({idle:`${base}/${prefix}-idle-
 
 export const assets={
   default:{
-    logoDesktop:`${root}/crashout/CrashoutPokerLogo.PNG`,
-    logoMobile:`${root}/crashout/CrashoutMiniLogo.PNG`,
-    brandLogo:`${root}/crashout/CrashoutPokerLogo.PNG`,
-    miniLogo:`${root}/crashout/CrashoutMiniLogo.PNG`,
+    logoDesktop:`${root}/crashout/CrashoutPokerLogo.png`,
+    logoMobile:`${root}/crashout/CrashoutMiniLogo.png`,
+    brandLogo:`${root}/crashout/CrashoutPokerLogo.png`,
+    miniLogo:`${root}/crashout/CrashoutMiniLogo.png`,
     mascotCrow:`${root}/default/the-crow.png`,
     mascotHare:`${root}/default/the-hare.png`,
     avatarFrame:`${root}/default/default-avatar-frame.png`,

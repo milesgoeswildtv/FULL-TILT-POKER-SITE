@@ -1,3 +1,4 @@
+body:has(.tablePage.gameplayV2Page){margin:0!important;overflow:hidden!important;overscroll-behavior:none!important;background:#07050a!important}
 .tablePage.gameplayV2Page{
   position:fixed!important;
   inset:0!important;

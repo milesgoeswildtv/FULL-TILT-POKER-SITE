@@ -1,0 +1,67 @@
+import test from'node:test';
+import assert from'node:assert/strict';
+import{AccessRegistry}from'../worker/access-registry.js';
+import{PlayerAccount}from'../worker/player-account.js';
+import{accountRequest}from'../worker/account-links.js';
+import{gatePokerRequest}from'../worker/auth.js';
+import{finalizeHostedGame}from'../worker/access.js';
+
+const enc=new TextEncoder();
+class MemoryStorage{constructor(){this.map=new Map()}async get(k){return this.map.get(k)}async put(k,v){this.map.set(k,v)}async delete(k){this.map.delete(k)}}
+function state(){return{storage:new MemoryStorage()}}
+class AccountNamespace{
+ constructor(){this.rows=new Map()}
+ idFromName(name){return String(name)}
+ get(id){id=String(id);if(!this.rows.has(id)){const st=state(),env={ACCOUNTS:this};this.rows.set(id,{st,account:new PlayerAccount(st,env)})}const row=this.rows.get(id);return{fetch:(input,init)=>row.account.fetch(input instanceof Request?input:new Request(input,init))}}
+}
+async function signedSession(identity,secret){let s='';for(const b of enc.encode(JSON.stringify(identity)))s+=String.fromCharCode(b);const body=btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']),bytes=new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(body)));let raw='';for(const b of bytes)raw+=String.fromCharCode(b);const sig=btoa(raw).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');return body+'.'+sig}
+async function cookie(identity,secret){return'ftp_account='+await signedSession({...identity,exp:Date.now()+60000},secret)}
+function post(url,body){return new Request(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)})}
+const host={id:'host-account',provider:'discord',providerId:'host-account',username:'host',displayName:'Host'};
+const guest={id:'guest-account',provider:'discord',providerId:'guest-account',username:'guest',displayName:'Guest'};
+
+test('host keys bind to the first account and cannot be shared to another account',async()=>{
+ const registry=new AccessRegistry(state(),{}),generated=await registry.fetch(post('https://access.internal/admin/generate',{type:'permanent',count:1})),g=await generated.json(),key=g.keys[0].key;
+ let prepared=await registry.fetch(post('https://access.internal/prepare',{key,fingerprint:'fp-a'})),p=await prepared.json();assert.equal(prepared.status,200);
+ let redeemed=await registry.fetch(post('https://access.internal/redeem',{ticket:p.ticket,accountId:'account-a'})),r=await redeemed.json();assert.equal(redeemed.status,200);assert.equal(r.type,'permanent');assert.equal(r.alreadyBound,false);
+ prepared=await registry.fetch(post('https://access.internal/prepare',{key,fingerprint:'fp-a'}));p=await prepared.json();redeemed=await registry.fetch(post('https://access.internal/redeem',{ticket:p.ticket,accountId:'account-a'}));r=await redeemed.json();assert.equal(redeemed.status,200);assert.equal(r.alreadyBound,true);
+ prepared=await registry.fetch(post('https://access.internal/prepare',{key,fingerprint:'fp-b'}));p=await prepared.json();redeemed=await registry.fetch(post('https://access.internal/redeem',{ticket:p.ticket,accountId:'account-b'}));r=await redeemed.json();assert.equal(redeemed.status,409);assert.match(r.error,/linked to another/i);
+});
+
+test('one-time host key creates exactly one game credit and grant is idempotent',async()=>{
+ const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,host,'/sync');
+ await accountRequest(env,host,'/access/host-grant',{keyId:'key-one',type:'one-time'});
+ await accountRequest(env,host,'/access/host-grant',{keyId:'key-one',type:'one-time'});
+ let profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,1);assert.equal(profile.account.access.canHost,true);
+ const reserved=await accountRequest(env,host,'/access/host-reserve');assert.ok(reserved.reservationId);profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,0);assert.equal(profile.account.access.canHost,false);
+ await accountRequest(env,host,'/access/host-release',{reservationId:reserved.reservationId});profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,1);
+ const used=await accountRequest(env,host,'/access/host-reserve');await accountRequest(env,host,'/access/host-finalize',{reservationId:used.reservationId});profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,0);await assert.rejects(()=>accountRequest(env,host,'/access/host-reserve'),/Host access required/i);
+});
+
+test('permanent host access never consumes a creation credit',async()=>{
+ const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,host,'/sync');await accountRequest(env,host,'/access/host-grant',{keyId:'key-perm',type:'permanent'});
+ for(let i=0;i<4;i++){const reserved=await accountRequest(env,host,'/access/host-reserve');assert.equal(reserved.permanent,true);assert.equal(reserved.reservationId,null)}
+ const profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.permanentHost,true);assert.equal(profile.account.access.canHost,true);assert.equal(profile.account.access.hostCredits,0);
+});
+
+test('invite grants are account-bound and do not grant hosting',async()=>{
+ const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,guest,'/sync');await accountRequest(env,guest,'/access/invite-grant',{kind:'table',code:'ABC123',source:'code'});
+ const allowed=await accountRequest(env,guest,'/access/invite-check',{kind:'table',code:'ABC123'}),denied=await accountRequest(env,guest,'/access/invite-check',{kind:'table',code:'ZZZ999'}),profile=await accountRequest(env,guest,'/profile');
+ assert.equal(allowed.allowed,true);assert.equal(denied.allowed,false);assert.equal(profile.account.access.canHost,false);assert.equal(profile.account.access.latestInvite.code,'ABC123');
+});
+
+test('backend gate blocks creation without host access and blocks private games without an invite',async()=>{
+ const ns=new AccountNamespace(),secret='access-gate-secret',env={ACCOUNTS:ns,AUTH_SECRET:secret};await accountRequest(env,guest,'/sync');const c=await cookie(guest,secret);
+ let gated=await gatePokerRequest(new Request('https://crashout.test/api/tables',{method:'POST',headers:{cookie:c,'content-type':'application/json'},body:JSON.stringify({startingChips:2500,blindMinutes:10})}),env);assert.equal(gated.response.status,403);
+ gated=await gatePokerRequest(new Request('https://crashout.test/api/tables/ABC123',{headers:{cookie:c}}),env);assert.equal(gated.response.status,403);
+ await accountRequest(env,guest,'/access/invite-grant',{kind:'table',code:'ABC123',source:'code'});
+ gated=await gatePokerRequest(new Request('https://crashout.test/api/tables/ABC123',{headers:{cookie:c}}),env);assert.equal(gated.response,null);
+});
+
+test('successful one-time host creation consumes the credit and grants access to the created game',async()=>{
+ const ns=new AccountNamespace(),secret='host-finalize-secret',env={ACCOUNTS:ns,AUTH_SECRET:secret};await accountRequest(env,host,'/sync');await accountRequest(env,host,'/access/host-grant',{keyId:'create-key',type:'one-time'});const c=await cookie(host,secret);
+ const request=new Request('https://crashout.test/api/tables',{method:'POST',headers:{cookie:c,'content-type':'application/json'},body:JSON.stringify({startingChips:2500,blindMinutes:10})}),gated=await gatePokerRequest(request,env);assert.equal(gated.response,null);assert.ok(gated.hostReservationId);
+ const response=new Response(JSON.stringify({code:'NEW123',token:'seat-token'}),{status:200,headers:{'content-type':'application/json'}});await finalizeHostedGame(env,gated,response);
+ const profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,0);assert.equal(profile.account.access.canHost,false);assert.equal(profile.account.access.latestInvite.code,'NEW123');
+ const check=await accountRequest(env,host,'/access/invite-check',{kind:'table',code:'NEW123'});assert.equal(check.allowed,true);
+});

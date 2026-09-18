@@ -19,7 +19,7 @@ export function revealMuckedHand(lastResult,player){
  lastResult.revealed??=[];lastResult.mucked??=[];
  if(lastResult.revealed.some(r=>r.playerId===player.id))return false;
  const index=lastResult.mucked.findIndex(r=>r.playerId===player.id);
- if(index<0)return false;
+ if(index<0||lastResult.mucked[index]?.confirmed)return false;
  lastResult.mucked.splice(index,1);
  lastResult.revealed.push({playerId:player.id,name:player.name,cards:[...player.cards],reason:'voluntary'});
  return true;

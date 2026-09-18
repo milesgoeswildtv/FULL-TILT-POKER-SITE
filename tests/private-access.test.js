@@ -65,3 +65,17 @@ test('successful one-time host creation consumes the credit and grants access to
  const profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,0);assert.equal(profile.account.access.canHost,false);assert.equal(profile.account.access.latestInvite.code,'NEW123');
  const check=await accountRequest(env,host,'/access/invite-check',{kind:'table',code:'NEW123'});assert.equal(check.allowed,true);
 });
+
+
+test('simultaneous redemption cannot bind one host key to two accounts',async()=>{
+ const registry=new AccessRegistry(state(),{}),generated=await registry.fetch(post('https://access.internal/admin/generate',{type:'one-time',count:1})),g=await generated.json(),key=g.keys[0].key;
+ const a=await (await registry.fetch(post('https://access.internal/prepare',{key,fingerprint:'race-a'}))).json(),b=await (await registry.fetch(post('https://access.internal/prepare',{key,fingerprint:'race-b'}))).json();
+ const results=await Promise.all([registry.fetch(post('https://access.internal/redeem',{ticket:a.ticket,accountId:'race-account-a'})),registry.fetch(post('https://access.internal/redeem',{ticket:b.ticket,accountId:'race-account-b'}))]);
+ assert.deepEqual(results.map(r=>r.status).sort((x,y)=>x-y),[200,409]);
+});
+
+test('simultaneous create reservations cannot spend one host credit twice',async()=>{
+ const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,host,'/sync');await accountRequest(env,host,'/access/host-grant',{keyId:'single-race-credit',type:'one-time'});
+ const results=await Promise.allSettled([accountRequest(env,host,'/access/host-reserve'),accountRequest(env,host,'/access/host-reserve')]);
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected').length,1);const profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,0);
+});

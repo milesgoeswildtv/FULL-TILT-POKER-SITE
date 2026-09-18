@@ -147,7 +147,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 
 .ftp3Stage{
   position:absolute!important;
-  top:12dvh!important;
+  top:10.4dvh!important;
   left:50%!important;
   height:70.5dvh!important;
   width:auto!important;
@@ -270,7 +270,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Win{color:#ffe18a;text-shadow:0 2px 6px #000}
 .ftp3Away{position:absolute;right:4px;top:-12px;padding:2px 6px;border-radius:999px;border:1px solid #6f6376;background:#151018;color:#c5b8ca;font-style:normal;font-size:7px;font-weight:900;letter-spacing:.08em}
 .ftp3SeatKick{position:absolute;right:-7px;top:-8px;width:20px;height:20px;padding:0;border-radius:50%;border:1px solid #7a3344;background:#1a0d12;color:#f2a0af;font:inherit;font-size:12px;line-height:1;pointer-events:auto;cursor:pointer}
-.ftp3Bet{position:absolute;z-index:15!important;transform:translate(-50%,-50%)!important;display:flex;align-items:center;gap:3px;padding:1px 6px 1px 2px!important;border-radius:999px;background:rgba(10,7,14,.9);border:1px solid rgba(225,175,80,.55);color:#f1cd73;font-size:8px!important;box-shadow:0 4px 12px #0008}
+.ftp3Bet{position:absolute;z-index:15!important;transform:translate(-50%,-50%)!important;display:flex;align-items:center;gap:3px;padding:0!important;background:transparent;border:0;color:#f3d27b;font-size:8px!important;box-shadow:none;text-shadow:0 2px 5px #000}
 .ftp3Bet img{width:18px!important;height:18px!important;object-fit:contain}
 
 .ftp3Board{position:absolute;left:50%;top:36.5%!important;transform:translateX(-50%);width:58%!important;height:6.1dvh!important;min-height:45px!important;display:flex;justify-content:center;align-items:stretch;gap:5px!important;z-index:10}
@@ -278,36 +278,35 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Board .card b,.ftp3Board .card span{position:static!important;display:block!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;line-height:.9!important;transform:none!important}
 .ftp3Board .card b{font-size:1em!important}
 .ftp3Board .card span{font-size:.72em!important;margin-top:3px!important}
-.ftp3Street{align-self:center;min-width:52%;padding:7px 16px;border-radius:999px;background:rgba(12,8,17,.9);border:1px solid rgba(223,177,80,.48);color:#dbc36f;text-align:center;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-.ftp3Pot{position:absolute;left:50%;top:47.5%!important;transform:translateX(-50%);min-width:27%!important;padding:5px 14px!important;border-radius:999px;background:rgba(12,8,17,.90);border:1px solid rgba(225,177,80,.55);text-align:center;z-index:11;box-shadow:0 5px 14px #0008}
+.ftp3Street{align-self:center;min-width:52%;padding:3px 8px;background:transparent;border:0;color:#e5c66f;text-align:center;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 7px #000}
+.ftp3Pot{position:absolute;left:50%;top:47.5%!important;transform:translateX(-50%);min-width:27%!important;padding:2px 8px!important;background:transparent;border:0;text-align:center;z-index:11;box-shadow:none;text-shadow:0 2px 7px #000}
 .ftp3Pot small{display:block;color:#a99bab;font-size:7px;letter-spacing:.14em}
 .ftp3Pot strong{display:block;color:#f0ca6d;font-size:clamp(16px,3.5vw,24px)!important;line-height:1}
 .ftp3SidePots{position:absolute;left:50%;top:54.5%!important;transform:translateX(-50%);width:62%!important;display:flex;justify-content:center;gap:5px!important;z-index:11}
-.ftp3SidePots span{min-width:0;flex:1;padding:4px 3px!important;border-radius:9px;background:rgba(11,8,15,.90);border:1px solid rgba(131,82,147,.44);text-align:center}
+.ftp3SidePots span{min-width:0;flex:1;padding:2px 3px!important;background:transparent;border:0;text-align:center;text-shadow:0 2px 6px #000}
 .ftp3SidePots small{display:block;color:#8e7f95;font-size:5.5px;letter-spacing:.08em}.ftp3SidePots b{display:block;color:#e5c46b;font-size:8px}
 .ftp3Showdown{position:absolute;left:50%;top:64%;transform:translateX(-50%);width:72%;padding:8px 10px;border-radius:12px;background:rgba(12,8,17,.95);border:1px solid rgba(228,179,78,.62);text-align:center;z-index:45;box-shadow:0 9px 26px #000b}
 .ftp3Showdown small{display:block;color:#c2ad72;font-size:7px;letter-spacing:.1em}.ftp3Showdown b{display:block;margin-top:3px;color:#fff;font-size:9px}
 
-.ftp3Hero{position:absolute;left:50%;bottom:18.3dvh!important;transform:translateX(-50%);z-index:65;width:min(37vw,194px)!important;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.ftp3Hero{position:absolute;left:50%;bottom:19.6dvh!important;transform:translateX(-50%);z-index:65;width:min(37vw,194px)!important;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .ftp3HeroCards{position:relative!important;top:-18px!important;height:7.3dvh!important;min-height:55px!important;display:flex;align-items:flex-end;justify-content:center;margin-bottom:-9px!important;z-index:2}
 .ftp3HeroCards .card{width:44px!important;height:100%!important;min-height:0!important;padding:7px 5px!important;border-radius:7px!important;background:#f7f4ef!important;box-shadow:0 6px 14px #0009!important;font-size:clamp(20px,4.5vw,30px)!important}
 .ftp3HeroCards .card:first-child{transform:rotate(-3deg) translateX(3px)}.ftp3HeroCards .card:last-child{transform:rotate(3deg) translateX(-3px)}
-.ftp3Strength{position:absolute!important;left:calc(50% + 58px)!important;right:auto!important;top:auto!important;bottom:62px!important;transform:none!important;white-space:nowrap!important;min-width:108px!important;text-align:center!important;z-index:35!important;margin:0!important;padding:3px 12px;border-radius:999px;background:#16101c;border:1px solid #c18b39;color:#f1c96b;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.ftp3Strength{position:absolute!important;left:calc(50% + 58px)!important;right:auto!important;top:auto!important;bottom:62px!important;transform:none!important;white-space:nowrap!important;min-width:108px!important;text-align:center!important;z-index:35!important;margin:0!important;padding:2px 6px;color:#f3cf78;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:0;text-shadow:0 2px 7px #000}
 .ftp3HeroPlaque{position:relative;z-index:3;width:100%;min-height:51px!important;padding:6px 24px 6px 48px!important;border-radius:14px;border:1px solid #d39e3e;background:linear-gradient(160deg,#18101e,#0c0911);box-shadow:0 9px 22px #000b;display:flex;align-items:center}
 .ftp3HeroCrown{position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:47px!important;height:47px!important;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#2d1b37,#0c0910);border:1px solid #d39e3e;color:#f3ce72;font-size:22px!important;box-shadow:0 5px 14px #0009}
-.ftp3HeroPlaque div{display:grid;gap:1px}.ftp3HeroPlaque small{color:#a89bac;font-size:8px;letter-spacing:.16em}.ftp3HeroPlaque b{color:#f0c968;font-size:18px}.ftp3HeroPlaque em{margin-left:auto;color:#fff;font-style:normal;font-size:10px;font-weight:900}
+.ftp3HeroPlaque div{display:grid;gap:1px}.ftp3HeroPlaque small{color:#a89bac;font-size:8px;letter-spacing:.16em}.ftp3HeroPlaque b{color:#f0c968;font-size:18px}.ftp3HeroPlaque em{margin-left:auto;color:#fff;font-style:normal;font-size:10px;font-weight:900}.ftp3ExtraTime{position:absolute;right:8px;top:5px;padding:0;border:0;background:transparent;color:#e4bb61;font:inherit;font-size:8px;font-weight:900;letter-spacing:.04em;cursor:pointer;pointer-events:auto;text-shadow:0 1px 4px #000}.ftp3ExtraTime:active{transform:translateY(1px)}
 
 .ftp3UtilityBar{position:absolute;left:12px!important;right:12px!important;bottom:4px!important;z-index:86;display:flex;gap:8px;pointer-events:none}
 .ftp3UtilityBar button{pointer-events:auto;flex:1 1 0;min-width:0!important;height:38px!important;padding:0 10px!important;border-radius:11px;border:1px solid rgba(172,119,196,.48);background:linear-gradient(180deg,rgba(24,15,31,.98),rgba(12,8,17,.98));color:#efe7f2;display:flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-size:9px!important;font-weight:900;letter-spacing:.05em;box-shadow:0 6px 16px #0007}
 .ftp3UtilityBar button.active{border-color:#b23cff;color:#f2ce74;background:linear-gradient(180deg,rgba(48,23,61,.98),rgba(20,10,28,.98))}.ftp3UtilityBar svg{width:18px;height:18px;stroke:currentColor;fill:none}
 
-.ftp3ActionDock{position:absolute!important;left:10px!important;right:10px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;min-height:16.8dvh!important;padding:12px 12px 52px!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;outline:0!important;z-index:80!important;display:block!important}
+.ftp3ActionDock{position:absolute!important;left:10px!important;right:10px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;min-height:0!important;padding:6px 12px 48px!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;outline:0!important;z-index:80!important;display:block!important}
 .ftp3ActionDock:before,.ftp3ActionDock:after{display:none!important;content:none!important}
 .ftp3ActionRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.ftp3ActionRow button,.ftp3PregameControls button{min-height:54px;padding:7px 6px;border-radius:12px;border:1px solid rgba(151,83,177,.56);background:linear-gradient(180deg,#26152e,#120d18);color:#fff;font:inherit;font-weight:900;font-size:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.ftp3ActionRow button,.ftp3PregameControls button{min-height:48px;padding:6px 6px;border-radius:12px;border:1px solid rgba(151,83,177,.56);background:linear-gradient(180deg,#26152e,#120d18);color:#fff;font:inherit;font-weight:900;font-size:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 .ftp3ActionRow button small{display:block;margin-top:2px;color:#b8aaba;font-size:8px;font-weight:700}.ftp3ActionRow button.raise{background:linear-gradient(180deg,#8a31ef,#5b18bf);border-color:#ae57ff}.ftp3ActionRow button.allin{background:linear-gradient(180deg,#6d4a18,#2d1c0a);border-color:#d6a33f;color:#f7d57f}.ftp3ActionRow button:disabled{opacity:.38;filter:saturate(.45)}
-.ftp3RaiseRow{margin-top:9px;display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center}.ftp3RaiseRow>span{color:#bcaec2;font-size:9px;white-space:nowrap}.ftp3RaiseRow>span b{color:#f1cb70}.ftp3RaiseRow input{width:100%;accent-color:#b785ff}.ftp3RaiseRow>div{display:flex;gap:5px}.ftp3RaiseRow button{height:30px;min-width:40px;padding:0 8px;border-radius:8px;border:1px solid #4c3658;background:#120d18;color:#cbbdd0;font:inherit;font-size:8px}
-.ftp3TimeBankRow{margin-top:7px;display:flex;justify-content:flex-end}.ftp3TimeBankRow button{min-height:30px;padding:4px 11px;border-radius:999px;border:1px solid rgba(218,174,78,.72);background:linear-gradient(180deg,#2c2110,#15100a);color:#f3cf78;font:inherit;font-size:9px;font-weight:900;letter-spacing:.04em}.ftp3TimeBankRow button small{display:inline;margin-left:7px;color:#a89875;font-size:7px;font-weight:800}.ftp3TimeBankRow button:disabled{opacity:.38;filter:saturate(.45)}
+.ftp3RaiseRow{margin-top:6px;display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center}.ftp3RaiseRow>span{color:#bcaec2;font-size:9px;white-space:nowrap}.ftp3RaiseRow>span b{color:#f1cb70}.ftp3RaiseRow input{width:100%;accent-color:#b785ff}.ftp3RaiseRow>div{display:flex;gap:5px}.ftp3RaiseRow button{height:30px;min-width:40px;padding:0 8px;border-radius:8px;border:1px solid #4c3658;background:#120d18;color:#cbbdd0;font:inherit;font-size:8px}
 .ftp3PregameControls{display:grid;grid-template-columns:2fr 1fr;gap:9px}.ftp3PregameControls .ftp3Start{border-color:#d1a249;background:linear-gradient(180deg,#6d4a18,#2d1c0a);color:#f7d57f;font-size:15px}
 .ftp3Watching{height:62px;display:grid;place-items:center;color:#c3b6c8;font-size:12px}
 .ftp3SittingOut{border:1px solid #5a4f61;border-radius:12px;background:#100c13;color:#b9adbe;letter-spacing:.08em;font-size:10px;font-weight:900}
@@ -349,16 +348,15 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 }
 @media(max-width:520px){
   .ftp3SitoutControl{left:8px}.ftp3SitoutControl button{height:27px;padding:0 9px;font-size:7px}.ftp3SittingOut{font-size:8px}
-  .ftp3TimeBankRow{margin-top:5px}.ftp3TimeBankRow button{min-height:28px;padding:3px 9px;font-size:8px}.ftp3TimeBankRow button small{font-size:6.5px;margin-left:5px}
   .ftp3UtilityBar{left:8px!important;right:8px!important;gap:6px}.ftp3UtilityBar button{height:36px!important;padding:0 7px!important;font-size:8px!important}.ftp3UtilityBar svg{width:16px;height:16px}
 }
 @media(max-height:700px){
-  .ftp3Stage{top:10.6dvh!important;height:69dvh!important}
-  .ftp3Hero{bottom:18.7dvh!important}
+  .ftp3Stage{top:9.4dvh!important;height:69dvh!important}
+  .ftp3Hero{bottom:20.2dvh!important}
 }
 @media(min-width:761px){
   .gameplayV3Page{left:50%!important;right:auto!important;width:min(76vw,980px)!important;transform:translateX(-50%);box-shadow:0 0 90px #000d}
   .ftp3Stage{height:75dvh!important;max-height:860px}
-  .ftp3Hero{bottom:17.9dvh!important;width:min(28vw,240px)!important}
+  .ftp3Hero{bottom:18.2dvh!important;width:min(28vw,240px)!important}
   .ftp3Avatar{width:min(5.2vw,58px)!important}
 }

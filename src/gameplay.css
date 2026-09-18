@@ -19,14 +19,13 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   padding:0!important;
   isolation:isolate;
   background:
-    radial-gradient(circle at 50% 30%,rgba(128,35,181,.30),transparent 40%),
-    radial-gradient(ellipse at 50% 62%,rgba(210,158,58,.07),transparent 38%),
-    linear-gradient(180deg,rgba(4,2,6,.10),rgba(4,2,6,.38)),
+    radial-gradient(circle at 50% 28%,rgba(149,49,202,.36),transparent 43%),
+    radial-gradient(ellipse at 50% 64%,rgba(220,168,72,.09),transparent 42%),
     var(--mobile-bg)!important;
   background-size:cover!important;
   background-position:center top!important;
   background-repeat:no-repeat!important;
-  background-blend-mode:normal,multiply,normal!important;
+  background-blend-mode:screen,screen,normal!important;
   filter:none!important;
 }
 .gameplayV3Page:before{
@@ -35,7 +34,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   inset:0;
   z-index:1;
   pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(13,2,25,.05) 30%,rgba(4,0,12,.14) 68%,rgba(0,0,0,.56));
+  background:linear-gradient(180deg,rgba(12,5,18,.02),rgba(12,5,18,.03) 34%,rgba(10,4,15,.06) 70%,rgba(8,3,12,.16));
 }
 .gameplayV3Page:after{
   content:"";
@@ -44,8 +43,8 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   z-index:1;
   pointer-events:none;
   background:
-    radial-gradient(ellipse at 50% 42%,rgba(139,46,196,.14),transparent 48%),
-    radial-gradient(ellipse at 50% 66%,rgba(219,166,66,.05),transparent 42%);
+    radial-gradient(ellipse at 50% 40%,rgba(158,58,212,.18),transparent 52%),
+    radial-gradient(ellipse at 50% 68%,rgba(226,176,78,.07),transparent 46%);
   mix-blend-mode:screen;
 }
 .gameplayV3Page>*{position:relative;z-index:2}
@@ -164,7 +163,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   inset:0;
   border-radius:46%/49%;
   background:linear-gradient(135deg,#121015 0%,#3b353a 16%,#0f0e12 34%,#4d4547 49%,#171418 67%,#3e373b 84%,#0c0b0e 100%);
-  box-shadow:0 2.8dvh 4dvh rgba(0,0,0,.58),0 0 4.2vw rgba(132,36,180,.46),0 0 2.4vw rgba(218,165,65,.08),inset 0 0 0 2px rgba(235,197,113,.16);
+  box-shadow:0 2.8dvh 4dvh rgba(0,0,0,.42),0 0 4.8vw rgba(145,48,195,.52),0 0 2.8vw rgba(224,173,76,.10),inset 0 0 0 2px rgba(239,202,119,.20);
 }
 .ftp3Rail{
   position:absolute;
@@ -173,7 +172,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   padding:3.3%;
   background:linear-gradient(90deg,#5f3d12,#f1c45d 16%,#865717 30%,#d29b35 49%,#6d4512 70%,#e1b14d 84%,#6b4311);
   box-shadow:inset 0 0 0 2px #1c1510,inset 0 0 0 4px rgba(255,226,152,.2),0 0 0 2px #120e11;
-  filter:saturate(.96) contrast(1.08) brightness(1.03);
+  filter:saturate(1) contrast(1.05) brightness(1.08);
 }
 .ftp3FeltSurface{
   width:100%;

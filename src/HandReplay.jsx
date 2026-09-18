@@ -26,7 +26,7 @@ export default function HandReplay({hand,onClose}){
    <header className="replayHeader"><div><small>HAND REPLAYER</small><b>Hand #{hand.handNumber}</b><span>{meta.smallBlind}/{meta.bigBlind} NLH{meta.ante?' • BBA '+meta.ante:''}</span></div><button onClick={onClose} aria-label="Close hand replay">×</button></header>
    <div className="replayProgress"><i style={{width:String(progress)+'%'}}/></div>
    <div className={'replayFelt '+(step.hypothetical?'rabbitStep':'')}>
-    <div className="replayBoard">{Array.from({length:5},(_,i)=><Card key={i} c={step.board?.[i]||''}/>)}</div>
+    <div className="replayBoard">{Array.from({length:5},(_,i)=>step.board?.[i]?<Card key={i} c={step.board[i]}/>:<div className="replayBoardSlot" key={i}/>)}</div>
     <div className="replayPot"><small>{step.hypothetical?'RABBIT POT':'POT'}</small><b>{Number(step.pot||0).toLocaleString()}</b></div>
     {step.hypothetical&&<div className="replayRabbitFlag">RABBIT RUNOUT • DID NOT AFFECT THE HAND</div>}
     {(step.players||[]).map(p=>{const pos=seatPosition(p.seatIndex),left=pos[0],top=pos[1],cards=revealed.get(String(p.id))||[],dealer=Number(p.seatIndex)===Number(meta.dealerIndex);return <div key={p.id} className={'replaySeat '+(p.folded?'folded ':'')+(p.allIn?'allin ':'')+(step.turnPlayerId===p.id?'turn':'')} style={{left:String(left)+'%',top:String(top)+'%'}}>

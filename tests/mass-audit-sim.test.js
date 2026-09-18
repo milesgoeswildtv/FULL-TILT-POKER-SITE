@@ -51,7 +51,7 @@ test('AUDIT: 25,000 randomized side-pot settlements conserve every chip',{timeou
   const r=rng(seed*7919),n=2+int(r,8),deck=shuffle(r,DECK),board=deck.splice(0,5),players=[];
   for(let i=0;i<n;i++)players.push({id:'p'+i,name:'P'+i,contributed:int(r,2501),folded:r()<.35,cards:[deck.pop(),deck.pop()]});
   if(!players.some(p=>p.contributed>0))players[0].contributed=1;
-  const contributors=players.filter(p=>p.contributed>0);if(!contributors.some(p=>!p.folded))contributors[0].folded=false;
+  const contributors=players.filter(p=>p.contributed>0),maxContribution=Math.max(...contributors.map(p=>p.contributed));contributors.find(p=>p.contributed===maxContribution).folded=false;
   const result=settleContributions(players,board,int(r,n)),input=players.reduce((sum,p)=>sum+p.contributed,0),awards=[...result.awards.values()].reduce((a,b)=>a+b,0),returns=[...result.returns.values()].reduce((a,b)=>a+b,0);
   assert.equal(result.total,input,'seed '+seed+' total');assert.equal(awards+returns,input,'seed '+seed+' awards+returns');
   assert.equal(result.contestedTotal+result.returnedTotal,input,'seed '+seed+' components');

@@ -9,7 +9,7 @@ export const assets={
     logoMobile:`${root}/crashout/CrashoutMiniLogo.png`,
     brandLogo:`${root}/crashout/CrashoutPokerLogo.png`,
     miniLogo:`${root}/crashout/CrashoutMiniLogo.png`,
-    heroLogo:`${root}/crashout/CrashoutLogoNoCard.PNG`,
+    heroLogo:`${root}/crashout/CrashoutPokerLogo.png`,
     mascotCrow:`${root}/default/the-crow.png`,
     mascotHare:`${root}/default/the-hare.png`,
     avatarFrame:`${root}/default/default-avatar-frame.png`,

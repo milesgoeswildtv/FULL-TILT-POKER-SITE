@@ -1,34 +1,25 @@
 import React from'react';
 import{createRoot}from'react-dom/client';
 import App from'./App.jsx';
-import LayoutLab from'./LayoutLab.jsx';
-import V3Preview from'./V3Preview.jsx';
 import TournamentConfig from'./TournamentConfig.jsx';
-import ActionLogPanel from'./ActionLogPanel.jsx';
-import TableChatDock from'./TableChatDock.jsx';
 import{installSessionRouting}from'./session.js';
 import{bootstrapPlatform}from'./platform.js';
-import'./fx-runtime.js';
-import'./cash-table-v2-route.js';
 import'./tournament-config.css';
-import'./fixed-gameplay.css';
-import'./chat-dock-override.css';
-import'./fixed-gameplay-polish.css';
-import'./gameplay-v2-rebuild.css';
-import'./gameplay-v2-art.css';
-import'./cash-table-v2.css';
-import'./cash-table-v2-polish.css';
-import'./cash-table-v2-polish-v2.css';
-import'./cash-table-approved-layout.css';
-import'./approved-cash-felt.css';
-import'./approved-cash-felt-hotfix.css';
-import'./gameplay-v3-refinement.css';
-import'./gameplay-v3-pass2.css';
-import'./gameplay-v3-pass3.css';
-import'./gameplay-v3-pass4.css';
 import'./global-royal-grade.css';
 import'./telegram.css';
+
 const root=createRoot(document.getElementById('root'));
-function render(){const preview=/^#\/v3-preview(?:$|\?)/i.test(location.hash),lab=/^#\/layout-lab(?:$|\?)/i.test(location.hash);root.render(preview?<V3Preview/>:lab?<LayoutLab onExit={()=>{location.hash=''}}/>:<><App/><TournamentConfig/><ActionLogPanel/><TableChatDock/></>)}
-async function boot(){root.render(<div className="telegramBoot">Opening Crashout Poker…</div>);await bootstrapPlatform();installSessionRouting();addEventListener('hashchange',render);render()}
+
+function render(){
+ root.render(<><App/><TournamentConfig/></>);
+}
+
+async function boot(){
+ root.render(<div className="telegramBoot">Opening Crashout Poker…</div>);
+ await bootstrapPlatform();
+ installSessionRouting();
+ addEventListener('hashchange',render);
+ render();
+}
+
 boot();

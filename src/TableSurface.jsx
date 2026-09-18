@@ -22,7 +22,6 @@ export function TableHUD({state,me,isSpectator,strength,turnLeft,raise,setRaise,
  function quick(frac){if(!state.canRaise)return;const call=Math.max(0,Number(state.toCall||0)),pot=Math.max(0,Number(state.pot||0)),currentBet=Number(state.currentBet||0),suggested=Math.round(currentBet+call+(pot*frac)),clamped=Math.min(maxRaise,Math.max(minRaise,suggested));setRaise(String(clamped))}
  const primaryLabel=state.toCall===0?'Check':'Call';
  return <><div className="ftp3Hero"><div className="ftp3HeroCards">{heroCards.length?heroCards.map((card,i)=><Card key={i} c={card} backAsset={cardBackFor(me)}/>):<><Card c="" backAsset={cardBackFor(me)}/><Card c="" backAsset={cardBackFor(me)}/></>}</div>{strength&&state.started&&!me?.folded&&!isShowdown&&<div className="ftp3Strength">{strength}</div>}<div className="ftp3HeroPlaque"><span className="ftp3HeroCrown">♠</span><div><small>{isSpectator?'SPECTATOR':'YOU • BANK '+bankSeconds+'s'}</small><b>{Number(me?.chips||0).toLocaleString()}</b></div>{canAct&&turnLeft!=null&&<em>{turnLeft}s</em>}</div></div>
- <div className="ftp3UtilityBar"><button className={showChat?'active':''} onClick={()=>setShowChat(v=>!v)}><ChatIcon/>Chat</button>{state.tournamentStats?.length>0&&<button className={showStats?'active':''} onClick={()=>setShowStats(v=>!v)}>Stats</button>}<button className={showHistory?'active':''} onClick={()=>setShowHistory(v=>!v)}><LogIcon/>Hand Log</button></div>
  <section className="ftp3ActionDock">
  {!state.started?(state.street==='finished'||state.endedByHost)?<div className="ftp3Watching">Game complete</div>:me?.host?<div className="ftp3PregameControls"><button className="ftp3Start" onClick={()=>onAction('start')}>Start Game</button><button onClick={()=>onAction('addbot')}>+ Test Bot</button></div>:<div className="ftp3Watching">Waiting for the host to start</div>
  :isSpectator?<div className="ftp3Watching">Watching table • read only</div>
@@ -36,5 +35,6 @@ export function TableHUD({state,me,isSpectator,strength,turnLeft,raise,setRaise,
  {me&&!me.eliminated&&me.chips>0&&state.started&&!isShowdown&&<div className="ftp3SitoutControl"><button className={sittingOut?'active':''} onClick={()=>onAction(sittingOut?'sitin':'sitout')}>{sittingOut?'Sit Back In':'Sit Out'}</button></div>}
  {me?.host&&state.started&&<div className="ftp3HostRow">{!isShowdown&&<button onClick={()=>onAction(state.paused?'resume':'pause')}>{state.paused?'Resume':'Pause'}</button>}<button onClick={()=>onAction('end')}>End Game</button></div>}
  </>}
+ <div className="ftp3UtilityBar"><button className={showChat?'active':''} onClick={()=>setShowChat(v=>!v)}><ChatIcon/>Chat</button>{state.tournamentStats?.length>0&&<button className={showStats?'active':''} onClick={()=>setShowStats(v=>!v)}>Stats</button>}<button className={showHistory?'active':''} onClick={()=>setShowHistory(v=>!v)}><LogIcon/>Hand Log</button></div>
  </section></>
 }

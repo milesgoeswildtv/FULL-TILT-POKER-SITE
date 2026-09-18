@@ -1,8 +1,9 @@
+import{normalizeTimeBankMs}from'./time-bank.js';
 function int(v,fallback=0){const n=Math.trunc(Number(v));return Number.isFinite(n)?n:fallback}
 function isNonNegativeInteger(v){const n=Number(v);return Number.isInteger(n)&&n>=0}
 function isPositiveInteger(v){const n=Number(v);return Number.isInteger(n)&&n>=1}
 function rowStats(stats={}){return{handsPlayed:Math.max(0,int(stats.handsPlayed)),handsWon:Math.max(0,int(stats.handsWon)),vpipHands:Math.max(0,int(stats.vpipHands)),pfrHands:Math.max(0,int(stats.pfrHands)),biggestPotWon:Math.max(0,int(stats.biggestPotWon)),knockouts:Math.max(0,Number(stats.knockouts)||0),chipsWon:Math.max(0,int(stats.chipsWon))}}
-function canonicalRow(row={}){return{id:String(row.id||''),ownershipGeneration:Math.max(1,int(row.ownershipGeneration,1)),chips:Math.max(0,int(row.chips)),eliminated:!!row.eliminated,sittingOut:!!row.sittingOut,handStartChips:Math.max(0,int(row.handStartChips)),stats:rowStats(row.stats),cosmetic:String(row.cosmetic||'default')}}
+function canonicalRow(row={}){return{id:String(row.id||''),ownershipGeneration:Math.max(1,int(row.ownershipGeneration,1)),chips:Math.max(0,int(row.chips)),eliminated:!!row.eliminated,sittingOut:!!row.sittingOut,timeBankMs:normalizeTimeBankMs(row.timeBankMs),handStartChips:Math.max(0,int(row.handStartChips)),stats:rowStats(row.stats),cosmetic:String(row.cosmetic||'default')}}
 
 export function validateBoundaryShape(report={}){
  if(!Array.isArray(report.players))throw Error('Table report players required.');
@@ -11,7 +12,7 @@ export function validateBoundaryShape(report={}){
  if(report.reportGeneration!=null&&!isPositiveInteger(report.reportGeneration))throw Error('Tournament report generation must be a positive integer.');
  if(report.completedAt!=null&&!isNonNegativeInteger(report.completedAt))throw Error('Tournament boundary completion time is invalid.');
  if(report.nextBigBlindPlayerId!=null&&typeof report.nextBigBlindPlayerId!=='string')throw Error('Tournament next big blind player id is invalid.');
- for(const row of report.players){if(!row||typeof row!=='object'||!String(row.id||''))throw Error('Tournament report player id required.');if(!isPositiveInteger(row.ownershipGeneration??1))throw Error('Tournament player ownership generation is invalid.');if(!isNonNegativeInteger(row.chips))throw Error('Tournament player chips must be a non-negative integer.');if(row.handStartChips!=null&&!isNonNegativeInteger(row.handStartChips))throw Error('Tournament hand-start chips must be a non-negative integer.');}
+ for(const row of report.players){if(!row||typeof row!=='object'||!String(row.id||''))throw Error('Tournament report player id required.');if(!isPositiveInteger(row.ownershipGeneration??1))throw Error('Tournament player ownership generation is invalid.');if(!isNonNegativeInteger(row.chips))throw Error('Tournament player chips must be a non-negative integer.');if(row.handStartChips!=null&&!isNonNegativeInteger(row.handStartChips))throw Error('Tournament hand-start chips must be a non-negative integer.');if(row.timeBankMs!=null&&!isNonNegativeInteger(row.timeBankMs))throw Error('Tournament time bank must be a non-negative integer.');}
  return true;
 }
 

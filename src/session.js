@@ -5,6 +5,8 @@ export function safeSessionHash(hash=''){const value=String(hash||''),q=value.in
 export function sessionToken(code){return localStorage.getItem(key(SESSION_PREFIX,code))||''}
 export function tournamentSessionToken(code){return localStorage.getItem(key(TOURNAMENT_PREFIX,code))||''}
 export function rememberTournamentSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;localStorage.setItem(key(TOURNAMENT_PREFIX,code),token)}
+export function clearTournamentSession(code){code=String(code||'').toUpperCase();if(!code)return;localStorage.removeItem(key(TOURNAMENT_PREFIX,code))}
+export function clearTableSession(code){code=String(code||'').toUpperCase();if(!code)return;localStorage.removeItem(key(SESSION_PREFIX,code));localStorage.removeItem(key(SPECTATOR_PREFIX,code));localStorage.removeItem(key(ROLE_PREFIX,code))}
 export function sessionTokenFor(code,kind='table'){return kind==='tournament'?tournamentSessionToken(code):sessionToken(code)}
 export function rememberPlayerSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;localStorage.setItem(key(SESSION_PREFIX,code),token);localStorage.setItem(key(ROLE_PREFIX,code),'player');localStorage.removeItem(key(SPECTATOR_PREFIX,code))}
 export function rememberSpectatorSession(code,token){code=String(code||'').toUpperCase();if(!code||!token)return;localStorage.setItem(key(SESSION_PREFIX,code),token);localStorage.setItem(key(SPECTATOR_PREFIX,code),token);localStorage.setItem(key(ROLE_PREFIX,code),'spectator')}

@@ -17,3 +17,26 @@ test('acting before reminder advances the turn serial and prevents stale reminde
 
 
 test('pause and resume preserve the same turn serial and do not create duplicate reminders',async()=>{const h=harness();await post(h.table,'/init',{code:'ABC123',hostName:'Host',accountId:'host-account',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]]});await post(h.table,'/join',{name:'Guest One',accountId:'guest-1'});const host=h.table.data.players.find(p=>p.host);await post(h.table,'/action',{token:host.token,type:'start'});const serial=h.table.data.turnSerial;await post(h.table,'/action',{token:host.token,type:'pause'});assert.equal(h.table.data.turnSerial,serial);assert.equal(h.table.data.turnReminderAt,null);assert.equal(h.table.data.turnDeadline,null);await post(h.table,'/action',{token:host.token,type:'resume'});assert.equal(h.table.data.turnSerial,serial);assert.ok(h.table.data.turnReminderAt);const before=h.deliveries.filter(x=>x.body.event?.kind==='turn-reminder').length;const at=h.table.data.turnReminderAt;assert.equal(await h.table.sendTurnReminderIfDue(at),true);assert.equal(await h.table.sendTurnReminderIfDue(at+1),false);const after=h.deliveries.filter(x=>x.body.event?.kind==='turn-reminder').length;assert.equal(after,before+1)});
+
+
+test('sit out auto-folds the current human immediately, suppresses turn reminders, and allows sit back in',async()=>{
+ const h=harness();
+ await post(h.table,'/init',{code:'ABC123',hostName:'Host',accountId:'host-account',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]]});
+ await post(h.table,'/join',{name:'Guest One',accountId:'guest-1'});
+ const host=h.table.data.players.find(p=>p.host);
+ await post(h.table,'/action',{token:host.token,type:'start'});
+ const current=h.table.data.players[h.table.data.turnIndex],currentId=current.id;
+ const beforeReminders=h.deliveries.filter(x=>x.body.event?.kind==='turn-reminder').length;
+ let r=await post(h.table,'/action',{token:current.token,type:'sitout'});
+ assert.equal(r.status,200);
+ let body=await r.json();
+ assert.equal(h.table.data.players.find(p=>p.id===currentId).sittingOut,true);
+ assert.equal(body.players.find(p=>p.id===currentId).sittingOut,true);
+ assert.ok(h.table.data.actionLog.some(x=>x.type==='sitout'&&/auto-folded/.test(x.text))||h.table.data.handHistory[0]?.actionLog?.some(x=>x.type==='sitout'&&/auto-folded/.test(x.text)));
+ assert.equal(h.deliveries.filter(x=>x.body.event?.kind==='turn-reminder').length,beforeReminders);
+ r=await post(h.table,'/action',{token:current.token,type:'sitin'});
+ assert.equal(r.status,200);
+ body=await r.json();
+ assert.equal(h.table.data.players.find(p=>p.id===currentId).sittingOut,false);
+ assert.equal(body.players.find(p=>p.id===currentId).sittingOut,false);
+});

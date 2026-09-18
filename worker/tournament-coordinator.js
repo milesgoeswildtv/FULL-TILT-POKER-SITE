@@ -118,6 +118,7 @@ export class TournamentCoordinator{
   }
   return results;
  }
+ adminSummary(now=Date.now()){const d=this.data;if(!d)throw Error('Tournament not found.');const state=publicState(d,now),players=d.players.map(({token,reportOwnerTable,pendingMoveId,ownershipGeneration,...p})=>({...p,accountId:p.accountId||null})),host=d.players.find(p=>p.host)||null,winnerRow=d.players.find(p=>Number(p.finishPlace)===1)||(d.status==='finished'?activeField(d)[0]:null),lastReport=Math.max(0,...(d.tables||[]).map(t=>Number(t.lastReportAt)||0));return{...state,kind:'tournament',hostName:host?.name||null,hostAccountId:host?.accountId||null,playerCount:d.players.length,players,winner:winnerRow?{id:winnerRow.id,name:winnerRow.name,chips:winnerRow.chips,finishPlace:winnerRow.finishPlace}:null,lastActivityAt:Number(d.endedAt||d.finishedAt||lastReport||d.startedAt||d.createdAt)||null}}
  async fetch(req){
   await this.load();const u=new URL(req.url);
   if(u.pathname==='/access-exists'&&req.method==='GET')return this.data?json({ok:true,kind:'tournament',code:this.data.code,status:this.data.status}):json({error:'Tournament not found.'},404);
@@ -134,8 +135,10 @@ export class TournamentCoordinator{
    await this.save();return json({...publicState(this.data,Number(b.now)||Date.now()),token:players[0].token,host:true},201)
   }
   if(!this.data)return json({error:'Tournament not found.'},404);
+  if(u.pathname==='/admin-summary'&&req.method==='GET')return json(this.adminSummary());
   if(u.pathname==='/state'&&req.method==='GET')return json(publicState(this.data));
   if(u.pathname==='/session'&&req.method==='GET'){try{return json(this.sessionState(u.searchParams.get('token')||''))}catch(e){return json({error:e.message},403)}}
+  if(u.pathname==='/recover'&&req.method==='POST'){const b=await req.json().catch(()=>({})),accountId=String(b.accountId||'');if(!accountId)return json({error:'Account id required.'},400);const p=this.data.players.find(x=>x.accountId===accountId);if(!p)return json({error:'No tournament seat is linked to this account.'},404);return json({code:this.data.code,token:p.token,playerId:p.id,host:!!p.host,session:this.sessionState(p.token)})}
   if(u.pathname==='/join'&&req.method==='POST'){try{const b=await req.json(),p=this.joinLobby(b.name,b);await this.save();return json({code:this.data.code,token:p.token,playerId:p.id,tableNumber:p.tableNumber,seat:p.seat},201)}catch(e){return json({error:e.message},409)}}
   if(u.pathname==='/provision'&&req.method==='POST'){
    if(this.transitionInFlight)return this.busy('provision');if(this.data.status!=='lobby')return json({error:'Tables can only be provisioned before the tournament starts.'},409);if(this.data.players.length<2)return json({error:'At least two players are required to provision tables.'},409);

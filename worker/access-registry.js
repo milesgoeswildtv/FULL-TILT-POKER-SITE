@@ -70,6 +70,7 @@ export class AccessRegistry{
  async fetch(req){
   const u=new URL(req.url);let body={};if(req.method==='POST')try{body=await req.json()}catch{}
   try{
+   if(u.pathname==='/attempt'&&req.method==='POST'){await this.rateLimit(String(body.fingerprint||'anon'),body.invalid===true);return json({ok:true})}
    if(u.pathname==='/prepare'&&req.method==='POST')return json(await this.prepare(body));
    if(u.pathname==='/redeem'&&req.method==='POST')return json(await this.redeem(body));
    if(u.pathname==='/admin/generate'&&req.method==='POST')return json({keys:await this.generate(body)},201);

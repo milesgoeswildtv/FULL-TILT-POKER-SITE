@@ -2,7 +2,7 @@ function int(v,fallback=0){const n=Math.trunc(Number(v));return Number.isFinite(
 function isNonNegativeInteger(v){const n=Number(v);return Number.isInteger(n)&&n>=0}
 function isPositiveInteger(v){const n=Number(v);return Number.isInteger(n)&&n>=1}
 function rowStats(stats={}){return{handsPlayed:Math.max(0,int(stats.handsPlayed)),handsWon:Math.max(0,int(stats.handsWon)),vpipHands:Math.max(0,int(stats.vpipHands)),pfrHands:Math.max(0,int(stats.pfrHands)),biggestPotWon:Math.max(0,int(stats.biggestPotWon)),knockouts:Math.max(0,Number(stats.knockouts)||0),chipsWon:Math.max(0,int(stats.chipsWon))}}
-function canonicalRow(row={}){return{id:String(row.id||''),ownershipGeneration:Math.max(1,int(row.ownershipGeneration,1)),chips:Math.max(0,int(row.chips)),eliminated:!!row.eliminated,handStartChips:Math.max(0,int(row.handStartChips)),stats:rowStats(row.stats),cosmetic:String(row.cosmetic||'default')}}
+function canonicalRow(row={}){return{id:String(row.id||''),ownershipGeneration:Math.max(1,int(row.ownershipGeneration,1)),chips:Math.max(0,int(row.chips)),eliminated:!!row.eliminated,sittingOut:!!row.sittingOut,handStartChips:Math.max(0,int(row.handStartChips)),stats:rowStats(row.stats),cosmetic:String(row.cosmetic||'default')}}
 
 export function validateBoundaryShape(report={}){
  if(!Array.isArray(report.players))throw Error('Table report players required.');

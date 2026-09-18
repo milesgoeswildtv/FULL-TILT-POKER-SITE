@@ -35,6 +35,8 @@ test('uncontested real PokerTable hand can rabbit hunt without changing deck, bo
  assert.equal(t.data.lastResult.rabbitBoard.length,5);assert.equal(t.data.handHistory[0].rabbitBoard.length,5);
  assert.equal(t.data.handHistory[0].replay.steps.at(-1).type,'fold');
  assert.equal(t.data.handHistory[0].actionLog.at(-1).type,'rabbit');
+ const pub=t.public(actor.token);assert.equal(pub.handHistory[0].replay,undefined);assert.equal(pub.handHistory[0].replayAvailable,true);
+ const replay=t.replayHistory(t.data.handNumber);assert.ok(replay.replay.steps.length>=2);
  assert.equal(t.data.players.reduce((n,p)=>n+p.chips,0)+t.data.pot,chipsBefore);
  assert.equal(t.rabbitHunt(actor),false);
 });
@@ -43,4 +45,12 @@ test('Rabbit Hunt is rejected for normal showdown hands',()=>{
  const t=new PokerTable(state(),{});t.data=game();t.newHand();
  t.data.lastResult={uncontested:false,board:['2♠','3♠','4♠','5♠','6♠']};t.data.street='showdown';t.data.phaseDeadline=Date.now()+5000;t.data.rabbitCandidate=null;
  assert.throws(()=>t.rabbitHunt(t.data.players[0]),/not available/i);
+});
+
+
+test('immediate short-stack runout still records a usable replay',()=>{
+ const t=new PokerTable(state(),{}),d=game();d.players[1].chips=5;d.players[1].handStartChips=5;t.data=d;t.newHand();
+ assert.equal(t.data.street,'showdown');assert.equal(t.data.handHistory.length,1);
+ assert.ok(t.data.handHistory[0].replay?.steps?.length>=2);
+ assert.equal(t.data.handHistory[0].replay.players.length,2);
 });

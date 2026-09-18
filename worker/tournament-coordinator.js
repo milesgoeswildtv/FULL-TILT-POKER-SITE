@@ -120,6 +120,7 @@ export class TournamentCoordinator{
  }
  async fetch(req){
   await this.load();const u=new URL(req.url);
+  if(u.pathname==='/access-exists'&&req.method==='GET')return this.data?json({ok:true,kind:'tournament',code:this.data.code,status:this.data.status}):json({error:'Tournament not found.'},404);
   if(u.pathname==='/init'&&req.method==='POST'){
    if(this.data)return json({error:'Tournament already exists.'},409);
    const b=await req.json(),entries=Array.isArray(b.players)?b.players.map(x=>({name:cleanName(x?.name||x),accountId:String(x?.accountId||'')||null,cosmetic:cleanCosmetic(x?.cosmetic)})).filter(x=>x.name):[],names=entries.map(x=>x.name);

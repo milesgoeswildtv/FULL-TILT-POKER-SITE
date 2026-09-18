@@ -38,13 +38,15 @@ async function redeemTicket(req,env,identity,ticket){
  if(!result)throw Object.assign(Error('Account storage unavailable.'),{status:503});return{redeemed:true,type:redeemed.type,access:result.account?.access||null}
 }
 function adminAllowed(req,env){const expected=String(env?.ACCESS_ADMIN_SECRET||''),header=String(req.headers.get('authorization')||''),token=header.startsWith('Bearer ')?header.slice(7):String(req.headers.get('x-crashout-admin-key')||'');return!!expected&&token===expected}
+async function requestFingerprint(req,prefix='access'){const raw=req.headers.get('cf-connecting-ip')||req.headers.get('x-forwarded-for')||('ua:'+String(req.headers.get('user-agent')||'unknown'));return await digest(prefix+'|'+raw)}
+async function throttledInvite(req,env,body){const fingerprint=await requestFingerprint(req,'invite');await callRegistry(env,'/attempt',{body:{fingerprint,invalid:false}});try{return await resolveInvite(env,body.code,body.kind)}catch(error){if(error.status===404)try{await callRegistry(env,'/attempt',{body:{fingerprint,invalid:true}})}catch(throttle){if(throttle.status===429)throw throttle}throw error}}
 
 export async function handleAccessApi(req,env){
  const u=new URL(req.url);if(!u.pathname.startsWith('/api/access/'))return null;
  let body={};if(req.method==='POST')try{body=await req.json()}catch{}
  try{
   if(u.pathname==='/api/access/key/prepare'&&req.method==='POST'){
-   const identity=await authenticatedIdentity(req,env),rawFp=req.headers.get('cf-connecting-ip')||req.headers.get('x-forwarded-for')||('ua:'+String(req.headers.get('user-agent')||'unknown')),fingerprint=await digest(rawFp),prepared=await callRegistry(env,'/prepare',{body:{key:body.key,fingerprint}});
+   const identity=await authenticatedIdentity(req,env),fingerprint=await requestFingerprint(req,'host-key'),prepared=await callRegistry(env,'/prepare',{body:{key:body.key,fingerprint}});
    if(identity){const result=await redeemTicket(req,env,identity,prepared.ticket);return json(result)}
    return json({ok:true,redeemed:false,type:prepared.type,requiresLogin:true},200,{'set-cookie':secureCookie(HOST_TICKET_COOKIE,prepared.ticket,TICKET_SECONDS)})
   }
@@ -53,9 +55,9 @@ export async function handleAccessApi(req,env){
    const ticket=parseCookies(req)[HOST_TICKET_COOKIE];if(!ticket)return json({ok:true,redeemed:false});
    const result=await redeemTicket(req,env,identity,ticket);return json(result,200,{'set-cookie':clearCookie(HOST_TICKET_COOKIE)})
   }
-  if(u.pathname==='/api/access/invite/validate'&&req.method==='POST'){const invite=await resolveInvite(env,body.code,body.kind);return json({ok:true,...invite})}
+  if(u.pathname==='/api/access/invite/validate'&&req.method==='POST'){const invite=await throttledInvite(req,env,body);return json({ok:true,...invite})}
   if(u.pathname==='/api/access/invite/claim'&&req.method==='POST'){
-   const identity=await authenticatedIdentity(req,env);if(!identity)return json({error:'Crashout Poker login required.'},401);const invite=await resolveInvite(env,body.code,body.kind),granted=await grantInvite(env,identity,invite.kind,invite.code,String(body.source||'invite'));return json({ok:true,...invite,access:granted.account?.access||null})
+   const identity=await authenticatedIdentity(req,env);if(!identity)return json({error:'Crashout Poker login required.'},401);const invite=await throttledInvite(req,env,body),granted=await grantInvite(env,identity,invite.kind,invite.code,String(body.source||'invite'));return json({ok:true,...invite,access:granted.account?.access||null})
   }
   if(u.pathname==='/api/access/admin/keys'&&req.method==='POST'){
    if(!adminAllowed(req,env))return json({error:'Admin access required.'},403);if(!env?.ACCESS_ADMIN_SECRET)return json({error:'ACCESS_ADMIN_SECRET is not configured.'},503);return json(await callRegistry(env,'/admin/generate',{body:{type:body.type,count:body.count}}),201)

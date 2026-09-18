@@ -66,7 +66,7 @@ export async function handleAccessApi(req,env){
   }
   if(u.pathname==='/api/access/invite/validate'&&req.method==='POST'){const invite=await throttledInvite(req,env,body);return json({ok:true,...invite})}
   if(u.pathname==='/api/access/invite/claim'&&req.method==='POST'){
-   const identity=await authenticatedIdentity(req,env);if(!identity)return json({error:'Crashout Poker login required.'},401);const invite=await throttledInvite(req,env,body),granted=await grantInvite(env,identity,invite.kind,invite.code,String(body.source||'invite'));return json({ok:true,...invite,access:granted.account?.access||null})
+   const identity=await authenticatedIdentity(req,env);if(!identity)return json({error:'Crashout Poker login required.'},401);const requestedKind=cleanKind(body.kind),requestedCode=cleanCode(body.code);if(requestedKind&&requestedCode.length===6){const existing=await accountRequest(env,identity,'/access/invite-check',{kind:requestedKind,code:requestedCode});if(existing?.allowed)return json({ok:true,kind:requestedKind,code:requestedCode,existing:true,access:existing.access||null})}const invite=await throttledInvite(req,env,body),granted=await grantInvite(env,identity,invite.kind,invite.code,String(body.source||'invite'));return json({ok:true,...invite,access:granted.account?.access||null})
   }
   if(u.pathname==='/api/access/admin/games'&&req.method==='GET'){
    if(!adminAllowed(req,env))return json({error:'Admin access required.'},403);if(!env?.GAME_REGISTRY)return json({error:'Game registry is not configured.'},503);return json({games:await refreshedGames(env)})

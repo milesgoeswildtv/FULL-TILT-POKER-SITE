@@ -5,3 +5,5 @@ html,body,button,input,select,textarea{font-family:"Arial Narrow","Roboto Conden
 
 
 html,body,input,select,textarea{font-family:var(--crash-ui)!important}button,h1,h2,h3,h4,.brand,.eyebrow,.entryEyebrow,.sectionHead>div>span,.gamePanelHead span,.ftp3HeaderBrand,.ftp3ActionDock button,.ftp3UtilityBar button{font-family:var(--crash-display)!important;letter-spacing:.035em}.ftp3SeatCopy,.ftp3HeroPlaque,.ftp3Bet,.ftp3Pot,.ftp3SidePots,.ftp3Strength{font-family:var(--crash-ui)!important}
+
+.postgameCloseBar{max-width:1050px;margin:8px auto 10px;padding:9px 14px;border:1px solid #6f5321;border-radius:12px;background:#171006;color:#c9b98e;text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em}.postgameCloseBar b{color:#f1cf72;font-size:13px}

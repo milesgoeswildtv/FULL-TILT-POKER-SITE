@@ -24,7 +24,7 @@ export async function acknowledgeTournamentMoves(env,{tournamentCode,tableNumber
 
 export function applyTournamentBlinds(tableData,snapshot){
  if(!tableData||!snapshot?.handBlinds)return false;
- const b=snapshot.handBlinds;tableData.blindLevel=Number(b.blindLevel)||0;tableData.smallBlind=Math.max(1,Math.trunc(Number(b.smallBlind)||1));tableData.bigBlind=Math.max(tableData.smallBlind,Math.trunc(Number(b.bigBlind)||tableData.smallBlind));tableData.minRaise=tableData.bigBlind;tableData.tournamentClock=snapshot.clock||null;tableData.tournamentBreak=snapshot.scheduledBreak||null;tableData.tournamentBreakSchedule=snapshot.breakSchedule||null;tableData.tournamentStatus=snapshot.status||null;return true;
+ const b=snapshot.handBlinds;tableData.blindLevel=Number(b.blindLevel)||0;tableData.smallBlind=Math.max(1,Math.trunc(Number(b.smallBlind)||1));tableData.bigBlind=Math.max(tableData.smallBlind,Math.trunc(Number(b.bigBlind)||tableData.smallBlind));tableData.ante=Math.max(0,Math.trunc(Number(b.ante)||0));tableData.anteMode=snapshot.anteMode==='big-blind'?'big-blind':'none';tableData.minRaise=tableData.bigBlind;tableData.tournamentClock=snapshot.clock||null;tableData.tournamentBreak=snapshot.scheduledBreak||null;tableData.tournamentBreakSchedule=snapshot.breakSchedule||null;tableData.tournamentStatus=snapshot.status||null;return true;
 }
 
 function nonNegativeInt(v){return Math.max(0,Math.trunc(Number(v)||0))}

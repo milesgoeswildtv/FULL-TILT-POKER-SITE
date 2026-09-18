@@ -33,3 +33,22 @@ test('authenticated table proxy overwrites a forged action token before reaching
 test('authenticated GET proxy canonicalizes duplicate token parameters',async()=>{const x=runningProxyEnvironment(),r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/table?token=real-token&token=forged-token&view=compact'),x.env);assert.equal(r.status,200);const forwarded=x.request(),u=new URL(forwarded.url);assert.equal(u.pathname,'/state');assert.deepEqual(u.searchParams.getAll('token'),['real-token']);assert.equal(u.searchParams.get('view'),'compact')});
 
 test('table proxy rejects invalid endpoint methods before reaching a child table',async()=>{const x=runningProxyEnvironment(),r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments/ABC123/table/action?token=real-token'),x.env);assert.equal(r.status,405);assert.equal(r.headers.get('allow'),'POST');assert.equal(x.request(),null)});
+
+
+test('public tournament BBA toggle enriches every blind level and exposes the rule before start',async()=>{
+ const env=environment(),r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({hostName:'Ante Host',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]],bigBlindAnte:true})}),env),j=await r.json();
+ assert.equal(r.status,201);
+ assert.equal(j.anteMode,'big-blind');
+ assert.equal(j.clock.ante,20);
+ const stored=env.objects.get(j.code).coordinator.data;
+ assert.equal(stored.anteMode,'big-blind');
+ assert.deepEqual(stored.clock.blindStructure,[[10,20,20],[20,40,40]]);
+});
+
+test('public tournament keeps ante disabled when the host leaves BBA off',async()=>{
+ const env=environment(),r=await handleTournamentApi(new Request('https://fulltilt.test/api/tournaments',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({hostName:'No Ante',blindStructure:[[10,20],[20,40]],bigBlindAnte:false})}),env),j=await r.json();
+ assert.equal(r.status,201);
+ assert.equal(j.anteMode,'none');
+ assert.equal(j.clock.ante,0);
+ assert.deepEqual(env.objects.get(j.code).coordinator.data.clock.blindStructure,[[10,20,0],[20,40,0]]);
+});

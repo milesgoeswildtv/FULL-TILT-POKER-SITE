@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- production deploy marker: owner-tools-live -->
+<!-- production deploy marker: owner-console-v2 -->
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -8,64 +8,106 @@
 <title>Crashout Owner Tools</title>
 <style>
 :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;background:#09070d;color:#f4edf6}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 0,#2a1135 0,transparent 35%),radial-gradient(circle at 90% 15%,#3b2911 0,transparent 30%),#09070d;padding:calc(env(safe-area-inset-top) + 24px) 18px calc(env(safe-area-inset-bottom) + 32px)}
-main{max-width:620px;margin:0 auto}.eyebrow{font-size:11px;letter-spacing:.18em;color:#b593c4;font-weight:900}.card{background:linear-gradient(180deg,rgba(28,20,34,.96),rgba(13,9,17,.97));border:1px solid #4b3655;border-radius:22px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.4)}
-h1{font-size:30px;margin:8px 0 8px}p{color:#baaec0;line-height:1.5;font-size:14px}.warn{font-size:12px;color:#cfb77b}
-label{display:block;margin:18px 0 7px;font-size:10px;font-weight:900;letter-spacing:.12em;color:#a792af}
-input,select{width:100%;height:52px;border:1px solid #574260;border-radius:13px;background:#08060b;color:#fff;padding:0 14px;font-size:16px;outline:none}
-.grid{display:grid;grid-template-columns:1fr 110px;gap:10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-button{min-height:50px;border-radius:13px;border:1px solid #8a6928;background:linear-gradient(145deg,#3c2c0f,#171006);color:#f1cf72;font-weight:900;letter-spacing:.04em;cursor:pointer}
-button.secondary{border-color:#5e4768;background:linear-gradient(145deg,#24162b,#110b16);color:#d9c4e0}button:disabled{opacity:.5;cursor:wait}
-.result{margin-top:18px;display:grid;gap:10px}.keyrow,.statusrow{padding:14px;border:1px solid #493652;border-radius:14px;background:#0c0910}.keyline{display:flex;gap:8px;align-items:center}.keytext{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;overflow-wrap:anywhere}.copy{min-height:38px;padding:0 12px}.meta{margin-top:7px;font-size:10px;color:#95879b}.msg{margin-top:14px;font-size:13px;color:#d8cadc}.error{color:#ff9a9a}.ok{color:#b9e5b3}
-@media(max-width:520px){.grid,.actions{grid-template-columns:1fr}.card{padding:17px}h1{font-size:26px}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 0,#2a1135 0,transparent 35%),radial-gradient(circle at 90% 15%,#3b2911 0,transparent 30%),#09070d;padding:calc(env(safe-area-inset-top) + 18px) 14px calc(env(safe-area-inset-bottom) + 32px)}
+main{max-width:760px;margin:0 auto}.shell{background:linear-gradient(180deg,rgba(28,20,34,.97),rgba(13,9,17,.98));border:1px solid #4b3655;border-radius:22px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.42)}
+.eyebrow{font-size:10px;letter-spacing:.18em;color:#b593c4;font-weight:900}h1{font-size:28px;margin:7px 0 6px}h2{font-size:20px;margin:0 0 8px}h3{font-size:15px;margin:0}p{color:#baaec0;line-height:1.45;font-size:13px}.warn{font-size:11px;color:#cfb77b}
+label{display:block;margin:14px 0 6px;font-size:9px;font-weight:900;letter-spacing:.12em;color:#a792af}
+input,select{width:100%;height:48px;border:1px solid #574260;border-radius:12px;background:#08060b;color:#fff;padding:0 13px;font-size:15px;outline:none}
+button{min-height:46px;border-radius:12px;border:1px solid #8a6928;background:linear-gradient(145deg,#3c2c0f,#171006);color:#f1cf72;font-weight:900;letter-spacing:.035em;cursor:pointer;padding:0 14px}
+button.secondary{border-color:#5e4768;background:linear-gradient(145deg,#24162b,#110b16);color:#d9c4e0}button.danger{border-color:#71333c;background:linear-gradient(145deg,#3a151c,#16090c);color:#ffb2ba}button:disabled{opacity:.48;cursor:wait}
+.secretRow{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}.secretRow button{height:48px}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:16px 0}.tab{min-height:43px;border-color:#4a3753;background:#100b14;color:#a898af}.tab.active{border-color:#8a6928;color:#f1cf72;background:#24190b}
+.pane{display:none}.pane.active{display:block}.grid{display:grid;grid-template-columns:1fr 110px;gap:9px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.msg{margin-top:12px;font-size:12px;color:#d8cadc;min-height:18px}.error{color:#ff9a9a}.ok{color:#b9e5b3}
+.result,.gameList{margin-top:14px;display:grid;gap:9px}.keyrow,.statusrow,.gameCard,.detailBlock{padding:13px;border:1px solid #493652;border-radius:13px;background:#0c0910}.keyline{display:flex;gap:8px;align-items:center}.keytext{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-wrap:anywhere}.copy{min-height:36px;padding:0 11px}.meta{margin-top:6px;font-size:10px;color:#95879b}
+.toolbar{display:grid;grid-template-columns:1fr auto;gap:8px}.toolbar button{min-height:48px}.gameCard{cursor:pointer}.gameTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.gameCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:900;font-size:17px}.badge{font-size:9px;padding:5px 7px;border:1px solid #5c4767;border-radius:999px;color:#cbbbd1;text-transform:uppercase;white-space:nowrap}.badge.running,.badge.paused,.badge.break,.badge.break-pending{border-color:#56754f;color:#bfe6b8}.badge.finished,.badge.ended{border-color:#715a31;color:#e2c77d}.gameSub{font-size:11px;color:#a99bab;margin-top:7px;line-height:1.45}.gameMeta{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px;font-size:9px;color:#806f87;text-transform:uppercase;letter-spacing:.06em}
+.detail{display:none;margin-top:15px}.detail.active{display:block}.detailHead{display:flex;justify-content:space-between;gap:10px;align-items:start}.detailHead button{min-height:38px}.statGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.stat{padding:10px;border:1px solid #3c2d43;border-radius:10px;background:#09070c}.stat small{display:block;color:#8e7d95;font-size:8px;letter-spacing:.1em;text-transform:uppercase}.stat b{display:block;margin-top:4px;font-size:14px;overflow-wrap:anywhere}
+.controlRow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.sectionTitle{margin-top:16px;font-size:10px;letter-spacing:.13em;color:#aa96b1;font-weight:900}.players{margin-top:7px;display:grid;gap:6px}.player{display:grid;grid-template-columns:32px 1fr auto;gap:7px;align-items:center;padding:9px;border-radius:9px;background:#0a070c;border:1px solid #2f2534;font-size:11px}.player .place{color:#9e8ba5;font-family:ui-monospace,monospace}.player .stack{font-family:ui-monospace,monospace;color:#d8c8dd}.player small{display:block;color:#74697a;margin-top:2px}.empty{padding:20px 8px;text-align:center;color:#8f8294;font-size:12px}.log{font-size:10px;line-height:1.5;color:#9d909f;max-height:180px;overflow:auto}.searchHint{font-size:10px;color:#837689;margin-top:6px}
+@media(max-width:560px){.shell{padding:15px}.grid,.actions,.secretRow{grid-template-columns:1fr}.secretRow button{height:42px}.controlRow{grid-template-columns:1fr}.statGrid{grid-template-columns:1fr 1fr}h1{font-size:25px}.tabs{position:sticky;top:calc(env(safe-area-inset-top) + 5px);z-index:2;background:#120d16;padding:5px;border-radius:12px}}
 </style>
 </head>
 <body>
 <main>
-  <div class="card">
-    <div class="eyebrow">CRASHOUT POKER • OWNER TOOLS</div>
-    <h1>Host Key Generator</h1>
-    <p>Generate account-bound host keys from your phone. Your admin secret is used only for this request and is never saved by this page.</p>
+<div class="shell">
+  <div class="eyebrow">CRASHOUT POKER • OWNER CONSOLE</div>
+  <h1>Owner Tools</h1>
+  <p>Generate host keys, inspect live games, recover tournament results, and use emergency controls. Your admin secret is used only for requests from this page and is not stored.</p>
 
-    <label for="secret">ACCESS_ADMIN_SECRET</label>
-    <input id="secret" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Paste your Cloudflare secret"/>
-
-    <div class="grid">
-      <div>
-        <label for="type">KEY TYPE</label>
-        <select id="type">
-          <option value="permanent">Permanent host key</option>
-          <option value="one-time">One-time host key</option>
-        </select>
-      </div>
-      <div>
-        <label for="count">COUNT</label>
-        <input id="count" type="number" inputmode="numeric" min="1" max="100" value="1"/>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button id="generate">GENERATE KEY</button>
-      <button id="status" class="secondary">VIEW KEY STATUS</button>
-    </div>
-
-    <div id="message" class="msg"></div>
-    <div id="results" class="result"></div>
-    <p class="warn">Save newly generated plaintext keys immediately. Crashout stores the hashed key record afterward, not the plaintext key.</p>
+  <div class="secretRow">
+    <div><label for="secret">ACCESS_ADMIN_SECRET</label><input id="secret" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Paste your Cloudflare secret"/></div>
+    <button id="unlock" class="secondary">USE SECRET</button>
   </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="keys">KEYS</button>
+    <button class="tab" data-tab="live">LIVE GAMES</button>
+    <button class="tab" data-tab="finished">FINISHED</button>
+  </div>
+
+  <section id="keysPane" class="pane active">
+    <h2>Host Key Generator</h2>
+    <div class="grid">
+      <div><label for="type">KEY TYPE</label><select id="type"><option value="permanent">Permanent host key</option><option value="one-time">One-time host key</option></select></div>
+      <div><label for="count">COUNT</label><input id="count" type="number" inputmode="numeric" min="1" max="100" value="1"/></div>
+    </div>
+    <div class="actions"><button id="generate">GENERATE KEY</button><button id="keyStatus" class="secondary">VIEW KEY STATUS</button></div>
+    <div id="keyMessage" class="msg"></div><div id="keyResults" class="result"></div>
+    <p class="warn">Save newly generated plaintext keys immediately. Crashout stores the hashed key record afterward, not the plaintext key.</p>
+  </section>
+
+  <section id="livePane" class="pane">
+    <h2>Live Games</h2>
+    <div class="toolbar"><input id="liveSearch" placeholder="Search code, host, player, date…"/><button id="liveRefresh" class="secondary">REFRESH</button></div>
+    <div class="searchHint">A six-character code can also recover a game created before the registry was added.</div>
+    <div id="liveMessage" class="msg"></div><div id="liveGames" class="gameList"></div>
+  </section>
+
+  <section id="finishedPane" class="pane">
+    <h2>Finished Games</h2>
+    <div class="toolbar"><input id="finishedSearch" placeholder="Search code, winner, player, date…"/><button id="finishedRefresh" class="secondary">REFRESH</button></div>
+    <div id="finishedMessage" class="msg"></div><div id="finishedGames" class="gameList"></div>
+  </section>
+
+  <section id="detail" class="detail">
+    <div class="detailBlock">
+      <div class="detailHead"><div><div class="eyebrow">GAME INSPECTOR</div><h2 id="detailTitle">—</h2></div><button id="closeDetail" class="secondary">CLOSE</button></div>
+      <div id="detailStats" class="statGrid"></div>
+      <div id="controls" class="controlRow"></div>
+      <div class="sectionTitle">PLAYERS / STANDINGS</div><div id="players" class="players"></div>
+      <div id="tableSection"></div>
+      <div class="sectionTitle">OWNER ACTION LOG</div><div id="adminLog" class="log">No owner actions recorded.</div>
+    </div>
+  </section>
+</div>
 </main>
 <script>
-const $=id=>document.getElementById(id),message=$('message'),results=$('results'),generate=$('generate'),status=$('status');
+const $=id=>document.getElementById(id);
+let games=[],selected=null,currentTab='keys';
+
 function secret(){return $('secret').value.trim()}
-function setMessage(text,kind=''){message.className='msg '+kind;message.textContent=text}
+function setMsg(id,text,kind=''){const el=$(id);el.className='msg '+kind;el.textContent=text}
+function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function fmtDate(ms){if(!Number(ms))return'—';return new Date(Number(ms)).toLocaleString()}
+function fmtNum(n){return Number(n||0).toLocaleString()}
+function isFinished(g){return['finished','ended'].includes(String(g?.status||''))}
 async function api(path,options={}){
   const token=secret();if(!token)throw new Error('Paste ACCESS_ADMIN_SECRET first.');
   const headers={...(options.headers||{}),Authorization:'Bearer '+token};
   const response=await fetch(path,{...options,headers});
   let body={};try{body=await response.json()}catch{}
-  if(!response.ok)throw new Error(body.error||('Request failed ('+response.status+').'));
+  if(!response.ok){const error=new Error(body.error||('Request failed ('+response.status+').'));error.body=body;throw error}
   return body
 }
+function activate(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+  document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));
+  $(tab+'Pane').classList.add('active');
+  $('detail').classList.remove('active');
+  if(tab!=='keys')loadGames(tab);
+}
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>activate(btn.dataset.tab));
+$('unlock').onclick=()=>{setMsg(currentTab==='keys'?'keyMessage':currentTab+'Message',secret()?'Secret ready for this page session.':'Paste the secret first.',secret()?'ok':'error')};
+
 function keyCard(item){
   const wrap=document.createElement('div');wrap.className='keyrow';
   const line=document.createElement('div');line.className='keyline';
@@ -73,30 +115,91 @@ function keyCard(item){
   const copy=document.createElement('button');copy.className='copy secondary';copy.textContent='COPY';
   copy.onclick=async()=>{await navigator.clipboard.writeText(item.key||'');copy.textContent='COPIED';setTimeout(()=>copy.textContent='COPY',1200)};
   line.append(text,copy);wrap.append(line);
-  const meta=document.createElement('div');meta.className='meta';meta.textContent=(item.type||'key')+' • id '+(item.id||'');wrap.append(meta);
-  return wrap
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=(item.type||'key')+' • id '+(item.id||'');wrap.append(meta);return wrap
 }
-function statusCard(item){
+function keyStatusCard(item){
   const wrap=document.createElement('div');wrap.className='statusrow';
-  const line=document.createElement('div');line.className='keytext';line.textContent=(item.type||'key').toUpperCase()+' • '+(item.status||'unknown').toUpperCase();wrap.append(line);
-  const meta=document.createElement('div');meta.className='meta';meta.textContent='ID: '+(item.id||'')+(item.boundAccountId?' • Bound account: '+item.boundAccountId:'');wrap.append(meta);
-  return wrap
+  wrap.innerHTML='<div class="keytext">'+esc((item.type||'key').toUpperCase()+' • '+(item.status||'unknown').toUpperCase())+'</div><div class="meta">ID: '+esc(item.id||'')+(item.boundAccountId?' • Bound account: '+esc(item.boundAccountId):'')+'</div>';return wrap
 }
-generate.onclick=async()=>{
-  generate.disabled=true;status.disabled=true;results.replaceChildren();setMessage('Generating…');
-  try{
-    const count=Math.max(1,Math.min(100,Number($('count').value)||1));
-    const body=await api('/api/access/admin/keys',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({type:$('type').value,count})});
-    const keys=Array.isArray(body.keys)?body.keys:[];keys.forEach(k=>results.append(keyCard(k)));setMessage(keys.length?'Generated '+keys.length+' key'+(keys.length===1?'':'s')+'.':'No keys were returned.','ok');
-  }catch(error){setMessage(error.message,'error')}
-  finally{generate.disabled=false;status.disabled=false}
+$('generate').onclick=async()=>{
+  $('generate').disabled=$('keyStatus').disabled=true;$('keyResults').replaceChildren();setMsg('keyMessage','Generating…');
+  try{const count=Math.max(1,Math.min(100,Number($('count').value)||1)),body=await api('/api/access/admin/keys',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({type:$('type').value,count})}),keys=Array.isArray(body.keys)?body.keys:[];keys.forEach(k=>$('keyResults').append(keyCard(k)));setMsg('keyMessage',keys.length?'Generated '+keys.length+' key'+(keys.length===1?'':'s')+'.':'No keys were returned.','ok')}catch(e){setMsg('keyMessage',e.message,'error')}finally{$('generate').disabled=$('keyStatus').disabled=false}
 };
-status.onclick=async()=>{
-  generate.disabled=true;status.disabled=true;results.replaceChildren();setMessage('Loading…');
-  try{const body=await api('/api/access/admin/keys');const keys=Array.isArray(body.keys)?body.keys:[];keys.forEach(k=>results.append(statusCard(k)));setMessage(keys.length?keys.length+' key record'+(keys.length===1?'':'s')+'.':'No key records yet.','ok')}
-  catch(error){setMessage(error.message,'error')}
-  finally{generate.disabled=false;status.disabled=false}
+$('keyStatus').onclick=async()=>{
+  $('generate').disabled=$('keyStatus').disabled=true;$('keyResults').replaceChildren();setMsg('keyMessage','Loading…');
+  try{const body=await api('/api/access/admin/keys'),keys=Array.isArray(body.keys)?body.keys:[];keys.forEach(k=>$('keyResults').append(keyStatusCard(k)));setMsg('keyMessage',keys.length?keys.length+' key record'+(keys.length===1?'':'s')+'.':'No key records yet.','ok')}catch(e){setMsg('keyMessage',e.message,'error')}finally{$('generate').disabled=$('keyStatus').disabled=false}
 };
+
+function searchable(g){return[g.code,g.kind,g.status,g.hostName,g.winnerName,...(g.playerNames||[]),fmtDate(g.createdAt)].filter(Boolean).join(' ').toLowerCase()}
+function gameCard(g){
+  const el=document.createElement('div');el.className='gameCard';
+  el.innerHTML='<div class="gameTop"><div><div class="gameCode">'+esc(g.code)+'</div><div class="gameSub">'+esc((g.kind==='tournament'?'MTT':'TABLE')+' • Host: '+(g.hostName||'Unknown')+(g.winnerName?' • Winner: '+g.winnerName:''))+'</div></div><span class="badge '+esc(g.status)+'">'+esc(g.status||'unknown')+'</span></div><div class="gameMeta"><span>'+fmtNum(g.playerCount)+' PLAYERS</span><span>'+esc(fmtDate(g.createdAt))+'</span></div>';
+  el.onclick=()=>openGame(g);return el
+}
+async function maybeLookupCode(query){
+  const code=String(query||'').trim().toUpperCase();if(!/^[A-Z0-9]{6}$/.test(code))return false;
+  if(games.some(g=>g.code===code))return false;
+  try{const body=await api('/api/access/admin/games/lookup',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code})});if(body.game){await refreshGames();return true}}catch{}return false
+}
+function renderGames(tab){
+  const list=$(tab+'Games'),query=$(tab+'Search').value.trim().toLowerCase(),wanted=games.filter(g=>tab==='finished'?isFinished(g):!isFinished(g)).filter(g=>!query||searchable(g).includes(query));list.replaceChildren();
+  if(!wanted.length){list.innerHTML='<div class="empty">No '+(tab==='finished'?'finished':'live')+' games match.</div>';return}
+  wanted.forEach(g=>list.append(gameCard(g)))
+}
+async function refreshGames(){
+  const body=await api('/api/access/admin/games');games=Array.isArray(body.games)?body.games:[];return games
+}
+async function loadGames(tab){
+  setMsg(tab+'Message','Refreshing game registry…');try{await refreshGames();renderGames(tab);setMsg(tab+'Message',games.length?games.length+' indexed game'+(games.length===1?'':'s')+'.':'No indexed games yet.','ok')}catch(e){setMsg(tab+'Message',e.message,'error')}
+}
+$('liveRefresh').onclick=()=>loadGames('live');$('finishedRefresh').onclick=()=>loadGames('finished');
+for(const tab of['live','finished'])$(tab+'Search').addEventListener('input',()=>renderGames(tab));
+for(const tab of['live','finished'])$(tab+'Search').addEventListener('change',async e=>{if(await maybeLookupCode(e.target.value))renderGames(tab)});
+
+function stat(label,value){return'<div class="stat"><small>'+esc(label)+'</small><b>'+esc(value??'—')+'</b></div>'}
+function statusFor(detail){return detail.status||'unknown'}
+function playerRows(detail){
+  const rows=[...(detail.players||[])];
+  rows.sort((a,b)=>{const ap=Number.isInteger(a.finishPlace)?a.finishPlace:999,bp=Number.isInteger(b.finishPlace)?b.finishPlace:999;return ap-bp||Number(b.chips||0)-Number(a.chips||0)});
+  return rows
+}
+function renderDetail(detail,registry={}){
+  selected={kind:detail.kind,code:detail.code};$('detail').classList.add('active');$('detailTitle').textContent=(detail.kind==='tournament'?'MTT ':'TABLE ')+detail.code;
+  const status=statusFor(detail),turn=detail.players?.find(p=>p.turn)?.name||'—',winner=detail.winner?.name||registry.winnerName||'—';
+  const stats=[
+    stat('Status',status.toUpperCase()),stat('Host',detail.hostName||registry.hostName||'—'),
+    stat('Players',detail.playerCount??detail.players?.length??0),stat('Winner',winner),
+    stat('Hand',detail.handNumber??'—'),stat('Street',detail.street||'—'),
+    stat('Blinds',detail.smallBlind&&detail.bigBlind?detail.smallBlind+'/'+detail.bigBlind+(detail.ante?' • BBA '+detail.ante:''):(detail.clock?.smallBlind&&detail.clock?.bigBlind?detail.clock.smallBlind+'/'+detail.clock.bigBlind:'—')),
+    stat('Pot',detail.pot!=null?fmtNum(detail.pot):'—'),
+    stat('Turn',turn),stat('Created',fmtDate(detail.createdAt||registry.createdAt)),
+    stat('Started',fmtDate(detail.startedAt)),stat('Finished',fmtDate(detail.finishedAt||detail.endedAt))
+  ];$('detailStats').innerHTML=stats.join('');
+  const controls=$('controls');controls.replaceChildren();
+  if(!isFinished(detail)){
+    for(const action of['pause','resume','end']){const b=document.createElement('button');b.textContent=action.toUpperCase();b.className=action==='end'?'danger':action==='resume'?'secondary':'';b.onclick=()=>controlGame(action,b);controls.append(b)}
+  }else controls.innerHTML='<div class="meta">This game is complete. Emergency controls are disabled.</div>';
+  const players=$('players');players.replaceChildren();const rows=playerRows(detail);
+  if(!rows.length)players.innerHTML='<div class="empty">No player data.</div>';else rows.forEach((p,i)=>{const el=document.createElement('div');el.className='player';const place=Number.isInteger(p.finishPlace)?'#'+p.finishPlace:(p.eliminated?'OUT':String(i+1));el.innerHTML='<span class="place">'+esc(place)+'</span><span><b>'+esc(p.name||'Player')+'</b><small>'+(p.host?'HOST • ':'')+(p.sittingOut?'SITTING OUT • ':'')+(p.eliminated?'ELIMINATED':'ACTIVE')+'</small></span><span class="stack">'+fmtNum(p.chips)+'</span>';players.append(el)});
+  const sec=$('tableSection');
+  if(detail.kind==='tournament'){
+    const tableHtml=(detail.tables||[]).map(t=>'<div class="player"><span class="place">T'+esc(t.tableNumber)+'</span><span><b>'+esc((t.status||'unknown').toUpperCase())+'</b><small>HAND '+esc(t.handNumber??0)+' • '+esc((t.playerIds||[]).length)+' ASSIGNED</small></span><span class="stack">'+esc(t.provisioned?'LIVE':'WAIT')+'</span></div>').join('');
+    sec.innerHTML='<div class="sectionTitle">TOURNAMENT TABLES</div><div class="players">'+(tableHtml||'<div class="empty">No tables provisioned.</div>')+'</div><div class="meta">Field remaining: '+esc(detail.fieldRemaining??'—')+' • Pending moves: '+esc((detail.pendingMoves||[]).length)+'</div>'
+  }else{
+    const actions=(detail.actionLog||[]).slice(-20).reverse().map(a=>'<div>'+esc(fmtDate(a.at))+' • '+esc(a.text||a.type||'action')+'</div>').join('');
+    sec.innerHTML='<div class="sectionTitle">RECENT TABLE ACTIONS</div><div class="log">'+(actions||'No recent table actions.')+'</div>'
+  }
+  const events=registry.adminEvents||[];$('adminLog').innerHTML=events.length?events.slice().reverse().map(e=>'<div>'+esc(fmtDate(e.at))+' • '+esc((e.action||'action').toUpperCase())+' • '+esc(e.result||'')+(e.note?' • '+esc(e.note):'')+'</div>').join(''):'No owner actions recorded.';
+  $('detail').scrollIntoView({behavior:'smooth',block:'start'})
+}
+async function openGame(g){
+  setMsg(currentTab+'Message','Opening '+g.code+'…');try{const body=await api('/api/access/admin/games/'+g.kind+'/'+g.code),fresh=(await api('/api/access/admin/games')).games?.find(x=>x.kind===g.kind&&x.code===g.code)||g;renderDetail(body.game,fresh);setMsg(currentTab+'Message','Game loaded.','ok')}catch(e){setMsg(currentTab+'Message',e.message,'error')}
+}
+async function controlGame(action,button){
+  if(!selected)return;if(action==='end'&&!confirm('End this game now? This cannot be resumed.'))return;button.disabled=true;
+  try{const body=await api('/api/access/admin/games/'+selected.kind+'/'+selected.code+'/control',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action})});await refreshGames();const reg=games.find(x=>x.kind===selected.kind&&x.code===selected.code)||{};renderDetail(body.game,reg);setMsg(currentTab+'Message',action.toUpperCase()+' completed.','ok')}catch(e){setMsg(currentTab+'Message',e.message,'error')}finally{button.disabled=false}
+}
+$('closeDetail').onclick=()=>$('detail').classList.remove('active');
 </script>
 </body>
 </html>

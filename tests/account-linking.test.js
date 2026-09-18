@@ -39,3 +39,12 @@ test('account notification outbox de-duplicates the same event id',async()=>{con
 
 
 test('disabled turn reminders never enter the canonical account outbox',async()=>{const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,telegram,'/sync');let r=await post(ns.get(telegram.id),'/notifications/enqueue',{id:'turn:ABC123:1',event:{id:'turn:ABC123:1',kind:'turn-reminder',code:'ABC123'}});assert.equal(r.response.status,200);let stored=await ns.rows.get(telegram.id).account.load();assert.equal(stored.notificationOutbox.length,0);await post(ns.get(telegram.id),'/notifications/preferences',{notifications:{turnReminder:true}});r=await post(ns.get(telegram.id),'/notifications/enqueue',{id:'turn:ABC123:2',event:{id:'turn:ABC123:2',kind:'turn-reminder',code:'ABC123'}});assert.equal(r.response.status,200);stored=await ns.rows.get(telegram.id).account.load();assert.equal(stored.notificationOutbox.length,1);assert.equal(stored.notificationOutbox[0].event.kind,'turn-reminder')});
+
+
+test('linked Telegram and Discord identities merge private host and invite access',async()=>{
+ const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,discord,'/sync');await accountRequest(env,telegram,'/sync');
+ await post(ns.get(telegram.id),'/access/host-grant',{keyId:'tg-host-key',type:'permanent'});await post(ns.get(telegram.id),'/access/invite-grant',{kind:'tournament',code:'ABC123',source:'telegram'});
+ await post(ns.get(discord.id),'/access/host-grant',{keyId:'web-credit-key',type:'one-time'});
+ await linkTelegramToDiscord(env,telegram,discord);const profile=await accountRequest(env,discord,'/profile');
+ assert.equal(profile.account.access.permanentHost,true);assert.equal(profile.account.access.hostCredits,1);assert.equal(profile.account.access.canHost,true);assert.equal(profile.account.access.latestInvite.code,'ABC123');assert.equal(profile.account.access.latestInvite.kind,'tournament');
+});

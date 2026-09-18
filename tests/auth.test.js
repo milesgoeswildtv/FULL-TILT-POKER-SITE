@@ -5,7 +5,7 @@ import{PlayerAccount}from'../worker/player-account.js';
 
 class MemoryStorage{constructor(){this.map=new Map()}async get(k){return this.map.get(k)}async put(k,v){this.map.set(k,v)}}
 
-test('poker APIs require a Full Tilt account session',async()=>{const gated=await gatePokerRequest(new Request('https://fulltilt.test/api/tables/ABC123',{method:'GET'}),{});assert.equal(gated.response.status,401);assert.match((await gated.response.json()).error,/Full Tilt login required/i)})
+test('poker APIs require a Full Tilt account session',async()=>{const gated=await gatePokerRequest(new Request('https://fulltilt.test/api/tables/ABC123',{method:'GET'}),{});assert.equal(gated.response.status,401);assert.match((await gated.response.json()).error,/login required/i)})
 
 test('non poker APIs pass through account gate',async()=>{const req=new Request('https://fulltilt.test/assets/foo.png'),gated=await gatePokerRequest(req,{});assert.equal(gated.response,null);assert.equal(gated.request,req)})
 

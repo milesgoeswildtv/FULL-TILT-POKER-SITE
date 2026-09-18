@@ -2,8 +2,12 @@ import test from'node:test';
 import assert from'node:assert/strict';
 import{authenticatedIdentity,gatePokerRequest,handleAuthApi}from'../worker/auth.js';
 import{telegramIdentity,verifyTelegramInitData}from'../worker/telegram-auth.js';
+import{PlayerAccount}from'../worker/player-account.js';
+import{accountRequest}from'../worker/account-links.js';
 
 const enc=new TextEncoder();
+class MemoryStorage{constructor(){this.map=new Map()}async get(k){return this.map.get(k)}async put(k,v){this.map.set(k,v)}async delete(k){this.map.delete(k)}}
+class AccountNamespace{constructor(){this.rows=new Map()}idFromName(name){return String(name)}get(id){id=String(id);if(!this.rows.has(id)){const storage=new MemoryStorage(),ctx={storage},env={ACCOUNTS:this};this.rows.set(id,new PlayerAccount(ctx,env))}const account=this.rows.get(id);return{fetch:(input,init)=>account.fetch(input instanceof Request?input:new Request(input,init))}}}
 async function hmac(keyBytes,message){const key=await crypto.subtle.importKey('raw',keyBytes,{name:'HMAC',hash:'SHA-256'},false,['sign']);return new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(message)))}
 function hex(bytes){return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('')}
 async function signedInitData(fields,botToken){const pairs=Object.entries(fields).sort(([a],[b])=>a.localeCompare(b)),check=pairs.map(([k,v])=>`${k}=${v}`).join('\n'),secret=await hmac(enc.encode('WebAppData'),botToken),hash=hex(await hmac(secret,check)),params=new URLSearchParams();for(const[k,v]of Object.entries(fields))params.set(k,v);params.set('hash',hash);return params.toString()}
@@ -29,8 +33,8 @@ test('Telegram auth route exchanges verified init data for the normal Full Tilt 
  const{env,response,cookie}=await telegramSession({start_param:'tournament_ABC123'});assert.equal(response.status,200);const body=await response.json();assert.equal(body.identity.provider,'telegram');assert.equal(body.identity.id,'telegram:777');assert.equal(body.startParam,'tournament_ABC123');assert.match(cookie,/^ftp_account=/);const identity=await authenticatedIdentity(new Request('https://fulltilt.test/api/auth/me',{headers:{cookie}}),env);assert.equal(identity?.id,'telegram:777');assert.equal(identity?.displayName,'Kayla');
 });
 
-test('Telegram account sessions pass the same poker API gate and inject verified identity',async()=>{
- const{env,cookie}=await telegramSession({id:888,first_name:'Mikey',username:'mikey'}),request=new Request('https://fulltilt.test/api/tables',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({hostName:'forged-browser-name',startingChips:2500,blindMinutes:10})}),gated=await gatePokerRequest(request,env);assert.equal(gated.response,null);assert.equal(gated.identity?.id,'telegram:888');const body=await gated.request.json();assert.equal(body.hostName,'Mikey');assert.equal(body.accountId,'telegram:888');assert.equal(body.cosmetic,'default');
+test('Telegram host sessions pass the same private poker gate and inject verified identity',async()=>{
+ const{env,cookie}=await telegramSession({id:888,first_name:'Mikey',username:'mikey'}),identity={id:'telegram:888',provider:'telegram',providerId:'888',username:'mikey',displayName:'Mikey'};env.ACCOUNTS=new AccountNamespace();await accountRequest(env,identity,'/sync');await accountRequest(env,identity,'/access/host-grant',{keyId:'telegram-permanent',type:'permanent'});const request=new Request('https://fulltilt.test/api/tables',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({hostName:'forged-browser-name',startingChips:2500,blindMinutes:10})}),gated=await gatePokerRequest(request,env);assert.equal(gated.response,null);assert.equal(gated.identity?.id,'telegram:888');assert.equal(gated.hostKind,'table');const body=await gated.request.json();assert.equal(body.hostName,'Mikey');assert.equal(body.accountId,'telegram:888');assert.equal(body.cosmetic,'default');
 });
 
 test('Telegram player can begin a Discord linking OAuth flow without replacing the Telegram session',async()=>{

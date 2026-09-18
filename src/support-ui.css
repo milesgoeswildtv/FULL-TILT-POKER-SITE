@@ -5,3 +5,5 @@
 @media(max-width:760px){.historyPot{grid-template-columns:58px 55px minmax(0,1fr);padding:5px 6px;gap:5px}.historyPot>span{font-size:6px}.historyPot>b,.historyPot>em{font-size:7.5px}.historyStreet{grid-template-columns:45px minmax(0,1fr);gap:5px}.historyStreet>b{font-size:6px;padding-top:5px}.historyAction{grid-template-columns:46px minmax(0,1fr);padding:5px;gap:5px}.historyAction time{font-size:6px}.historyAction span{font-size:8px}}
 
 .historyAction.type-timebank span{color:#e7c66d;font-weight:800}
+
+.historyMucked{display:flex;flex-wrap:wrap;gap:5px}.historyMucked span{padding:4px 7px;border:1px solid #3d3342;border-radius:999px;background:#0d0a10;color:#9e92a3;font-size:8px;font-weight:800}.historyAction.type-showhand span{color:#e3c46c;font-weight:800}.historyAction.type-muck span{color:#95899a;font-style:italic}

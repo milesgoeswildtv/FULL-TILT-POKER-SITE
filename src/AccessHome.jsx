@@ -1,4 +1,5 @@
 import React,{useEffect,useState}from'react';
+import'./private-access.css';
 
 function cleanInvite(value=''){return String(value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)}
 

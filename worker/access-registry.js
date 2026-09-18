@@ -13,7 +13,8 @@ function cleanRecord(record={}){return{id:String(record.id||''),type:validType(r
 function ticketId(){return crypto.randomUUID().replace(/-/g,'')}
 
 export class AccessRegistry{
- constructor(state,env){this.state=state;this.env=env}
+ constructor(state,env){this.state=state;this.env=env;this.queue=Promise.resolve()}
+ async serialized(fn){const previous=this.queue;let release;this.queue=new Promise(resolve=>{release=resolve});await previous;try{return await fn()}finally{release()}}
  async keyRecordByHash(hash){return await this.state.storage.get('key:'+hash)||null}
  async rateLimit(fingerprint,invalid=false){
   const fp=String(fingerprint||'anon').slice(0,128),now=Date.now(),key='attempt:'+fp,state=await this.state.storage.get(key)||{startedAt:now,count:0};
@@ -30,7 +31,7 @@ export class AccessRegistry{
   await this.state.storage.put('ticket:'+ticket,{hash,expiresAt});
   return{ticket,expiresAt,type:record.type};
  }
- async redeem(body={}){
+ async redeem(body={}){return this.serialized(async()=>{
   const ticket=String(body.ticket||''),accountId=String(body.accountId||'');if(!ticket||!accountId)throw Object.assign(Error('Complete key redemption required.'),{status:400});
   const pending=await this.state.storage.get('ticket:'+ticket);if(!pending||Number(pending.expiresAt||0)<Date.now()){if(pending)await this.state.storage.delete('ticket:'+ticket);throw Object.assign(Error('Host key session expired. Enter the key again.'),{status:410})}
   const record=await this.keyRecordByHash(pending.hash);if(!record||record.revokedAt)throw Object.assign(Error('This host key is no longer available.'),{status:403});
@@ -38,7 +39,7 @@ export class AccessRegistry{
   const alreadyBound=!!record.boundAccountId;if(!alreadyBound){record.boundAccountId=accountId;record.boundAt=Date.now();await this.state.storage.put('key:'+pending.hash,record)}
   await this.state.storage.delete('ticket:'+ticket);
   return{keyId:record.id,type:record.type,alreadyBound,boundAccountId:String(record.boundAccountId||accountId)};
- }
+ })}
  async generate(body={}){
   const type=validType(String(body.type||''));if(!type)throw Object.assign(Error('Key type must be one-time or permanent.'),{status:400});
   const count=Math.max(1,Math.min(100,Math.trunc(Number(body.count)||1))),created=[];

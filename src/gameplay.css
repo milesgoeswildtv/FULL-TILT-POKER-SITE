@@ -147,7 +147,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 
 .ftp3Stage{
   position:absolute!important;
-  top:10.4dvh!important;
+  top:12dvh!important;
   left:50%!important;
   height:70.5dvh!important;
   width:auto!important;
@@ -288,7 +288,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Showdown{position:absolute;left:50%;top:64%;transform:translateX(-50%);width:72%;padding:8px 10px;border-radius:12px;background:rgba(12,8,17,.95);border:1px solid rgba(228,179,78,.62);text-align:center;z-index:45;box-shadow:0 9px 26px #000b}
 .ftp3Showdown small{display:block;color:#c2ad72;font-size:7px;letter-spacing:.1em}.ftp3Showdown b{display:block;margin-top:3px;color:#fff;font-size:9px}
 
-.ftp3Hero{position:absolute;left:50%;bottom:19.6dvh!important;transform:translateX(-50%);z-index:65;width:min(37vw,194px)!important;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.ftp3Hero{position:absolute;left:50%;bottom:18.3dvh!important;transform:translateX(-50%);z-index:65;width:min(37vw,194px)!important;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .ftp3HeroCards{position:relative!important;top:-18px!important;height:7.3dvh!important;min-height:55px!important;display:flex;align-items:flex-end;justify-content:center;margin-bottom:-9px!important;z-index:2}
 .ftp3HeroCards .card{width:44px!important;height:100%!important;min-height:0!important;padding:7px 5px!important;border-radius:7px!important;background:#f7f4ef!important;box-shadow:0 6px 14px #0009!important;font-size:clamp(20px,4.5vw,30px)!important}
 .ftp3HeroCards .card:first-child{transform:rotate(-3deg) translateX(3px)}.ftp3HeroCards .card:last-child{transform:rotate(3deg) translateX(-3px)}
@@ -297,7 +297,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3HeroCrown{position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:47px!important;height:47px!important;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#2d1b37,#0c0910);border:1px solid #d39e3e;color:#f3ce72;font-size:22px!important;box-shadow:0 5px 14px #0009}
 .ftp3HeroPlaque div{display:grid;gap:1px}.ftp3HeroPlaque small{color:#a89bac;font-size:8px;letter-spacing:.16em}.ftp3HeroPlaque b{color:#f0c968;font-size:18px}.ftp3HeroPlaque em{margin-left:auto;color:#fff;font-style:normal;font-size:10px;font-weight:900}
 
-.ftp3UtilityBar{position:absolute;left:18px!important;right:18px!important;bottom:18.5dvh!important;z-index:85;display:flex;justify-content:space-between;pointer-events:none}
+.ftp3UtilityBar{position:absolute;left:18px!important;right:18px!important;bottom:17.2dvh!important;z-index:85;display:flex;justify-content:space-between;pointer-events:none}
 .ftp3UtilityBar button{pointer-events:auto;min-width:98px!important;height:38px!important;padding:0 12px!important;border-radius:999px;border:1px solid rgba(172,119,196,.48);background:rgba(14,10,19,.95);color:#efe7f2;display:flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:10px!important;font-weight:900;letter-spacing:.05em;box-shadow:0 8px 20px #0008}
 .ftp3UtilityBar button.active{border-color:#b23cff;color:#f2ce74}.ftp3UtilityBar svg{width:20px;height:20px;stroke:currentColor;fill:none}
 
@@ -352,13 +352,13 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   .ftp3TimeBankRow{margin-top:5px}.ftp3TimeBankRow button{min-height:28px;padding:3px 9px;font-size:8px}.ftp3TimeBankRow button small{font-size:6.5px;margin-left:5px}
 }
 @media(max-height:700px){
-  .ftp3Stage{top:9.4dvh!important;height:69dvh!important}
-  .ftp3Hero{bottom:20.2dvh!important}
-  .ftp3UtilityBar{bottom:18.8dvh!important}
+  .ftp3Stage{top:10.6dvh!important;height:69dvh!important}
+  .ftp3Hero{bottom:18.7dvh!important}
+  .ftp3UtilityBar{bottom:17.6dvh!important}
 }
 @media(min-width:761px){
   .gameplayV3Page{left:50%!important;right:auto!important;width:min(76vw,980px)!important;transform:translateX(-50%);box-shadow:0 0 90px #000d}
   .ftp3Stage{height:75dvh!important;max-height:860px}
-  .ftp3Hero{bottom:18.2dvh!important;width:min(28vw,240px)!important}
+  .ftp3Hero{bottom:17.9dvh!important;width:min(28vw,240px)!important}
   .ftp3Avatar{width:min(5.2vw,58px)!important}
 }

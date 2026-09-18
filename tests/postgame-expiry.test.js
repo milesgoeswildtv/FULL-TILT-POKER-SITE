@@ -6,6 +6,7 @@ import{TournamentCoordinator}from'../worker/tournament-coordinator.js';
 import{PlayerAccount}from'../worker/player-account.js';
 import{accountRequest}from'../worker/account-links.js';
 import{handleAccessApi}from'../worker/access.js';
+import{AccessRegistry}from'../worker/access-registry.js';
 
 class MemoryStorage{
  constructor(){this.map=new Map();this.alarm=null}
@@ -28,6 +29,11 @@ class TableNamespace{
  constructor(){this.controls=[]}
  idFromName(name){return String(name)}
  get(id){return{fetch:async req=>{const u=new URL(req.url);if(u.pathname==='/mtt/control'){const b=await req.json();this.controls.push({id:String(id),type:b.type});return Response.json({ok:true,status:'finished'})}return Response.json({error:'not found'},{status:404})}}}
+}
+class AccessNamespace{
+ constructor(){this.registry=new AccessRegistry(memoryState(),{})}
+ idFromName(name){return String(name)}
+ get(){return{fetch:(input,init)=>this.registry.fetch(input instanceof Request?input:new Request(input,init))}}
 }
 class TerminalGameNamespace{
  idFromName(name){return String(name)}
@@ -81,7 +87,7 @@ test('tournament expires after buffer, revokes access, and tells every provision
 });
 
 test('completed games reject new invite validation immediately, before the ten minute viewer buffer ends',async()=>{
- const env={TABLES:new TerminalGameNamespace(),TOURNAMENTS:new TerminalGameNamespace(),ACCESS_ADMIN_SECRET:'x'};
+ const env={TABLES:new TerminalGameNamespace(),TOURNAMENTS:new TerminalGameNamespace(),ACCESS_REGISTRY:new AccessNamespace(),ACCESS_ADMIN_SECRET:'x'};
  const r=await handleAccessApi(post('https://crashout.test/api/access/invite/validate',{kind:'table',code:'END123'}),env);
  assert.equal(r.status,404);
 });

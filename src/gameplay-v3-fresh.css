@@ -205,3 +205,12 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a;}
   .ftp3UtilityBar{bottom:18.2dvh}
   .ftp3ActionDock{min-height:17.7dvh!important}
 }
+
+.ftp3Seat.sittingout .ftp3SeatPlaque{border-color:#5f5566;filter:saturate(.6);box-shadow:0 7px 18px #000c,inset 0 0 0 1px rgba(255,255,255,.04)}
+.ftp3Seat.sittingout .ftp3SeatCopy b,.ftp3Seat.sittingout .ftp3SeatCopy strong{color:#9f95a4}
+.ftp3Away{position:absolute;right:4px;top:-12px;padding:2px 6px;border-radius:999px;border:1px solid #6f6376;background:#151018;color:#c5b8ca;font-style:normal;font-size:7px;font-weight:900;letter-spacing:.08em}
+.ftp3SittingOut{border:1px solid #5a4f61;border-radius:12px;background:#100c13;color:#b9adbE;letter-spacing:.08em;font-size:10px;font-weight:900}
+.ftp3SitoutControl{position:absolute;left:12px;bottom:-34px;display:flex;z-index:4}
+.ftp3SitoutControl button{height:28px;padding:0 11px;border-radius:999px;border:1px solid #4c3658;background:#120d18;color:#bdaec2;font:inherit;font-size:8px;font-weight:900;letter-spacing:.04em}
+.ftp3SitoutControl button.active{border-color:#8a6a2d;background:#251b0d;color:#f0cd76}
+@media(max-width:520px){.ftp3SitoutControl{left:8px}.ftp3SitoutControl button{height:27px;padding:0 9px;font-size:7px}.ftp3SittingOut{font-size:8px}}

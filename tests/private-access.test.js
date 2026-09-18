@@ -4,7 +4,7 @@ import{AccessRegistry}from'../worker/access-registry.js';
 import{PlayerAccount}from'../worker/player-account.js';
 import{accountRequest}from'../worker/account-links.js';
 import{gatePokerRequest}from'../worker/auth.js';
-import{finalizeHostedGame}from'../worker/access.js';
+import{finalizeHostedGame,handleAccessApi}from'../worker/access.js';
 
 const enc=new TextEncoder();
 class MemoryStorage{constructor(){this.map=new Map()}async get(k){return this.map.get(k)}async put(k,v){this.map.set(k,v)}async delete(k){this.map.delete(k)}}
@@ -14,6 +14,8 @@ class AccountNamespace{
  idFromName(name){return String(name)}
  get(id){id=String(id);if(!this.rows.has(id)){const st=state(),env={ACCOUNTS:this};this.rows.set(id,{st,account:new PlayerAccount(st,env)})}const row=this.rows.get(id);return{fetch:(input,init)=>row.account.fetch(input instanceof Request?input:new Request(input,init))}}
 }
+class AccessNamespace{constructor(){this.registry=new AccessRegistry(state(),{})}idFromName(name){return String(name)}get(){return{fetch:(input,init)=>this.registry.fetch(input instanceof Request?input:new Request(input,init))}}}
+class GameNamespace{constructor(validCode){this.validCode=validCode}idFromName(name){return String(name)}get(id){return{fetch:async()=>String(id)===this.validCode?Response.json({ok:true}):Response.json({error:'not found'},{status:404})}}}
 async function signedSession(identity,secret){let s='';for(const b of enc.encode(JSON.stringify(identity)))s+=String.fromCharCode(b);const body=btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']),bytes=new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(body)));let raw='';for(const b of bytes)raw+=String.fromCharCode(b);const sig=btoa(raw).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');return body+'.'+sig}
 async function cookie(identity,secret){return'ftp_account='+await signedSession({...identity,exp:Date.now()+60000},secret)}
 function post(url,body){return new Request(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)})}
@@ -78,4 +80,20 @@ test('simultaneous create reservations cannot spend one host credit twice',async
  const ns=new AccountNamespace(),env={ACCOUNTS:ns};await accountRequest(env,host,'/sync');await accountRequest(env,host,'/access/host-grant',{keyId:'single-race-credit',type:'one-time'});
  const results=await Promise.allSettled([accountRequest(env,host,'/access/host-reserve'),accountRequest(env,host,'/access/host-reserve')]);
  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected').length,1);const profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,0);
+});
+
+
+test('public access API issues a key ticket and links the redeemed key to the logged-in account',async()=>{
+ const accounts=new AccountNamespace(),access=new AccessNamespace(),secret='public-access-secret',admin='admin-secret',env={ACCOUNTS:accounts,ACCESS_REGISTRY:access,AUTH_SECRET:secret,ACCESS_ADMIN_SECRET:admin};await accountRequest(env,host,'/sync');
+ let response=await handleAccessApi(new Request('https://crashout.test/api/access/admin/keys',{method:'POST',headers:{authorization:'Bearer '+admin,'content-type':'application/json'},body:JSON.stringify({type:'one-time',count:1})}),env),body=await response.json();assert.equal(response.status,201);const rawKey=body.keys[0].key;
+ response=await handleAccessApi(post('https://crashout.test/api/access/key/prepare',{key:rawKey}),env);body=await response.json();assert.equal(response.status,200);assert.equal(body.requiresLogin,true);const ticketCookie=(response.headers.get('set-cookie')||'').split(';')[0];assert.match(ticketCookie,/^ftp_host_key_ticket=/);
+ const accountCookie=await cookie(host,secret);response=await handleAccessApi(new Request('https://crashout.test/api/access/key/redeem',{method:'POST',headers:{cookie:accountCookie+'; '+ticketCookie}}),env);body=await response.json();assert.equal(response.status,200);assert.equal(body.redeemed,true);assert.equal(body.type,'one-time');
+ const profile=await accountRequest(env,host,'/profile');assert.equal(profile.account.access.hostCredits,1);assert.equal(profile.account.access.canHost,true);
+});
+
+test('public invite API validates a real game and links only that game to the account',async()=>{
+ const accounts=new AccountNamespace(),access=new AccessNamespace(),secret='invite-api-secret',env={ACCOUNTS:accounts,ACCESS_REGISTRY:access,AUTH_SECRET:secret,TABLES:new GameNamespace('TAB123'),TOURNAMENTS:new GameNamespace('NONE00')};await accountRequest(env,guest,'/sync');
+ let response=await handleAccessApi(post('https://crashout.test/api/access/invite/validate',{code:'TAB123'}),env),body=await response.json();assert.equal(response.status,200);assert.equal(body.kind,'table');assert.equal(body.code,'TAB123');
+ const c=await cookie(guest,secret);response=await handleAccessApi(new Request('https://crashout.test/api/access/invite/claim',{method:'POST',headers:{cookie:c,'content-type':'application/json'},body:JSON.stringify({code:'TAB123',kind:'table'})}),env);body=await response.json();assert.equal(response.status,200);assert.equal(body.access.latestInvite.code,'TAB123');
+ const profile=await accountRequest(env,guest,'/profile');assert.equal(profile.account.access.canHost,false);assert.equal(profile.account.access.latestInvite.code,'TAB123');
 });

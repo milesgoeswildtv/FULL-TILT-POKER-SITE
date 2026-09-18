@@ -10,6 +10,7 @@ export{TournamentCoordinator}from'./tournament-coordinator.js';
 export{TournamentChat}from'./tournament-chat.js';
 export{PlayerAccount}from'./player-account.js';
 export{AccessRegistry}from'./access-registry.js';
+export{GameRegistry}from'./game-registry.js';
 
 const SECURITY_HEADERS={
  'x-content-type-options':'nosniff',

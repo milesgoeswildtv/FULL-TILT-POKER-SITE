@@ -55,7 +55,7 @@ The response contains the plaintext keys. Save or distribute them at issuance ti
     GET /api/access/admin/keys
     Authorization: Bearer <ACCESS_ADMIN_SECRET>
 
-The list shows key id, type, creation time, and whether the key is unused, bound, or revoked. It does not return plaintext keys.
+The list shows key id, type, creation time, whether the key is unused, bound, or revoked, and the bound account id for claimed keys. It does not return plaintext keys.
 
 ## Revoke an unused key
 

@@ -9,7 +9,7 @@ async function sha256(value){const bytes=new Uint8Array(await crypto.subtle.dige
 function randomChars(n){let out='';for(let i=0;i<n;i++)out+=ALPHABET[secureInt(ALPHABET.length)];return out}
 function displayKey(raw){const chars=raw.match(/.{1,5}/g)||[];return'CRASH-'+chars.join('-')}
 function validType(value){return value==='permanent'?'permanent':value==='one-time'?'one-time':null}
-function cleanRecord(record={}){return{id:String(record.id||''),type:validType(record.type)||'one-time',createdAt:Number(record.createdAt)||0,status:record.revokedAt?'revoked':record.boundAccountId?'bound':'unused',boundAt:record.boundAt||null,revokedAt:record.revokedAt||null}}
+function cleanRecord(record={}){return{id:String(record.id||''),type:validType(record.type)||'one-time',createdAt:Number(record.createdAt)||0,status:record.revokedAt?'revoked':record.boundAccountId?'bound':'unused',boundAccountId:record.boundAccountId?String(record.boundAccountId):null,boundAt:record.boundAt||null,revokedAt:record.revokedAt||null}}
 function ticketId(){return crypto.randomUUID().replace(/-/g,'')}
 
 export class AccessRegistry{

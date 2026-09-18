@@ -20,10 +20,10 @@ test('all tables read one clock but live hands retain their snapshot',()=>{
 });
 
 function coordinatorWithSizes(sizes){
- let n=0;const players=[],tables=sizes.map((size,i)=>{const tableNumber=i+1,playerIds=[];for(let seat=1;seat<=size;seat++){const id=`p${++n}`;players.push({id,token:`t${n}`,name:id,chips:2500,eliminated:false,finishPlace:null,moveCount:0,tableNumber,seat,handStartChips:2500,stats:{},cosmetic:'default',ownershipGeneration:1,reportOwnerTable:tableNumber,pendingMoveId:null});playerIds.push(id)}return{tableNumber,tableKey:`TEST-T${tableNumber}`,capacity:8,playerIds,status:'running',handNumber:0,reportGeneration:1,lastBoundarySequence:0,lastBoundaryFingerprint:null,nextBigBlindPlayerId:playerIds.length>=2?playerIds[Math.min(2,playerIds.length-1)]:null,provisioned:true}});
+ let n=0;const players=[],tables=sizes.map((size,i)=>{const tableNumber=i+1,playerIds=[];for(let seat=1;seat<=size;seat++){const id=`p${++n}`;players.push({id,token:`t${n}`,name:id,chips:2500,eliminated:false,finishPlace:null,moveCount:0,tableNumber,seat,handStartChips:2500,stats:{},cosmetic:'default',sittingOut:false,timeBankMs:60000,ownershipGeneration:1,reportOwnerTable:tableNumber,pendingMoveId:null});playerIds.push(id)}return{tableNumber,tableKey:`TEST-T${tableNumber}`,capacity:8,playerIds,status:'running',handNumber:0,reportGeneration:1,lastBoundarySequence:0,lastBoundaryFingerprint:null,nextBigBlindPlayerId:playerIds.length>=2?playerIds[Math.min(2,playerIds.length-1)]:null,provisioned:true}});
  const c=new TournamentCoordinator({storage:{async put(){}}},{});c.data={code:'TEST',status:'running',startingChips:2500,players,tables,pendingMoves:[],eliminationLedger:[],clock:createTournamentClock({blindStructure:[[50,100],[75,150]],levelDurationMs:150000,now:1000})};return c;
 }
-function reportRow(p,{chips=p.chips,handStartChips=p.handStartChips,stats=p.stats}={}){return{id:p.id,ownershipGeneration:p.ownershipGeneration,name:p.name,chips,handStartChips,stats,cosmetic:p.cosmetic}}
+function reportRow(p,{chips=p.chips,handStartChips=p.handStartChips,stats=p.stats,timeBankMs=p.timeBankMs}={}){return{id:p.id,ownershipGeneration:p.ownershipGeneration,name:p.name,chips,handStartChips,stats,cosmetic:p.cosmetic,sittingOut:!!p.sittingOut,timeBankMs}}
 
 test('coordinator owns global elimination places instead of trusting a child table place',()=>{const c=coordinatorWithSizes([2]),p1=c.player('p1'),p2=c.player('p2');const outcome=c.reportTable(1,{reportGeneration:1,boundarySequence:1,handNumber:1,completedAt:2000,status:'running',nextBigBlindPlayerId:null,players:[reportRow(p1,{chips:5000,handStartChips:2500,stats:{handsPlayed:1}}),{...reportRow(p2,{chips:0,handStartChips:2500,stats:{handsPlayed:1}}),eliminated:true,finishPlace:99}]});assert.deepEqual(outcome.newlyBusted,['p2']);assert.equal(c.player('p2').finishPlace,2);assert.equal(c.player('p1').finishPlace,1);assert.equal(c.data.status,'finished')});
 
@@ -40,3 +40,17 @@ test('Telegram notification outbox de-duplicates the same tournament event',()=>
 
 
 test('finished tournament queues one result notification per linked player',()=>{const c=coordinatorWithSizes([2]),p1=c.player('p1'),p2=c.player('p2');p1.accountId='acct-1';p2.accountId='acct-2';c.reportTable(1,{reportGeneration:1,boundarySequence:1,handNumber:1,completedAt:2000,status:'running',nextBigBlindPlayerId:null,players:[reportRow(p1,{chips:5000,handStartChips:2500,stats:{handsPlayed:1}}),reportRow(p2,{chips:0,handStartChips:2500,stats:{handsPlayed:1}})]});assert.equal(c.data.status,'finished');assert.equal(c.queueTournamentResultNotifications(),2);assert.equal(c.queueTournamentResultNotifications(),0);const notices=c.data.telegramNotifications.filter(x=>x.kind==='tournament-result');assert.equal(notices.length,2);assert.equal(notices.find(x=>x.playerId==='p1').finishPlace,1);assert.equal(notices.find(x=>x.playerId==='p2').finishPlace,2);assert.ok(notices.every(x=>x.fieldSize===2))});
+
+
+test('coordinator round-trips remaining time bank through reports and table snapshots',()=>{
+ const c=coordinatorWithSizes([2]),p1=c.player('p1'),p2=c.player('p2');
+ c.reportTable(1,{reportGeneration:1,boundarySequence:1,handNumber:1,completedAt:2000,status:'running',nextBigBlindPlayerId:'p1',players:[
+  reportRow(p1,{chips:2500,timeBankMs:30000}),
+  reportRow(p2,{chips:2500,timeBankMs:45000})
+ ]});
+ assert.equal(c.player('p1').timeBankMs,30000);
+ assert.equal(c.player('p2').timeBankMs,45000);
+ const snapshot=c.tableSnapshot(1,2100);
+ assert.equal(snapshot.players.find(p=>p.id==='p1').timeBankMs,30000);
+ assert.equal(snapshot.players.find(p=>p.id==='p2').timeBankMs,45000);
+});

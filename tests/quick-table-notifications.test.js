@@ -40,3 +40,52 @@ test('sit out auto-folds the current human immediately, suppresses turn reminder
  assert.equal(h.table.data.players.find(p=>p.id===currentId).sittingOut,false);
  assert.equal(body.players.find(p=>p.id===currentId).sittingOut,false);
 });
+
+
+test('time bank starts at 60s, spends 15s per use, extends only the current deadline, and never refills',async()=>{
+ const h=harness(),alarms=[];
+ h.table.state.storage.setAlarm=async at=>{alarms.push(at)};
+ await post(h.table,'/init',{code:'ABC123',hostName:'Host',accountId:'host-account',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]]});
+ await post(h.table,'/join',{name:'Guest One',accountId:'guest-1'});
+ const host=h.table.data.players.find(p=>p.host);
+ await post(h.table,'/action',{token:host.token,type:'start'});
+ const current=h.table.data.players[h.table.data.turnIndex],other=h.table.data.players.find(p=>p.id!==current.id),serial=h.table.data.turnSerial,startDeadline=h.table.data.turnDeadline;
+ assert.equal(current.timeBankMs,60000);
+ assert.equal(other.timeBankMs,60000);
+ let response=await post(h.table,'/action',{token:current.token,type:'timebank'});
+ assert.equal(response.status,200);
+ let body=await response.json(),me=body.players.find(p=>p.id===current.id);
+ assert.equal(me.timeBankMs,45000);
+ assert.equal(body.timeBankChunkMs,15000);
+ assert.equal(h.table.data.turnDeadline,startDeadline+15000);
+ assert.equal(h.table.data.turnSerial,serial);
+ for(let i=0;i<3;i++){response=await post(h.table,'/action',{token:current.token,type:'timebank'});assert.equal(response.status,200)}
+ assert.equal(h.table.data.players.find(p=>p.id===current.id).timeBankMs,0);
+ assert.equal(h.table.data.turnDeadline,startDeadline+60000);
+ assert.equal(h.table.data.turnSerial,serial);
+ response=await post(h.table,'/action',{token:current.token,type:'timebank'});
+ assert.equal(response.status,400);
+ assert.match((await response.json()).error,/empty/i);
+ assert.ok(h.table.data.actionLog.filter(x=>x.type==='timebank'&&x.playerId===current.id).length===4);
+ assert.ok(alarms.length>=4);
+});
+
+test('time bank rejects non-turn, sitting-out, paused, and expired use',async()=>{
+ const h=harness();
+ await post(h.table,'/init',{code:'ABC123',hostName:'Host',accountId:'host-account',startingChips:2500,blindMinutes:10,blindStructure:[[10,20],[20,40]]});
+ await post(h.table,'/join',{name:'Guest One',accountId:'guest-1'});
+ const host=h.table.data.players.find(p=>p.host);
+ await post(h.table,'/action',{token:host.token,type:'start'});
+ const current=h.table.data.players[h.table.data.turnIndex],other=h.table.data.players.find(p=>p.id!==current.id);
+ let response=await post(h.table,'/action',{token:other.token,type:'timebank'});
+ assert.equal(response.status,400);
+ assert.match((await response.json()).error,/only available on your turn/i);
+ current.sittingOut=true;
+ assert.throws(()=>h.table.useTimeBank(current,Date.now()),/Sit back in/i);
+ current.sittingOut=false;
+ h.table.data.paused=true;
+ assert.throws(()=>h.table.useTimeBank(current,Date.now()),/not available/i);
+ h.table.data.paused=false;
+ const deadline=h.table.data.turnDeadline;
+ assert.throws(()=>h.table.useTimeBank(current,deadline),/already expired/i);
+});

@@ -12,6 +12,7 @@ const KEY='tournament',COSMETICS=new Set(['default','constellation','deadMansHan
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store'}})}
 function cleanName(v){return String(v||'').trim().replace(/\s+/g,' ').slice(0,24)}
 function cleanCosmetic(v){return COSMETICS.has(String(v||''))?String(v):'default'}
+function cleanAvatarUrl(v){const s=String(v||'').trim();return /^https:\/\//i.test(s)?s.slice(0,2048):''}
 function playerId(i){return`p${String(i+1).padStart(2,'0')}`}
 function sessionToken(){return crypto.randomUUID().replace(/-/g,'')}
 function nonNegativeInt(v){return Math.max(0,Math.trunc(Number(v)||0))}

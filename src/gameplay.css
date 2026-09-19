@@ -53,7 +53,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Header{
   position:absolute!important;
   inset:0 0 auto 0!important;
-  height:9.7dvh!important;
+  height:min(9.7dvh,16.5vw)!important;
   min-height:68px!important;
   margin:0!important;
   padding:max(7px,env(safe-area-inset-top)) 14px 0!important;
@@ -147,9 +147,9 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 
 .ftp3Stage{
   position:absolute!important;
-  top:10.4dvh!important;
+  top:min(10.4dvh,18vw)!important;
   left:50%!important;
-  height:70.5dvh!important;
+  height:min(70.5dvh,121.5vw)!important;
   width:auto!important;
   aspect-ratio:.69!important;
   transform:translateX(-50%)!important;
@@ -211,7 +211,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   left:50%;
   bottom:67%!important;
   width:76%!important;
-  height:4.9dvh!important;
+  height:min(4.9dvh,8.45vw)!important;
   min-height:39px!important;
   transform:translateX(-50%);
   display:flex;
@@ -276,7 +276,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Bet{position:absolute;z-index:15!important;transform:translate(-50%,-50%)!important;display:flex;align-items:center;gap:3px;padding:0!important;background:transparent;border:0;color:#f3d27b;font-size:8px!important;box-shadow:none;text-shadow:0 2px 5px #000}
 .ftp3Bet img{width:18px!important;height:18px!important;object-fit:contain}
 
-.ftp3Board{position:absolute;left:50%;top:36.5%!important;transform:translateX(-50%);width:58%!important;height:6.1dvh!important;min-height:45px!important;display:flex;justify-content:center;align-items:stretch;gap:5px!important;z-index:10}
+.ftp3Board{position:absolute;left:50%;top:36.5%!important;transform:translateX(-50%);width:58%!important;height:min(6.1dvh,10.5vw)!important;min-height:45px!important;display:flex;justify-content:center;align-items:stretch;gap:5px!important;z-index:10}
 .ftp3Board .card{position:relative!important;flex:1 1 0!important;min-width:0!important;width:auto!important;height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;overflow:hidden!important;padding:5px!important;line-height:.82!important;border-radius:7px!important;border:1px solid rgba(0,0,0,.24)!important;background:#f6f3ef!important;box-shadow:0 5px 12px #0007!important;font-size:clamp(15px,3.25vw,22px)!important}
 .ftp3Board .card b,.ftp3Board .card span{position:static!important;display:block!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;line-height:.9!important;transform:none!important}
 .ftp3Board .card b{font-size:1em!important}
@@ -291,8 +291,8 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Showdown{position:absolute;left:50%;top:64%;transform:translateX(-50%);width:72%;padding:8px 10px;border-radius:12px;background:rgba(12,8,17,.95);border:1px solid rgba(228,179,78,.62);text-align:center;z-index:45;box-shadow:0 9px 26px #000b}
 .ftp3Showdown small{display:block;color:#c2ad72;font-size:7px;letter-spacing:.1em}.ftp3Showdown b{display:block;margin-top:3px;color:#fff;font-size:9px}
 
-.ftp3Hero{position:absolute;left:50%;bottom:19.6dvh!important;transform:translateX(-50%);z-index:65;width:min(37vw,194px)!important;display:flex;flex-direction:column;align-items:center;pointer-events:none}
-.ftp3HeroCards{position:relative!important;top:-18px!important;height:7.3dvh!important;min-height:55px!important;display:flex;align-items:flex-end;justify-content:center;margin-bottom:-9px!important;z-index:2}
+.ftp3Hero{position:absolute;left:50%;bottom:min(19.6dvh,33.8vw)!important;transform:translateX(-50%);z-index:65;width:min(37vw,194px)!important;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.ftp3HeroCards{position:relative!important;top:-18px!important;height:min(7.3dvh,12.55vw)!important;min-height:55px!important;display:flex;align-items:flex-end;justify-content:center;margin-bottom:-9px!important;z-index:2}
 .ftp3HeroCards .card{width:44px!important;height:100%!important;min-height:0!important;padding:7px 5px!important;border-radius:7px!important;background:#f7f4ef!important;box-shadow:0 6px 14px #0009!important;font-size:clamp(20px,4.5vw,30px)!important}
 .ftp3HeroCards .card:first-child{transform:rotate(-3deg) translateX(3px)}.ftp3HeroCards .card:last-child{transform:rotate(3deg) translateX(-3px)}
 .ftp3Strength{position:absolute!important;left:calc(50% + 58px)!important;right:auto!important;top:auto!important;bottom:62px!important;transform:none!important;white-space:nowrap!important;min-width:108px!important;text-align:center!important;z-index:35!important;margin:0!important;padding:2px 6px;color:#f3cf78;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:0;text-shadow:0 2px 7px #000}
@@ -329,8 +329,13 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .gameplayV3Page>.mttHostBar{position:absolute!important;left:50%!important;bottom:18.2dvh!important;transform:translateX(-50%)!important;z-index:91!important;min-height:0!important;padding:4px 8px!important;border-radius:999px!important;background:rgba(12,8,16,.92)!important}
 .gameplayV3Page>.toast{z-index:150!important}
 
-.pregameTablePage .ftp3Stage,.pregameTablePage .ftp3Hero,.pregameTablePage .ftp3UtilityBar{display:none!important}
-.pregameTablePage .ftp3ActionDock{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:min(620px,calc(100% - 20px));margin:10px auto 0!important;min-height:0!important;padding:0!important}
+.pregameTablePage{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:0!important;overflow:hidden!important}
+.pregameTablePage .ftp3Stage{display:block!important;top:37%!important;height:min(49dvh,98vw)!important;opacity:.94}
+.pregameTablePage .ftp3Hero{display:flex!important;bottom:min(14.5dvh,25vw)!important;width:min(34vw,180px)!important}
+.pregameTablePage .ftp3HeroCards,.pregameTablePage .ftp3Strength,.pregameTablePage .ftp3Pot,.pregameTablePage .ftp3SidePots,.pregameTablePage .ftp3UtilityBar{display:none!important}
+.pregameTablePage .ftp3ActionDock{position:absolute!important;left:14px!important;right:14px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;width:auto!important;margin:0!important;min-height:0!important;padding:0!important}
+.pregameTablePage .ftp3PregameControls{grid-template-columns:1.65fr 1fr!important}
+.pregameTablePage .ftp3PregameControls button{min-height:56px!important}
 .pregameTablePage .ftp3HostRow,.pregameTablePage .ftp3SitoutControl{display:none!important}
 
 @media(max-width:430px){
@@ -341,7 +346,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   .ftp3SeatUnit[data-seat="0"]>.ftp3Seat{width:17.5%!important}
   .ftp3SeatPlaque{min-width:74px!important}
   .ftp3Avatar{width:40px!important}
-  .ftp3SeatCards{width:78%!important;height:4.8dvh!important;min-height:38px!important}
+  .ftp3SeatCards{width:78%!important;height:min(4.8dvh,8.25vw)!important;min-height:38px!important}
   .ftp3Board{top:36%!important;width:57%!important}
   .ftp3Pot{top:47%!important}
   .ftp3SidePots{top:54%!important}
@@ -354,8 +359,10 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   .ftp3UtilityBar{left:8px!important;right:8px!important;gap:6px}.ftp3UtilityBar button{height:36px!important;padding:0 7px!important;font-size:8px!important}.ftp3UtilityBar svg{width:16px;height:16px}
 }
 @media(max-height:700px){
-  .ftp3Stage{top:9.4dvh!important;height:69dvh!important}
-  .ftp3Hero{bottom:20.2dvh!important}
+  .ftp3Stage{top:min(9.4dvh,18vw)!important;height:min(69dvh,121.5vw)!important}
+  .ftp3Hero{bottom:min(20.2dvh,33.8vw)!important}
+  .pregameTablePage .ftp3Stage{top:38%!important;height:min(46dvh,98vw)!important}
+  .pregameTablePage .ftp3Hero{bottom:min(15dvh,25vw)!important}
 }
 @media(min-width:761px){
   .gameplayV3Page{left:50%!important;right:auto!important;width:min(76vw,980px)!important;transform:translateX(-50%);box-shadow:0 0 90px #000d}

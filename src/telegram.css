@@ -16,6 +16,8 @@ html.telegramMiniApp body{padding-top:max(var(--telegram-safe-top,0px),env(safe-
 .telegramMiniApp .accountChip,.telegramMiniApp .entryActions button,.telegramMiniApp .createChoice button,.telegramMiniApp .notificationToggle,.telegramMiniApp .discordLogin,.telegramMiniApp .primary{min-height:44px}
 .telegramMiniApp .toast{bottom:max(18px,calc(var(--telegram-safe-bottom,0px) + 10px))}
 .telegramMiniApp.telegramGameRoute .tablePage{padding-bottom:max(8px,var(--telegram-safe-bottom,0px))}
+.telegramMiniApp.telegramGameRoute .gameplayV3Page,.telegramMiniApp.telegramGameRoute .pregameTablePage{height:var(--telegram-viewport-stable-height,100dvh)!important;min-height:0!important}
+.telegramMiniApp.telegramGameRoute .ftp3Back{visibility:hidden!important;pointer-events:none!important}
 @media(max-width:620px){
  html.telegramMiniApp .homeFrame{width:min(100% - 12px,1180px)}
  .telegramMiniApp .homeTop{margin:0 -6px;padding-left:8px;padding-right:8px}

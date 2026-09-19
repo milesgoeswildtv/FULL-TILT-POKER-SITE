@@ -1,145 +1,167 @@
 .pregameRoom{
-  width:min(900px,calc(100% - 24px));
-  margin:8px auto 0;
-  padding:10px 12px;
   position:relative;
   z-index:70;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:center;
-  gap:12px;
-  border:0;
-  border-radius:0;
-  background:transparent;
-  box-shadow:none;
+  width:min(960px,calc(100% - 24px));
+  height:clamp(128px,12vw,188px);
+  margin:4px auto 0;
+  color:#f4ead0;
+  pointer-events:none;
 }
-.pregameStatus{
-  min-width:0;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:center;
-  gap:10px;
+.pregameHeaderArt{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  pointer-events:none;
+  user-select:none;
+  filter:drop-shadow(0 12px 28px #000a);
 }
-.pregameStatusCopy{
-  min-width:0;
+.pregameHeaderLeft{
+  position:absolute;
+  left:18.5%;
+  top:27%;
+  width:37%;
+  height:39%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   text-align:center;
+  pointer-events:none;
 }
-.pregameEyebrow{
-  display:block;
-  color:#b8974e;
+.pregameHeaderLeft>span{
+  color:#c7a55d;
   font-size:7px;
   font-weight:900;
   letter-spacing:.16em;
-}
-.pregameStatus h2{
-  margin:2px 0 3px;
-  color:#f3e8c5;
-  font-size:18px;
   line-height:1;
 }
-.pregameStatus p{
-  max-width:520px;
-  margin:0 auto;
-  color:#9f93a5;
+.pregameHeaderLeft h2{
+  margin:4px 0 4px;
+  color:#f4ead0;
+  font-size:clamp(17px,1.6vw,24px);
+  line-height:.95;
+  text-shadow:0 2px 6px #000,0 0 8px rgba(154,57,208,.24);
+}
+.pregameHeaderLeft p{
+  max-width:94%;
+  margin:0;
+  color:#bfb1c3;
   font-size:8px;
-  line-height:1.3;
+  line-height:1.25;
+}
+.pregameHeaderRight{
+  position:absolute;
+  left:57%;
+  top:26%;
+  width:26%;
+  height:41%;
+  display:grid;
+  grid-template-columns:42% 58%;
+  align-items:center;
+  pointer-events:none;
 }
 .pregameCount{
-  min-width:62px;
-  padding:5px 8px 5px 10px;
-  border-left:1px solid #4a3924;
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  height:82%;
+  border-right:1px solid rgba(211,166,83,.42);
   text-align:center;
 }
 .pregameCount b{
-  display:block;
-  color:#f0ce6d;
-  font-size:22px;
-  line-height:1;
+  color:#f2d27b;
+  font-size:clamp(24px,2.4vw,36px);
+  line-height:.9;
+  text-shadow:0 2px 7px #000;
 }
-.pregameCount b small{font-size:.58em}
+.pregameCount b small{font-size:.55em}
 .pregameCount span{
-  color:#8f8195;
+  margin-top:7px;
+  color:#b8a7bd;
   font-size:6px;
   font-weight:900;
-  letter-spacing:.12em;
+  letter-spacing:.16em;
 }
-.pregameTools{
+.pregameInviteCluster{
   display:grid;
-  grid-template-columns:auto auto;
-  align-items:center;
-  justify-content:end;
-  gap:4px 5px;
+  justify-items:center;
+  align-content:center;
+  gap:5px;
+  pointer-events:auto;
 }
 .pregameInviteButton{
-  grid-column:1/-1;
-  width:72px;
-  height:22px;
+  width:76px;
+  height:24px;
   margin:0;
-  padding:0 7px;
-  border:1px solid #8f49ad;
+  padding:0 8px;
+  border:1px solid #a65bc4;
   border-radius:7px;
-  background:linear-gradient(135deg,#6e2da2,#a546be);
+  background:linear-gradient(135deg,#67258d,#a540be);
   color:#fff;
   font:inherit;
-  font-size:6.5px;
+  font-size:7px;
   font-weight:900;
   line-height:1;
+  letter-spacing:.06em;
   cursor:pointer;
-  justify-self:center;
+  box-shadow:inset 0 1px rgba(255,255,255,.12),0 4px 12px #0008;
 }
+.pregameInviteButton:active{transform:translateY(1px)}
 .pregameCode{
   color:#f1d071;
-  font-size:12px;
+  font-size:10px;
+  line-height:1;
   letter-spacing:.12em;
+  text-shadow:0 2px 5px #000;
+}
+.pregameBlindBadge{
+  position:absolute;
+  left:50%;
+  top:76%;
+  width:21%;
+  transform:translateX(-50%);
+  color:#f0ce72;
   text-align:center;
-}
-.pregameMeta{
-  display:flex;
-  justify-content:flex-end;
-  gap:4px;
-}
-.pregameMeta span{
-  padding:3px 5px;
-  border:1px solid #392c40;
-  border-radius:999px;
-  background:#0a0710;
-  color:#aa9db0;
-  font-size:5.5px;
-  font-weight:800;
-  white-space:nowrap;
+  font-size:clamp(12px,1.2vw,17px);
+  font-weight:900;
+  line-height:1;
+  letter-spacing:.08em;
+  text-shadow:0 2px 6px #000;
+  pointer-events:none;
 }
 @media(max-width:760px){
   .pregameRoom{
     position:absolute;
-    left:10px;
-    right:10px;
-    top:7.2dvh;
+    left:3px;
+    right:3px;
+    top:5.4dvh;
     width:auto;
+    height:clamp(116px,28vw,144px);
     margin:0;
-    min-height:52px;
-    padding:2px 4px;
-    grid-template-columns:minmax(0,1fr) 82px;
-    gap:5px;
-    border-radius:0;
   }
-  .pregameStatus{grid-template-columns:minmax(0,1fr) 48px;gap:6px}
-  .pregameStatusCopy{text-align:center}
-  .pregameEyebrow{font-size:5px}
-  .pregameStatus h2{margin:1px 0 2px;font-size:12px}
-  .pregameStatus p{max-width:245px;font-size:6px;line-height:1.22}
-  .pregameCount{min-width:48px;padding:3px 4px 3px 6px}
-  .pregameCount b{font-size:16px}
-  .pregameCount span{font-size:4.5px}
-  .pregameTools{grid-template-columns:1fr;justify-items:center;gap:2px}
-  .pregameInviteButton{grid-column:auto;width:64px;height:18px;padding:0 4px;font-size:5px;border-radius:6px}
-  .pregameCode{font-size:8px;line-height:1}
-  .pregameMeta{justify-content:center;gap:2px}
-  .pregameMeta span{padding:1px 3px;font-size:4.1px}
+  .pregameHeaderLeft{left:18%;top:26%;width:38%;height:40%}
+  .pregameHeaderLeft>span{font-size:4.6px;letter-spacing:.14em}
+  .pregameHeaderLeft h2{margin:2px 0 2px;font-size:10.5px}
+  .pregameHeaderLeft p{max-width:96%;font-size:5.2px;line-height:1.18}
+  .pregameHeaderRight{left:57%;top:26%;width:27%;height:41%;grid-template-columns:40% 60%}
+  .pregameCount{height:86%}
+  .pregameCount b{font-size:17px}
+  .pregameCount span{margin-top:4px;font-size:4.2px}
+  .pregameInviteCluster{gap:3px}
+  .pregameInviteButton{width:58px;height:17px;padding:0 4px;border-radius:5px;font-size:4.8px}
+  .pregameCode{font-size:7.2px}
+  .pregameBlindBadge{top:77%;width:23%;font-size:8.5px}
 }
 @media(max-width:390px){
-  .pregameRoom{left:7px;right:7px;grid-template-columns:minmax(0,1fr) 78px;gap:4px;padding:2px 3px}
-  .pregameStatus{grid-template-columns:minmax(0,1fr) 44px;gap:4px}
-  .pregameStatus p{max-width:205px;font-size:5.5px}
-  .pregameCount{min-width:44px}
-  .pregameMeta span{font-size:4.2px;padding:2px 3px}
+  .pregameRoom{left:1px;right:1px;height:clamp(110px,29vw,132px)}
+  .pregameHeaderLeft{left:17.7%;width:38.5%}
+  .pregameHeaderLeft h2{font-size:9.7px}
+  .pregameHeaderLeft p{font-size:4.9px}
+  .pregameHeaderRight{left:56.8%;width:27.5%}
+  .pregameInviteButton{width:54px;height:16px;font-size:4.5px}
+  .pregameCode{font-size:6.8px}
+  .pregameBlindBadge{font-size:8px}
 }

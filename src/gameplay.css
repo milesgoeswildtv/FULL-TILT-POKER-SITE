@@ -308,7 +308,8 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .gameplayV3Page>.toast{z-index:150!important}
 
 .pregameTablePage{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:0!important;overflow:hidden!important}
-.pregameTablePage .ftp3Stage{display:block!important;top:15.5dvh!important;height:min(70dvh,122vw)!important;opacity:.98}
+.pregameTablePage .ftp3HeaderBrand{display:none!important}
+.pregameTablePage .ftp3Stage{display:block!important;top:17.2dvh!important;height:min(69dvh,120vw)!important;opacity:.98}
 .pregameTablePage .ftp3Hero{display:flex!important;bottom:min(12.5dvh,22vw)!important;width:min(38vw,194px)!important}
 .pregameTablePage .ftp3HeroCards,.pregameTablePage .ftp3Strength,.pregameTablePage .ftp3Pot,.pregameTablePage .ftp3SidePots,.pregameTablePage .ftp3UtilityBar{display:none!important}
 .pregameTablePage .ftp3ActionDock{position:absolute!important;left:14px!important;right:14px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;width:auto!important;margin:0!important;min-height:0!important;padding:0!important}
@@ -336,7 +337,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 @media(max-height:700px){
   .ftp3Stage{top:9.4dvh!important;height:min(69dvh,121.5vw)!important}
   .ftp3Hero{bottom:22.5dvh!important}
-  .pregameTablePage .ftp3Stage{top:16.5dvh!important;height:min(68dvh,120vw)!important}
+  .pregameTablePage .ftp3Stage{top:18dvh!important;height:min(67dvh,118vw)!important}
   .pregameTablePage .ftp3Hero{bottom:min(13dvh,22vw)!important}
 }
 @media(min-width:761px){

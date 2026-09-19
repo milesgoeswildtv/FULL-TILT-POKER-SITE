@@ -108,18 +108,6 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   box-shadow:none!important;
 }
 .ftp3HeaderBrand:before,.ftp3HeaderBrand:after{display:none!important;content:none!important}
-.ftp3HeaderBrand img{
-  position:absolute!important;
-  left:-17%!important;
-  top:-17px!important;
-  transform:translateX(-50%)!important;
-  width:136px!important;
-  height:108px!important;
-  max-width:none!important;
-  max-height:none!important;
-  object-fit:contain!important;
-  filter:drop-shadow(0 8px 12px rgba(0,0,0,.58)) saturate(1.08)!important;
-}
 .ftp3HeaderBrand strong{color:var(--ftp3-gold);font-size:clamp(12px,2.9vw,19px)!important;line-height:1!important;letter-spacing:.02em}
 .ftp3HeaderBrand span{display:flex;align-items:center;gap:7px;color:#d1c6d6;font-size:clamp(8px,2vw,13px)!important;line-height:1!important;white-space:nowrap;text-transform:uppercase;letter-spacing:.07em}
 .ftp3HeaderBrand i{width:3px;height:3px;border-radius:50%;background:#b28d48}
@@ -221,22 +209,26 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   position:relative;
   z-index:3;
   width:100%;
-  min-width:78px!important;
-  min-height:38px!important;
-  padding:.42dvh 7px .42dvh 34px!important;
-  border:1px solid rgba(229,178,77,.75);
-  border-radius:10px!important;
-  background:linear-gradient(165deg,rgba(27,19,33,.98),rgba(10,8,14,.99));
-  box-shadow:0 7px 18px #000c,inset 0 0 0 1px rgba(126,50,154,.18);
+  min-width:82px!important;
+  min-height:42px!important;
+  padding:.45dvh 10px .45dvh 36px!important;
+  border:0!important;
+  border-radius:0!important;
+  background-color:transparent!important;
+  background-image:var(--player-plaque)!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  box-shadow:0 8px 18px #0009;
   display:flex;
   align-items:flex-start;
   justify-content:center;
   flex-direction:column;
 }
-.ftp3Seat.turn .ftp3SeatPlaque{border-color:#ffe08a;box-shadow:0 0 0 1px rgba(255,223,134,.33),0 0 24px rgba(132,32,238,.42),0 8px 20px #000c}
+.ftp3Seat.turn .ftp3SeatPlaque{box-shadow:0 0 24px rgba(132,32,238,.42),0 8px 20px #000a}
 .ftp3Seat.folded{opacity:.42;filter:saturate(.45)}
 .ftp3Seat.out{opacity:.22;filter:grayscale(.8)}
-.ftp3Seat.sittingout .ftp3SeatPlaque{border-color:#5f5566;filter:saturate(.6)}
+.ftp3Seat.sittingout .ftp3SeatPlaque{filter:saturate(.6)}
 .ftp3IdentityAvatar{display:grid;place-items:center;aspect-ratio:1;overflow:visible}
 .ftp3Avatar{position:absolute;left:-8px!important;top:50%;transform:translateY(-50%);width:42px!important;max-width:none!important;z-index:5}
 .ftp3AvatarFallback,.ftp3AvatarPhoto{position:absolute;inset:11%;width:78%;height:78%;border-radius:50%;border:1px solid #9c64b6}
@@ -275,7 +267,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3HeroCards .card{width:44px!important;height:100%!important;min-height:0!important;padding:7px 5px!important;border-radius:7px!important;background:#f7f4ef!important;box-shadow:0 6px 14px #0009!important;font-size:clamp(20px,4.5vw,30px)!important}
 .ftp3HeroCards .card:first-child{transform:rotate(-3deg) translateX(3px)}.ftp3HeroCards .card:last-child{transform:rotate(3deg) translateX(-3px)}
 .ftp3Strength{position:absolute!important;left:calc(50% + 58px)!important;right:auto!important;top:auto!important;bottom:62px!important;transform:none!important;white-space:nowrap!important;min-width:108px!important;text-align:center!important;z-index:35!important;margin:0!important;padding:2px 6px;color:#f3cf78;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:0;text-shadow:0 2px 7px #000}
-.ftp3HeroPlaque{position:relative;z-index:3;width:100%;min-height:51px!important;padding:6px 24px 6px 48px!important;border-radius:14px;border:1px solid #d39e3e;background:linear-gradient(160deg,#18101e,#0c0911);box-shadow:0 9px 22px #000b;display:flex;align-items:center}
+.ftp3HeroPlaque{position:relative;z-index:3;width:100%;min-height:54px!important;padding:7px 28px 7px 50px!important;border:0!important;border-radius:0!important;background-color:transparent!important;background-image:var(--player-plaque)!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;box-shadow:0 10px 24px #0009;display:flex;align-items:center}
 .ftp3HeroAvatar{position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:47px!important;height:47px!important;z-index:5;filter:drop-shadow(0 5px 10px #0009)}
 .ftp3HeroPlaque div{display:grid;gap:1px}.ftp3HeroPlaque small{color:#a89bac;font-size:8px;letter-spacing:.16em}.ftp3HeroPlaque b{color:#f0c968;font-size:18px}.ftp3HeroPlaque em{margin-left:auto;color:#fff;font-style:normal;font-size:10px;font-weight:900}.ftp3ExtraTime{position:absolute;right:8px;top:5px;padding:0;border:0;background:transparent;color:#e4bb61;font:inherit;font-size:8px;font-weight:900;letter-spacing:.04em;cursor:pointer;pointer-events:auto;text-shadow:0 1px 4px #000}.ftp3ExtraTime:active{transform:translateY(1px)}
 
@@ -292,8 +284,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3PregameControls{display:grid;grid-template-columns:2fr 1fr;gap:9px}.ftp3PregameControls .ftp3Start{border-color:#d1a249;background:linear-gradient(180deg,#6d4a18,#2d1c0a);color:#f7d57f;font-size:15px}
 .ftp3Watching{height:62px;display:grid;place-items:center;color:#c3b6c8;font-size:12px}
 .ftp3SittingOut{border:1px solid #5a4f61;border-radius:12px;background:#100c13;color:#b9adbe;letter-spacing:.08em;font-size:10px;font-weight:900}
-.ftp3SitoutControl{position:absolute;left:12px;bottom:-34px;display:flex;z-index:4}.ftp3SitoutControl button{height:28px;padding:0 11px;border-radius:999px;border:1px solid #4c3658;background:#120d18;color:#bdaec2;font:inherit;font-size:8px;font-weight:900;letter-spacing:.04em}.ftp3SitoutControl button.active{border-color:#8a6a2d;background:#251b0d;color:#f0cd76}
-.ftp3HostRow{position:absolute;right:12px;bottom:-34px;display:flex;gap:6px}.ftp3HostRow button{height:28px;padding:0 10px;border-radius:999px;border:1px solid #4c3658;background:#120d18;color:#bdaec2;font:inherit;font-size:8px}.ftp3HostRow button:last-child{border-color:#6b2d3c;color:#f19cab}
+.ftp3ManagementBar{display:flex;justify-content:flex-end;gap:6px;margin-top:6px;min-height:26px}.ftp3ManagementBar button{height:26px;padding:0 10px;border-radius:8px;border:1px solid #4c3658;background:rgba(18,13,24,.96);color:#bdaec2;font:inherit;font-size:8px;font-weight:900;letter-spacing:.04em}.ftp3ManagementBar button.active{border-color:#8a6a2d;background:#251b0d;color:#f0cd76}.ftp3ManagementBar button.danger{border-color:#6b2d3c;color:#f19cab;background:#1a0d12}
 .ftp3PreActions{display:grid;gap:6px}.ftp3PreActions>small{color:#8f8195;font-size:7px;font-weight:900;letter-spacing:.14em}.ftp3PreActions>div{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.ftp3PreActions button{min-height:42px;border-radius:11px;border:1px solid #4b3657;background:#120d18;color:#cfc3d4;font:inherit;font-size:10px;font-weight:900}.ftp3PreActions button.active{border-color:#b681ff;background:#2c1637;color:#f0d479}
 .ftp3ShowdownChoice{display:grid;grid-template-columns:1fr auto auto;gap:7px;align-items:center;margin-bottom:7px;padding:8px 9px;border:1px solid #634c6e;border-radius:12px;background:#100b15}.ftp3ShowdownChoice span{display:grid;gap:2px}.ftp3ShowdownChoice small{color:#8f8195;font-size:6px;letter-spacing:.12em}.ftp3ShowdownChoice b{font-size:10px}.ftp3ShowdownChoice button,.ftp3Rabbit button{min-height:36px;padding:0 10px;border-radius:9px;border:1px solid #6d4f7a;background:#1b1023;color:#eee1f2;font:inherit;font-size:8px;font-weight:900}.ftp3ShowdownChoice button:last-child{border-color:#70404a;color:#ef9ba9}
 .ftp3Rabbit{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;padding:8px 9px;border:1px solid #5d4d33;border-radius:12px;background:#141008}.ftp3Rabbit small{color:#9d8f73;font-size:7px}.ftp3Rabbit button{border-color:#8f6f31;color:#e9c86e;background:#211808}
@@ -333,7 +324,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
   .ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="5"]>.ftp3Seat,.ftp3Stage[data-opponents="7"] .ftp3SeatUnit[data-seat="6"]>.ftp3Seat{top:72%!important}
 }
 @media(max-width:520px){
-  .ftp3SitoutControl{left:8px}.ftp3SitoutControl button{height:27px;padding:0 9px;font-size:7px}.ftp3SittingOut{font-size:8px}
+  .ftp3ManagementBar{gap:5px}.ftp3ManagementBar button{height:25px;padding:0 8px;font-size:7px}.ftp3SittingOut{font-size:8px}
   .ftp3UtilityBar{left:8px!important;right:8px!important;gap:6px}.ftp3UtilityBar button{height:36px!important;padding:0 7px!important;font-size:8px!important}.ftp3UtilityBar svg{width:16px;height:16px}
 }
 @media(max-height:700px){

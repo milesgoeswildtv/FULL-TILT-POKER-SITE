@@ -10,6 +10,7 @@ export const assets={
     brandLogo:`${root}/crashout/CrashoutPokerLogo.png`,
     miniLogo:`${root}/crashout/CrashoutMiniLogo.png`,
     heroLogo:`${root}/crashout/CrashoutLogoNoCard.PNG`,
+    studioLogo:`${root}/crashout/LostCrashoutSub.PNG`,
     mascotCrow:`${root}/default/the-crow.png`,
     mascotHare:`${root}/default/the-hare.png`,
     avatarFrame:`${root}/default/default-avatar-frame.png`,

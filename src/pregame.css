@@ -8,10 +8,10 @@
   grid-template-columns:minmax(0,1fr) auto;
   align-items:center;
   gap:12px;
-  border:1px solid #5b4726;
-  border-radius:14px;
-  background:linear-gradient(145deg,rgba(23,16,30,.93),rgba(9,7,13,.96));
-  box-shadow:0 14px 34px #0008,inset 0 1px #ffffff0b;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
 }
 .pregameStatus{
   min-width:0;
@@ -72,11 +72,11 @@
 }
 .pregameInviteButton{
   grid-column:1/-1;
-  min-width:108px;
-  height:28px;
-  padding:0 12px;
-  border-radius:9px;
-  font-size:8px;
+  min-width:78px;
+  height:22px;
+  padding:0 8px;
+  border-radius:7px;
+  font-size:6.5px;
   font-weight:900;
 }
 .pregameCode{
@@ -108,11 +108,11 @@
     top:7.2dvh;
     width:auto;
     margin:0;
-    min-height:64px;
-    padding:6px 7px;
-    grid-template-columns:minmax(0,1fr) 108px;
-    gap:7px;
-    border-radius:11px;
+    min-height:52px;
+    padding:2px 4px;
+    grid-template-columns:minmax(0,1fr) 82px;
+    gap:5px;
+    border-radius:0;
   }
   .pregameStatus{grid-template-columns:minmax(0,1fr) 48px;gap:6px}
   .pregameStatusCopy{text-align:center}
@@ -122,14 +122,14 @@
   .pregameCount{min-width:48px;padding:3px 4px 3px 6px}
   .pregameCount b{font-size:16px}
   .pregameCount span{font-size:4.5px}
-  .pregameTools{grid-template-columns:1fr;justify-items:stretch;gap:3px}
-  .pregameInviteButton{grid-column:auto;min-width:0;width:100%;height:22px;padding:0 6px;font-size:6px;border-radius:7px}
-  .pregameCode{font-size:9px;line-height:1}
-  .pregameMeta{justify-content:center;gap:3px}
-  .pregameMeta span{padding:2px 4px;font-size:4.5px}
+  .pregameTools{grid-template-columns:1fr;justify-items:center;gap:2px}
+  .pregameInviteButton{grid-column:auto;min-width:0;width:72px;height:19px;padding:0 5px;font-size:5.5px;border-radius:6px}
+  .pregameCode{font-size:8px;line-height:1}
+  .pregameMeta{justify-content:center;gap:2px}
+  .pregameMeta span{padding:1px 3px;font-size:4.1px}
 }
 @media(max-width:390px){
-  .pregameRoom{left:7px;right:7px;grid-template-columns:minmax(0,1fr) 100px;gap:5px;padding:5px 6px}
+  .pregameRoom{left:7px;right:7px;grid-template-columns:minmax(0,1fr) 78px;gap:4px;padding:2px 3px}
   .pregameStatus{grid-template-columns:minmax(0,1fr) 44px;gap:4px}
   .pregameStatus p{max-width:205px;font-size:5.5px}
   .pregameCount{min-width:44px}

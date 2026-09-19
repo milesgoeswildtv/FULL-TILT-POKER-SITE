@@ -60,6 +60,13 @@ test('backend gate blocks creation without host access and blocks private games 
  gated=await gatePokerRequest(new Request('https://crashout.test/api/tables/ABC123',{headers:{cookie:c}}),env);assert.equal(gated.response,null);
 });
 
+test('authenticated game entry carries the player avatar into the table payload',async()=>{
+ const ns=new AccountNamespace(),secret='avatar-gate-secret',identity={...guest,avatarUrl:'https://cdn.example.test/guest.png'},env={ACCOUNTS:ns,AUTH_SECRET:secret};
+ await accountRequest(env,identity,'/sync');await accountRequest(env,identity,'/access/invite-grant',{kind:'table',code:'AVA123',source:'code'});const ck=await cookie(identity,secret);
+ const gated=await gatePokerRequest(new Request('https://crashout.test/api/tables/AVA123/join',{method:'POST',headers:{cookie:ck,'content-type':'application/json'},body:'{}'}),env);
+ assert.equal(gated.response,null);const body=await gated.request.json();assert.equal(body.name,'Guest');assert.equal(body.accountId,'guest-account');assert.equal(body.avatarUrl,'https://cdn.example.test/guest.png');
+});
+
 test('successful one-time host creation consumes the credit and grants access to the created game',async()=>{
  const ns=new AccountNamespace(),secret='host-finalize-secret',env={ACCOUNTS:ns,AUTH_SECRET:secret};await accountRequest(env,host,'/sync');await accountRequest(env,host,'/access/host-grant',{keyId:'create-key',type:'one-time'});const c=await cookie(host,secret);
  const request=new Request('https://crashout.test/api/tables',{method:'POST',headers:{cookie:c,'content-type':'application/json'},body:JSON.stringify({startingChips:2500,blindMinutes:10})}),gated=await gatePokerRequest(request,env);assert.equal(gated.response,null);assert.ok(gated.hostReservationId);

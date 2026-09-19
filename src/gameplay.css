@@ -258,9 +258,12 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3Seat.folded{opacity:.42;filter:saturate(.45)}
 .ftp3Seat.out{opacity:.22;filter:grayscale(.8)}
 .ftp3Seat.sittingout .ftp3SeatPlaque{border-color:#5f5566;filter:saturate(.6)}
-.ftp3Avatar{position:absolute;left:-8px!important;top:50%;transform:translateY(-50%);width:42px!important;max-width:none!important;aspect-ratio:1;display:grid;place-items:center;z-index:5}
-.ftp3Avatar>span{position:absolute;inset:11%;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#3f2650,#0b0710 72%);border:1px solid #9c64b6;color:#f0d07b;font-size:clamp(8px,1.8vw,13px);font-weight:900}
-.ftp3Avatar img{position:absolute;inset:-7%;width:114%;height:114%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 8px #000a)}
+.ftp3IdentityAvatar{display:grid;place-items:center;aspect-ratio:1;overflow:visible}
+.ftp3Avatar{position:absolute;left:-8px!important;top:50%;transform:translateY(-50%);width:42px!important;max-width:none!important;z-index:5}
+.ftp3AvatarFallback,.ftp3AvatarPhoto{position:absolute;inset:11%;width:78%;height:78%;border-radius:50%;border:1px solid #9c64b6}
+.ftp3AvatarFallback{display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#3f2650,#0b0710 72%);color:#f0d07b;font-size:clamp(8px,1.8vw,13px);font-weight:900;z-index:1}
+.ftp3AvatarPhoto{object-fit:cover;background:#120b18;z-index:2}
+.ftp3AvatarFrame{position:absolute;inset:-7%;width:114%;height:114%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 8px #000a);z-index:3}
 .ftp3SeatCopy{min-width:0!important;width:100%!important;display:grid;gap:2px}
 .ftp3SeatCopy b{font-size:10px!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#fff;line-height:1}
 .ftp3SeatCopy strong{font-size:12px!important;color:#f1c966;line-height:1;font-weight:900}
@@ -294,7 +297,7 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3HeroCards .card:first-child{transform:rotate(-3deg) translateX(3px)}.ftp3HeroCards .card:last-child{transform:rotate(3deg) translateX(-3px)}
 .ftp3Strength{position:absolute!important;left:calc(50% + 58px)!important;right:auto!important;top:auto!important;bottom:62px!important;transform:none!important;white-space:nowrap!important;min-width:108px!important;text-align:center!important;z-index:35!important;margin:0!important;padding:2px 6px;color:#f3cf78;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:0;text-shadow:0 2px 7px #000}
 .ftp3HeroPlaque{position:relative;z-index:3;width:100%;min-height:51px!important;padding:6px 24px 6px 48px!important;border-radius:14px;border:1px solid #d39e3e;background:linear-gradient(160deg,#18101e,#0c0911);box-shadow:0 9px 22px #000b;display:flex;align-items:center}
-.ftp3HeroCrown{position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:47px!important;height:47px!important;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#2d1b37,#0c0910);border:1px solid #d39e3e;color:#f3ce72;font-size:22px!important;box-shadow:0 5px 14px #0009}
+.ftp3HeroAvatar{position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:47px!important;height:47px!important;z-index:5;filter:drop-shadow(0 5px 10px #0009)}
 .ftp3HeroPlaque div{display:grid;gap:1px}.ftp3HeroPlaque small{color:#a89bac;font-size:8px;letter-spacing:.16em}.ftp3HeroPlaque b{color:#f0c968;font-size:18px}.ftp3HeroPlaque em{margin-left:auto;color:#fff;font-style:normal;font-size:10px;font-weight:900}.ftp3ExtraTime{position:absolute;right:8px;top:5px;padding:0;border:0;background:transparent;color:#e4bb61;font:inherit;font-size:8px;font-weight:900;letter-spacing:.04em;cursor:pointer;pointer-events:auto;text-shadow:0 1px 4px #000}.ftp3ExtraTime:active{transform:translateY(1px)}
 
 .ftp3UtilityBar{position:absolute;left:12px!important;right:12px!important;bottom:4px!important;z-index:86;display:flex;gap:8px;pointer-events:none}

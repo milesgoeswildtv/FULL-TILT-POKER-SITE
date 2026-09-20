@@ -2,41 +2,54 @@
 .statsOverlay{width:100%;height:100%;display:grid;place-items:center}
 .statsPanel{position:relative;width:min(94vw,680px,44dvh);max-width:100%;margin:0;border:0;background:transparent;box-shadow:none;overflow:hidden;isolation:isolate;container-type:inline-size}
 .statsPanelArt{position:relative;z-index:0;display:block;width:100%;height:auto;pointer-events:none;user-select:none}
-.statsPanelContent{position:absolute;left:5.8%;top:5.8%;width:88.4%;height:88%;z-index:2;display:grid;grid-template-rows:auto minmax(0,1fr);min-width:0;min-height:0}
-.statsHead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:1.8% 2% 2.4%;border:0;background:transparent}
-.statsHead>div{display:grid;gap:2px;min-width:0}
-.statsHead b{font-size:clamp(10px,2.2cqw,14px);letter-spacing:.14em;color:#e1bd63;text-shadow:0 0 14px #b6832c22}
-.statsHead span,.statsHead small{font-size:clamp(7px,1.55cqw,10px);color:#8d7f94}
-.statsHead small{max-width:44%;text-align:right;line-height:1.3}
-.statsTable{min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 1.5% 1.5%;overscroll-behavior:contain;scrollbar-width:thin}
-.statsRow{min-width:0;display:grid;grid-template-columns:1.7fr .8fr .6fr .6fr .65fr .65fr .9fr .45fr;align-items:center;gap:1.2%;padding:2.1% 2.2%;border-top:1px solid #2a1f30;color:#c7bacd;font-size:clamp(8px,1.65cqw,11px)}
-.statsLabels{border-top:0;background:#0b080f66;color:#786b7f;font-size:clamp(7px,1.35cqw,9px);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.statsRow>span:not(:first-child){text-align:right}
-.statName{display:flex;align-items:center;gap:7px;min-width:0}
-.statName i{flex:0 0 auto;min-width:30px;padding:3px 5px;border:1px solid #493452;border-radius:999px;color:#9b8ca3;font-size:clamp(7px,1.35cqw,9px);font-style:normal;text-align:center}
-.statName b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2d7e6}
-.champRow{background:linear-gradient(90deg,#3b2c0f55,transparent);box-shadow:inset 3px 0 #d7ad50}
+.statsPanelContent{position:absolute;left:2.7%;top:1.2%;width:94.6%;height:97.4%;z-index:2;display:grid;grid-template-rows:11.8% 15.3% minmax(0,1fr);min-width:0;min-height:0}
+.statsHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 3%;border:0;background:transparent}
+.statsHead>div{display:grid;gap:.35cqw;min-width:0}
+.statsHead b{font-size:clamp(10px,2.7cqw,16px);letter-spacing:.14em;color:#e1bd63;text-shadow:0 0 14px #b6832c22;line-height:1}
+.statsHead span,.statsHead small{font-size:clamp(7px,1.55cqw,10px);color:#8d7f94;line-height:1.15}
+.statsHead small{max-width:42%;text-align:right}
+
+.statsLabels{position:relative;min-width:0;min-height:0;color:#8b7d91;font-size:clamp(7px,1.55cqw,10px);font-weight:900;letter-spacing:.07em;text-transform:uppercase;pointer-events:none}
+.statsLabels span{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.05;transform:translate(-50%,-50%)}
+.statsLabels span:nth-child(1){left:36.8%;top:26%}
+.statsLabels span:nth-child(2){left:55.2%;top:26%}
+.statsLabels span:nth-child(3){left:72.2%;top:26%}
+.statsLabels span:nth-child(4){left:91.2%;top:26%}
+.statsLabels span:nth-child(5){left:38.2%;top:75%}
+.statsLabels span:nth-child(6){left:57.1%;top:75%}
+.statsLabels span:nth-child(7){left:72.4%;top:75%;max-width:18%}
+.statsLabels span:nth-child(8){left:91.8%;top:75%}
+
+.statsRows{min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
+.statsRows::-webkit-scrollbar{display:none}
+.statsRow{position:relative;flex:0 0 33.3333%;min-width:0;min-height:0;display:grid;grid-template-columns:48% 16% 16% 20%;grid-template-rows:33.3333% 33.3333% 33.3333%;align-items:stretch;gap:0;padding:0;border:0;background:transparent;box-shadow:none;color:#d0c3d5;font-size:clamp(8px,2.15cqw,12px);scroll-snap-align:start;scroll-snap-stop:always}
+.statsRow>span{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.05;padding:0 .3cqw;box-sizing:border-box}
+.statsRow>.statName{grid-column:1;grid-row:1/4;flex-direction:row;justify-content:flex-start;gap:2.2cqw;padding-left:5.5%;padding-right:3%;text-align:left}
+.statName i{flex:0 0 auto;min-width:9.5cqw;padding:.75cqw 1.15cqw;border:1px solid #493452;border-radius:999px;color:#9b8ca3;font-size:clamp(7px,1.75cqw,10px);font-style:normal;text-align:center;box-sizing:border-box}
+.statName b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2d7e6;font-size:clamp(9px,2.45cqw,14px);line-height:1}
+.statsRow>span:nth-child(2){grid-column:2;grid-row:1}
+.statsRow>span:nth-child(3){grid-column:3;grid-row:1}
+.statsRow>span:nth-child(4){grid-column:4;grid-row:1}
+.statsRow>span:nth-child(5){grid-column:2;grid-row:2}
+.statsRow>span:nth-child(6){grid-column:3;grid-row:2}
+.statsRow>span:nth-child(7){grid-column:3;grid-row:3}
+.statsRow>span:nth-child(8){grid-column:4;grid-row:3}
+.statsRow>span[data-label]:before{content:attr(data-label);display:block;margin-bottom:.55cqw;color:#76687d;font-size:clamp(5px,1.25cqw,7px);font-weight:900;letter-spacing:.07em;text-transform:uppercase;line-height:1}
+.statsRow>span[data-label='Biggest Pot']:before{max-width:100%;white-space:normal}
 .champRow .statName i{border-color:#a9832e;background:#2a210d;color:#f3cc66}
 .finalStandings .statsHead b{color:#f0cc73}
 .finalBanner{border-color:#c6a149!important;background:#181108e8!important}
 .knockoutLine{padding:7px 9px;border:1px solid #592c3a;border-radius:8px;background:#210e15;color:#e68ca0;font-size:10px;font-weight:800;letter-spacing:.04em}
 @media(max-width:760px){
 .statsPanel{width:min(94vw,44dvh)}
-.statsPanelContent{left:5.5%;top:5.3%;width:89%;height:89%}
-.statsHead{align-items:flex-start;flex-direction:column;gap:2px;padding:1.5% 2% 2%}
 .statsHead small{display:none}
-.statsLabels{display:none}
-.statsTable{padding:0 1.2% 1.5%}
-.statsRow{display:grid;grid-template-columns:minmax(0,1.55fr) repeat(3,minmax(38px,.55fr));gap:5px;padding:7px 8px;margin:0 0 5px;border:1px solid #2b2031;border-radius:9px;background:#0c0910cc;font-size:9px}
-.statsRow:last-child{margin-bottom:0}
-.statsRow>span{min-width:0;text-align:right}
-.statsRow>.statName{grid-row:1/3;align-self:center;text-align:left}
-.statsRow>.statName i{min-width:27px;padding:2px 4px;font-size:7px}
-.statsRow>.statName b{font-size:9px}
-.statsRow>span[data-label]{display:grid;gap:1px}
-.statsRow>span[data-label]:before{content:attr(data-label);font-size:5.5px;letter-spacing:.06em;text-transform:uppercase;color:#685e6d;font-weight:900}
-.statsRow>span[data-label='Biggest Pot']{grid-column:2/4}
-.statsRow>span[data-label='KO']{grid-column:4}
-.champRow{border-color:#765a24;background:linear-gradient(90deg,#2a1e0b,#0c0910cc);box-shadow:inset 2px 0 #d7ad50}
+.statsHead{padding:0 3.2%}
+.statsHead b{font-size:clamp(10px,3.15cqw,15px)}
+.statsHead span{font-size:clamp(7px,1.9cqw,9px)}
+.statsLabels{font-size:clamp(7px,2cqw,9px)}
+.statsRow{font-size:clamp(8px,2.7cqw,11px)}
+.statName b{font-size:clamp(9px,3cqw,13px)}
+.statName i{font-size:clamp(7px,1.9cqw,9px)}
+.statsRow>span[data-label]:before{font-size:clamp(5px,1.55cqw,7px)}
 .hudToggles{margin-top:3px}
 }

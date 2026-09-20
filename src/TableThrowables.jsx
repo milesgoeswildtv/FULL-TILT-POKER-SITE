@@ -26,11 +26,10 @@ export function ThrowableEffects({events=[]}){
  useEffect(()=>{
   const layer=layerRef.current;if(!layer||!events.length)return;
   const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-  const timers=[];
   const impact=(item,x,y)=>{
    const hit=document.createElement('span');hit.className=`throwableImpact effect-${item.effect}`;hit.style.left=`${x}px`;hit.style.top=`${y}px`;putArt(hit,item);layer.appendChild(hit);
    if(typeof hit.animate==='function'&&!reduce)hit.animate([{transform:'translate(-50%,-50%) scale(.55)',opacity:.2},{transform:'translate(-50%,-50%) scale(1.45)',opacity:1,offset:.34},{transform:'translate(-50%,-50%) scale(1)',opacity:1,offset:.68},{transform:'translate(-50%,-50%) scale(.92)',opacity:0}],{duration:item.effect==='splat'?820:650,easing:'cubic-bezier(.2,.8,.2,1)'}).finished.catch(()=>{}).finally(()=>hit.remove());
-   else timers.push(setTimeout(()=>hit.remove(),reduce?300:650));
+   else setTimeout(()=>hit.remove(),reduce?300:650);
   };
   for(const event of events){
    if(!event?.id||seenRef.current.has(event.id))continue;
@@ -48,7 +47,6 @@ export function ThrowableEffects({events=[]}){
     {transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) rotate(370deg) scale(.9)`,opacity:1}
    ],{duration:560,easing:'cubic-bezier(.22,.68,.28,1)'}).finished.then(()=>impact(item,tx,ty)).catch(()=>{}).finally(()=>shot.remove());
   }
-  return()=>timers.forEach(clearTimeout);
  },[events]);
  return <div className="throwableFxLayer" ref={layerRef} aria-hidden="true"/>;
 }

@@ -13,7 +13,7 @@ html.telegramMiniApp body{padding-top:max(var(--telegram-safe-top,0px),env(safe-
 .telegramMiniApp input,.telegramMiniApp select,.telegramMiniApp textarea{font-size:16px!important}
 .telegramMiniApp .telegramShopNotice{margin-top:12px;padding:12px 14px;border:1px solid rgba(215,183,84,.24);border-radius:12px;background:rgba(12,7,18,.78);color:#b8aebd;font:700 11px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:center}
 .telegramMiniApp .telegramShopNotice b{display:block;color:#dbc76f;letter-spacing:.06em;margin-bottom:3px}
-.telegramMiniApp .accountChip,.telegramMiniApp .entryActions button,.telegramMiniApp .createChoice button,.telegramMiniApp .notificationToggle,.telegramMiniApp .discordLogin,.telegramMiniApp .primary{min-height:44px}
+.telegramMiniApp .entryActions button,.telegramMiniApp .createChoice button,.telegramMiniApp .notificationToggle,.telegramMiniApp .discordLogin,.telegramMiniApp .primary{min-height:44px}
 .telegramMiniApp .toast{bottom:max(18px,calc(var(--telegram-safe-bottom,0px) + 10px))}
 .telegramMiniApp.telegramGameRoute .tablePage{padding-bottom:max(8px,var(--telegram-safe-bottom,0px))}
 .telegramMiniApp.telegramGameRoute .gameplayV3Page,.telegramMiniApp.telegramGameRoute .pregameTablePage{height:var(--telegram-viewport-stable-height,100dvh)!important;min-height:0!important}
@@ -23,9 +23,6 @@ html.telegramMiniApp body{padding-top:max(var(--telegram-safe-top,0px),env(safe-
  .telegramMiniApp .homeTop{margin:0;padding-left:0;padding-right:0}
  .telegramMiniApp .miniBrand img{width:46px;height:46px}
  .telegramMiniApp .miniBrand span{display:none}
- .telegramMiniApp .accountChip{max-width:72vw}
- .telegramMiniApp .accountChip span{min-width:0}
- .telegramMiniApp .accountChip b,.telegramMiniApp .accountChip small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
  .telegramMiniApp .profileShade{justify-content:stretch}
  .telegramMiniApp .profileDrawer{width:100vw;max-width:none;border-left:0}
  .telegramMiniApp .homeHero{margin-top:2px}

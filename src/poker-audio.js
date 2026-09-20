@@ -1,12 +1,7 @@
 import{useEffect,useRef}from'react';
 
 const ROOT='/assets/sfx/';
-const MP3_ONLY=new Set([
- 'results/pot_win',
- 'results/big_pot_win',
- 'results/split_pot',
- 'results/player_bust'
-]);
+const MP3_ONLY=new Set();
 
 const GROUPS={
  handStart:['table/hand_start'],
@@ -66,10 +61,10 @@ function silentWavUrl(){
 
 function mediaUrlsFor(base){
  const urls=[];
- if(SUPPORT.mp3)urls.push(`${ROOT}${base}.mp3`);
  if(!MP3_ONLY.has(base)&&SUPPORT.ogg)urls.push(`${ROOT}${base}.ogg`);
- if(!urls.some(x=>x.endsWith('.mp3')))urls.push(`${ROOT}${base}.mp3`);
+ if(SUPPORT.mp3)urls.push(`${ROOT}${base}.mp3`);
  if(!MP3_ONLY.has(base)&&!urls.some(x=>x.endsWith('.ogg')))urls.push(`${ROOT}${base}.ogg`);
+ if(!urls.some(x=>x.endsWith('.mp3')))urls.push(`${ROOT}${base}.mp3`);
  return urls;
 }
 

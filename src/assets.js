@@ -14,7 +14,6 @@ export const assets={
     homeMainButtons:`${root}/crashout/HomescreenMainButtons.PNG`,
     playerProfilePlaque:`${root}/crashout/PlayerProfilePlaque.PNG`,
     chatBoxPanel:`${root}/crashout/ChatBoxPanel.PNG`,
-    statsPanel:`${root}/crashout/StatsPanel.PNG`,
     joinTablePanel:`${root}/crashout/JoinTablePanel.PNG`,
     lastHandPanel:`${root}/crashout/LastHandPanel.PNG`,
     createGamePanel:`${root}/crashout/CreateGamePanel.PNG`,

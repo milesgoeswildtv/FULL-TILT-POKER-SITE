@@ -258,9 +258,9 @@
 @media(max-width:760px){
   .pregameTablePage{
     /* Header moves upward; table keeps its approved Y position. */
-    --pg-header-top:clamp(46px,5.8dvh,62px);
+    --pg-header-top:clamp(40px,5.1dvh,56px);
     --pg-header-height:clamp(116px,28vw,144px);
-    --pg-table-top:calc(clamp(62px,7.5dvh,84px) + var(--pg-header-height) - 10px);
+    --pg-table-top:calc(clamp(62px,7.5dvh,84px) + var(--pg-header-height) - 26px);
 
     /* Micro-scale only: equivalent to roughly 82% -> 80%. */
     --pg-table-height:min(69.3dvh,119vw);
@@ -304,7 +304,7 @@
 
   /* The complete player plaque is anchored below the table instead of overlapping the felt. */
   .pregameTablePage .ftp3Hero{
-    top:calc(var(--pg-table-top) + var(--pg-table-height) + 8px)!important;
+    top:calc(var(--pg-table-top) + var(--pg-table-height) + 2px)!important;
     bottom:auto!important;
     width:min(38vw,194px)!important;
   }

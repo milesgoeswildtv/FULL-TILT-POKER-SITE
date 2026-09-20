@@ -8,7 +8,6 @@ export const assets={
     logoDesktop:`${root}/crashout/CrashoutPokerLogo.png`,
     logoMobile:`${root}/crashout/CrashoutMiniLogo.png`,
     brandLogo:`${root}/crashout/CrashoutPokerLogo.png`,
-    miniLogo:`${root}/crashout/CrashoutMiniLogo.png`,
     heroLogo:`${root}/crashout/CrashoutLogoNoCard.PNG`,
     studioLogo:`${root}/crashout/LostCrashoutSub.PNG`,
     homeMainButtons:`${root}/crashout/HomescreenMainButtons.PNG`,

@@ -1,6 +1,6 @@
-/* Crashout Poker pregame staging room — single source of truth.
-   Gameplay/table rules live in gameplay.css. Everything that positions or sizes
-   the pregame header, table, back control, START GAME, and TEST BOT lives here. */
+/* Crashout Poker pregame staging room.
+   This file is the single source of truth for the cash-table pregame composition.
+   Do not duplicate these layout rules in gameplay.css or add patch overrides elsewhere. */
 
 .pregameTablePage{
   position:fixed!important;
@@ -11,8 +11,7 @@
   overflow:hidden!important;
 }
 
-.pregameTablePage .ftp3HeaderBrand{display:none!important}
-
+/* Desktop keeps the established table scale and staging proportions. */
 .pregameTablePage .ftp3Stage{
   display:block!important;
   top:14.2dvh!important;
@@ -36,7 +35,7 @@
 
 .pregameRoom{
   position:relative;
-  z-index:70;
+  z-index:80;
   width:min(960px,calc(100% - 24px));
   height:clamp(128px,12vw,188px);
   margin:4px auto 0;
@@ -184,16 +183,17 @@
   pointer-events:none;
 }
 
+/* Pregame controls are styled here only. */
 .pregameTablePage .ftp3ActionDock{
   position:absolute!important;
   left:14px!important;
   right:14px!important;
   bottom:max(78px,5.5dvh)!important;
   width:auto!important;
-  margin:0!important;
   min-height:0!important;
+  margin:0!important;
   padding:0!important;
-  z-index:140!important;
+  z-index:150!important;
 }
 
 .pregameTablePage .ftp3PregameControls{
@@ -228,25 +228,47 @@
   color:#cdbfd2!important;
 }
 
+/* Dedicated pregame back control: not a child of the gameplay top bar. */
+.pregameBack{
+  position:fixed;
+  left:12px;
+  top:max(12px,env(safe-area-inset-top));
+  z-index:220;
+  width:96px;
+  height:42px;
+  padding:0 16px 0 12px;
+  border:1px solid rgba(205,155,226,.42);
+  border-radius:999px;
+  background:linear-gradient(180deg,#2a1831,#17101d);
+  color:#f6eef8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  font:inherit;
+  font-size:16px;
+  font-weight:800;
+  line-height:1;
+  box-shadow:0 8px 22px #0008;
+  cursor:pointer;
+}
+
 @media(max-width:760px){
-  .pregameTablePage .ftp3Back{
-    position:fixed!important;
-    left:10px!important;
-    top:max(8px,env(safe-area-inset-top))!important;
-    display:grid!important;
-    visibility:visible!important;
-    opacity:1!important;
-    z-index:180!important;
-    pointer-events:auto!important;
+  .pregameTablePage{
+    --pg-header-top:clamp(62px,7.5dvh,84px);
+    --pg-header-height:clamp(116px,28vw,144px);
+    --pg-table-top:calc(var(--pg-header-top) + var(--pg-header-height) - 10px);
+    --pg-table-height:min(71dvh,122vw);
   }
 
+  /* Header artwork and every text/control inside it move together. */
   .pregameRoom{
     position:absolute;
     left:3px;
     right:3px;
-    top:10dvh;
+    top:var(--pg-header-top);
     width:auto;
-    height:clamp(116px,28vw,144px);
+    height:var(--pg-header-height);
     margin:0;
   }
 
@@ -263,22 +285,29 @@
   .pregameCode{font-size:7.2px}
   .pregameBlindBadge{top:77%;width:23%;font-size:8.5px}
 
-  /* Move the existing table only. Its baseline scale is unchanged. */
+  /* Position changes only. The established table size remains exactly 71dvh / 122vw. */
   .pregameTablePage .ftp3Stage{
     left:50%!important;
-    top:27.3dvh!important;
-    height:min(71dvh,122vw)!important;
+    top:var(--pg-table-top)!important;
+    height:var(--pg-table-height)!important;
     aspect-ratio:.69!important;
     transform:translateX(-50%)!important;
   }
 
-  /* START GAME occupies the marked upper-right target and is deliberately smaller. */
+  /* Keep the player plaque tied to the table's lower edge so the table moves as one composition. */
+  .pregameTablePage .ftp3Hero{
+    top:auto!important;
+    bottom:calc(100dvh - var(--pg-table-top) - var(--pg-table-height) + min(12.5dvh,22vw))!important;
+    width:min(38vw,194px)!important;
+  }
+
+  /* START GAME is compact and anchored to the header/table transition. */
   .pregameTablePage .ftp3ActionDock{
     left:auto!important;
-    right:8px!important;
-    top:24.4dvh!important;
+    right:10px!important;
+    top:calc(var(--pg-table-top) + 10px)!important;
     bottom:auto!important;
-    width:124px!important;
+    width:108px!important;
   }
 
   .pregameTablePage .ftp3PregameControls{
@@ -287,24 +316,24 @@
   }
 
   .pregameTablePage .ftp3Start{
-    width:100%!important;
-    height:34px!important;
-    min-height:34px!important;
-    padding:3px 8px!important;
-    font-size:11px!important;
+    width:108px!important;
+    height:32px!important;
+    min-height:32px!important;
+    padding:3px 7px!important;
+    font-size:10px!important;
   }
 
-  /* Temporary owner-only development control, kept away from the primary CTA. */
+  /* Temporary development control: separate from START GAME and intentionally quiet. */
   .pregameTablePage .ftp3OwnerBotControl{
     position:fixed!important;
     left:10px!important;
-    top:24.4dvh!important;
-    width:86px!important;
-    height:28px!important;
-    min-height:28px!important;
-    padding:3px 6px!important;
-    font-size:7px!important;
-    z-index:145!important;
+    top:calc(var(--pg-table-top) + 12px)!important;
+    width:76px!important;
+    height:24px!important;
+    min-height:24px!important;
+    padding:2px 5px!important;
+    font-size:6.5px!important;
+    z-index:155!important;
   }
 }
 
@@ -318,10 +347,8 @@
   .pregameBlindBadge{font-size:8px}
 }
 
-@media(max-height:700px){
-  .pregameTablePage .ftp3Hero{bottom:min(13dvh,22vw)!important}
-}
-
-@media(min-width:761px){
-  .pregameTablePage .ftp3Stage{top:14.2dvh!important}
+@media(max-height:700px) and (max-width:760px){
+  .pregameTablePage{
+    --pg-header-top:58px;
+  }
 }

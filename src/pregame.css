@@ -257,12 +257,17 @@
 
 @media(max-width:760px){
   .pregameTablePage{
-    --pg-header-top:clamp(62px,7.5dvh,84px);
+    /* Header moves upward; table keeps its approved Y position. */
+    --pg-header-top:clamp(46px,5.8dvh,62px);
     --pg-header-height:clamp(116px,28vw,144px);
-    --pg-table-top:calc(var(--pg-header-top) + var(--pg-header-height) - 10px);
-    --pg-table-height:min(71dvh,122vw);
+    --pg-table-top:calc(clamp(62px,7.5dvh,84px) + var(--pg-header-height) - 10px);
+
+    /* Micro-scale only: equivalent to roughly 82% -> 80%. */
+    --pg-table-height:min(69.3dvh,119vw);
   }
 
+  /* Move the complete staging header upward and return it to an in-viewport scale.
+     Artwork, copy, count, invite, code, and blind badge remain one transformed unit. */
   .pregameRoom{
     position:absolute;
     left:3px;
@@ -271,7 +276,7 @@
     width:auto;
     height:var(--pg-header-height);
     margin:0;
-    transform:scale(1.14);
+    transform:scale(1);
     transform-origin:top center;
   }
 
@@ -288,6 +293,7 @@
   .pregameCode{font-size:7.2px}
   .pregameBlindBadge{top:77%;width:23%;font-size:8.5px}
 
+  /* Preserve the approved table location; only apply the requested micro-scale. */
   .pregameTablePage .ftp3Stage{
     left:50%!important;
     top:var(--pg-table-top)!important;
@@ -296,12 +302,14 @@
     transform:translateX(-50%)!important;
   }
 
+  /* The complete player plaque is anchored below the table instead of overlapping the felt. */
   .pregameTablePage .ftp3Hero{
-    top:auto!important;
-    bottom:max(18px,env(safe-area-inset-bottom))!important;
+    top:calc(var(--pg-table-top) + var(--pg-table-height) + 8px)!important;
+    bottom:auto!important;
     width:min(38vw,194px)!important;
   }
 
+  /* START GAME and TEST BOT keep their approved positions and sizes from the prior pass. */
   .pregameTablePage .ftp3ActionDock{
     left:auto!important;
     right:10px!important;

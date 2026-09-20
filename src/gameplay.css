@@ -300,10 +300,9 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .ftp3ActionDock{position:absolute!important;left:10px!important;right:10px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;min-height:0!important;padding:6px 12px 48px!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;outline:0!important;z-index:80!important;display:block!important}
 .ftp3ActionDock:before,.ftp3ActionDock:after{display:none!important;content:none!important}
 .ftp3ActionRow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.ftp3ActionRow button,.ftp3PregameControls button{min-height:42px;padding:5px 5px;border-radius:10px;border:1px solid rgba(151,83,177,.56);background:linear-gradient(180deg,#26152e,#120d18);color:#fff;font:inherit;font-weight:900;font-size:15px;line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.ftp3ActionRow button{min-height:42px;padding:5px 5px;border-radius:10px;border:1px solid rgba(151,83,177,.56);background:linear-gradient(180deg,#26152e,#120d18);color:#fff;font:inherit;font-weight:900;font-size:15px;line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 .ftp3ActionRow button small{display:block;margin-top:3px;color:#b8aaba;font-size:9px;font-weight:700;line-height:1}.ftp3ActionRow button.raise{background:linear-gradient(180deg,#8a31ef,#5b18bf);border-color:#ae57ff}.ftp3ActionRow button.allin{background:linear-gradient(180deg,#6d4a18,#2d1c0a);border-color:#d6a33f;color:#f7d57f}.ftp3ActionRow button:disabled{opacity:.38;filter:saturate(.45)}
 .ftp3RaiseRow{margin-top:6px;display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center}.ftp3RaiseRow>span{color:#bcaec2;font-size:9px;white-space:nowrap}.ftp3RaiseRow>span b{color:#f1cb70}.ftp3RaiseRow input{width:100%;accent-color:#b785ff}.ftp3RaiseRow>div{display:flex;gap:5px}.ftp3RaiseRow button{height:30px;min-width:40px;padding:0 8px;border-radius:8px;border:1px solid #4c3658;background:#120d18;color:#cbbdd0;font:inherit;font-size:8px}
-.ftp3PregameControls{display:block}.ftp3PregameControls .ftp3Start{width:100%;border-color:#d1a249;background:linear-gradient(180deg,#6d4a18,#2d1c0a);color:#f7d57f;font-size:15px}.ftp3PregameControls .ftp3OwnerBotControl{position:fixed!important;left:10px!important;top:24.8dvh!important;width:92px!important;min-height:30px!important;height:30px!important;padding:4px 7px!important;border-color:#4e365a!important;background:linear-gradient(180deg,#211529,#100b15)!important;color:#cdbfd2!important;font-size:8px!important;z-index:132!important}
 .ftp3Watching{height:62px;display:grid;place-items:center;color:#c3b6c8;font-size:12px}
 .ftp3SittingOut{border:1px solid #5a4f61;border-radius:12px;background:#100c13;color:#b9adbe;letter-spacing:.08em;font-size:10px;font-weight:900}
 .ftp3PreActions{display:grid;gap:6px}.ftp3PreActions>small{color:#8f8195;font-size:7px;font-weight:900;letter-spacing:.14em}.ftp3PreActions>div{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.ftp3PreActions button{min-height:42px;border-radius:11px;border:1px solid #4b3657;background:#120d18;color:#cfc3d4;font:inherit;font-size:10px;font-weight:900}.ftp3PreActions button.active{border-color:#b681ff;background:#2c1637;color:#f0d479}
@@ -320,16 +319,6 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 .gameplayV3Page>.mttHostBar{position:absolute!important;left:50%!important;bottom:18.2dvh!important;transform:translateX(-50%)!important;z-index:91!important;min-height:0!important;padding:4px 8px!important;border-radius:999px!important;background:rgba(12,8,16,.92)!important}
 .gameplayV3Page>.toast{z-index:150!important}
 
-.pregameTablePage{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:0!important;overflow:hidden!important}
-.pregameTablePage .ftp3HeaderBrand{display:none!important}
-.pregameTablePage .ftp3Back{position:fixed!important;left:10px!important;top:max(46px,env(safe-area-inset-top))!important;width:48px!important;height:48px!important;display:grid!important;visibility:visible!important;opacity:1!important;z-index:160!important;pointer-events:auto!important}
-.pregameTablePage .ftp3Stage{display:block!important;left:51.4%!important;top:27.3dvh!important;height:min(71dvh,122vw)!important;aspect-ratio:.69!important;opacity:.98}
-.pregameTablePage .ftp3Hero{display:flex!important;bottom:min(12.5dvh,22vw)!important;width:min(38vw,194px)!important}
-.pregameTablePage .ftp3HeroCards,.pregameTablePage .ftp3Strength,.pregameTablePage .ftp3Pot,.pregameTablePage .ftp3SidePots,.pregameTablePage .ftp3UtilityBar{display:none!important}
-.pregameTablePage .ftp3ActionDock{position:absolute!important;left:auto!important;right:7px!important;top:24.4dvh!important;bottom:auto!important;width:124px!important;margin:0!important;min-height:0!important;padding:0!important}
-.pregameTablePage .ftp3PregameControls{display:block!important;width:100%!important}
-.pregameTablePage .ftp3PregameControls.showcase{width:124px!important;margin:0!important}
-.pregameTablePage .ftp3PregameControls .ftp3Start{min-height:38px!important;height:38px!important;padding:3px 8px!important;font-size:12px!important}
 
 @media(max-width:430px){
   .ftp3HeaderBrand{top:max(3px,env(safe-area-inset-top))!important;width:46%!important}
@@ -352,7 +341,6 @@ body:has(.gameplayV3Page){margin:0;overflow:hidden;background:#07050a}
 @media(max-height:700px){
   .ftp3Stage{top:9.4dvh!important;height:min(69dvh,121.5vw)!important}
   .ftp3Hero{bottom:22.5dvh!important}
-  .pregameTablePage .ftp3Hero{bottom:min(13dvh,22vw)!important}
 }
 @media(min-width:761px){
   .gameplayV3Page{left:50%!important;right:auto!important;width:min(76vw,980px)!important;transform:translateX(-50%);box-shadow:0 0 90px #000d}

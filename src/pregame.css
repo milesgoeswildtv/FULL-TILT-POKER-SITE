@@ -1,3 +1,39 @@
+/* Crashout Poker pregame staging room — single source of truth.
+   Gameplay/table rules live in gameplay.css. Everything that positions or sizes
+   the pregame header, table, back control, START GAME, and TEST BOT lives here. */
+
+.pregameTablePage{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+
+.pregameTablePage .ftp3HeaderBrand{display:none!important}
+
+.pregameTablePage .ftp3Stage{
+  display:block!important;
+  top:14.2dvh!important;
+  height:min(71dvh,122vw)!important;
+  opacity:.98;
+}
+
+.pregameTablePage .ftp3Hero{
+  display:flex!important;
+  bottom:min(12.5dvh,22vw)!important;
+  width:min(38vw,194px)!important;
+}
+
+.pregameTablePage .ftp3HeroCards,
+.pregameTablePage .ftp3Strength,
+.pregameTablePage .ftp3Pot,
+.pregameTablePage .ftp3SidePots,
+.pregameTablePage .ftp3UtilityBar{
+  display:none!important;
+}
+
 .pregameRoom{
   position:relative;
   z-index:70;
@@ -7,6 +43,7 @@
   color:#f4ead0;
   pointer-events:none;
 }
+
 .pregameHeaderArt{
   position:absolute;
   inset:0;
@@ -18,6 +55,7 @@
   user-select:none;
   filter:drop-shadow(0 12px 28px #000a);
 }
+
 .pregameHeaderLeft{
   position:absolute;
   left:18.5%;
@@ -31,6 +69,7 @@
   text-align:center;
   pointer-events:none;
 }
+
 .pregameHeaderLeft>span{
   color:#c7a55d;
   font-size:7px;
@@ -38,13 +77,15 @@
   letter-spacing:.16em;
   line-height:1;
 }
+
 .pregameHeaderLeft h2{
-  margin:4px 0 4px;
+  margin:4px 0;
   color:#f4ead0;
   font-size:clamp(17px,1.6vw,24px);
   line-height:.95;
   text-shadow:0 2px 6px #000,0 0 8px rgba(154,57,208,.24);
 }
+
 .pregameHeaderLeft p{
   max-width:94%;
   margin:0;
@@ -52,6 +93,7 @@
   font-size:8px;
   line-height:1.25;
 }
+
 .pregameHeaderRight{
   position:absolute;
   left:57%;
@@ -63,6 +105,7 @@
   align-items:center;
   pointer-events:none;
 }
+
 .pregameCount{
   display:grid;
   justify-items:center;
@@ -71,13 +114,16 @@
   border-right:1px solid rgba(211,166,83,.42);
   text-align:center;
 }
+
 .pregameCount b{
   color:#f2d27b;
   font-size:clamp(24px,2.4vw,36px);
   line-height:.9;
   text-shadow:0 2px 7px #000;
 }
+
 .pregameCount b small{font-size:.55em}
+
 .pregameCount span{
   margin-top:7px;
   color:#b8a7bd;
@@ -85,6 +131,7 @@
   font-weight:900;
   letter-spacing:.16em;
 }
+
 .pregameInviteCluster{
   display:grid;
   justify-items:center;
@@ -92,6 +139,7 @@
   gap:5px;
   pointer-events:auto;
 }
+
 .pregameInviteButton{
   width:76px;
   height:24px;
@@ -109,7 +157,9 @@
   cursor:pointer;
   box-shadow:inset 0 1px rgba(255,255,255,.12),0 4px 12px #0008;
 }
+
 .pregameInviteButton:active{transform:translateY(1px)}
+
 .pregameCode{
   color:#f1d071;
   font-size:10px;
@@ -117,6 +167,7 @@
   letter-spacing:.12em;
   text-shadow:0 2px 5px #000;
 }
+
 .pregameBlindBadge{
   position:absolute;
   left:50%;
@@ -132,7 +183,63 @@
   text-shadow:0 2px 6px #000;
   pointer-events:none;
 }
+
+.pregameTablePage .ftp3ActionDock{
+  position:absolute!important;
+  left:14px!important;
+  right:14px!important;
+  bottom:max(78px,5.5dvh)!important;
+  width:auto!important;
+  margin:0!important;
+  min-height:0!important;
+  padding:0!important;
+  z-index:140!important;
+}
+
+.pregameTablePage .ftp3PregameControls{
+  display:grid!important;
+  grid-template-columns:1.65fr 1fr!important;
+  gap:9px!important;
+}
+
+.pregameTablePage .ftp3PregameControls button{
+  min-height:56px!important;
+  padding:5px!important;
+  border-radius:10px!important;
+  border:1px solid rgba(151,83,177,.56)!important;
+  background:linear-gradient(180deg,#26152e,#120d18)!important;
+  color:#fff!important;
+  font:inherit!important;
+  font-weight:900!important;
+  font-size:15px!important;
+  line-height:1!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+
+.pregameTablePage .ftp3Start{
+  border-color:#d1a249!important;
+  background:linear-gradient(180deg,#6d4a18,#2d1c0a)!important;
+  color:#f7d57f!important;
+}
+
+.pregameTablePage .ftp3OwnerBotControl{
+  border-color:#4e365a!important;
+  background:linear-gradient(180deg,#211529,#100b15)!important;
+  color:#cdbfd2!important;
+}
+
 @media(max-width:760px){
+  .pregameTablePage .ftp3Back{
+    position:fixed!important;
+    left:10px!important;
+    top:max(8px,env(safe-area-inset-top))!important;
+    display:grid!important;
+    visibility:visible!important;
+    opacity:1!important;
+    z-index:180!important;
+    pointer-events:auto!important;
+  }
+
   .pregameRoom{
     position:absolute;
     left:3px;
@@ -142,9 +249,10 @@
     height:clamp(116px,28vw,144px);
     margin:0;
   }
+
   .pregameHeaderLeft{left:18%;top:26%;width:38%;height:40%}
   .pregameHeaderLeft>span{font-size:4.6px;letter-spacing:.14em}
-  .pregameHeaderLeft h2{margin:2px 0 2px;font-size:10.5px}
+  .pregameHeaderLeft h2{margin:2px 0;font-size:10.5px}
   .pregameHeaderLeft p{max-width:96%;font-size:5.2px;line-height:1.18}
   .pregameHeaderRight{left:57%;top:26%;width:27%;height:41%;grid-template-columns:40% 60%}
   .pregameCount{height:86%}
@@ -154,7 +262,52 @@
   .pregameInviteButton{width:58px;height:17px;padding:0 4px;border-radius:5px;font-size:4.8px}
   .pregameCode{font-size:7.2px}
   .pregameBlindBadge{top:77%;width:23%;font-size:8.5px}
+
+  /* Move the existing table only. Its baseline scale is unchanged. */
+  .pregameTablePage .ftp3Stage{
+    left:50%!important;
+    top:27.3dvh!important;
+    height:min(71dvh,122vw)!important;
+    aspect-ratio:.69!important;
+    transform:translateX(-50%)!important;
+  }
+
+  /* START GAME occupies the marked upper-right target and is deliberately smaller. */
+  .pregameTablePage .ftp3ActionDock{
+    left:auto!important;
+    right:8px!important;
+    top:24.4dvh!important;
+    bottom:auto!important;
+    width:124px!important;
+  }
+
+  .pregameTablePage .ftp3PregameControls{
+    display:block!important;
+    width:100%!important;
+  }
+
+  .pregameTablePage .ftp3Start{
+    width:100%!important;
+    height:34px!important;
+    min-height:34px!important;
+    padding:3px 8px!important;
+    font-size:11px!important;
+  }
+
+  /* Temporary owner-only development control, kept away from the primary CTA. */
+  .pregameTablePage .ftp3OwnerBotControl{
+    position:fixed!important;
+    left:10px!important;
+    top:24.4dvh!important;
+    width:86px!important;
+    height:28px!important;
+    min-height:28px!important;
+    padding:3px 6px!important;
+    font-size:7px!important;
+    z-index:145!important;
+  }
 }
+
 @media(max-width:390px){
   .pregameHeaderLeft{left:17.7%;width:38.5%}
   .pregameHeaderLeft h2{font-size:9.7px}
@@ -163,4 +316,12 @@
   .pregameInviteButton{width:54px;height:16px;font-size:4.5px}
   .pregameCode{font-size:6.8px}
   .pregameBlindBadge{font-size:8px}
+}
+
+@media(max-height:700px){
+  .pregameTablePage .ftp3Hero{bottom:min(13dvh,22vw)!important}
+}
+
+@media(min-width:761px){
+  .pregameTablePage .ftp3Stage{top:14.2dvh!important}
 }

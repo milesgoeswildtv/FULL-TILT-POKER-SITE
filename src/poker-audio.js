@@ -24,6 +24,7 @@ const GROUPS={
 
 const PRELOAD=[...new Set(Object.values(GROUPS).flat())];
 const MAX_PENDING_AGE_MS=1800;
+const MEDIA_PRIME_URL='/assets/sfx/table/check_tap_01.mp3';
 
 function storageGet(key,fallback){
  try{const value=localStorage.getItem(key);return value==null?fallback:value}catch{return fallback}
@@ -48,16 +49,6 @@ function setPlaybackAudioSession(){
  try{
   if(navigator?.audioSession&&'type'in navigator.audioSession)navigator.audioSession.type='playback';
  }catch{}
-}
-
-function silentWavUrl(){
- if(typeof Blob==='undefined'||typeof URL==='undefined')return'';
- const sampleRate=8000,samples=sampleRate,bytes=44+samples*2,buffer=new ArrayBuffer(bytes),view=new DataView(buffer);
- const write=(offset,text)=>{for(let i=0;i<text.length;i++)view.setUint8(offset+i,text.charCodeAt(i))};
- write(0,'RIFF');view.setUint32(4,bytes-8,true);write(8,'WAVE');write(12,'fmt ');
- view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sampleRate,true);
- view.setUint32(28,sampleRate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);write(36,'data');view.setUint32(40,samples*2,true);
- return URL.createObjectURL(new Blob([buffer],{type:'audio/wav'}));
 }
 
 function mediaUrlsFor(base){
@@ -87,8 +78,6 @@ class PokerAudio{
   this.lastPick=new Map();
   this.pending=[];
   this.mediaPreloads=new Map();
-  this.mediaPrime=null;
-  this.mediaPrimeUrl='';
   this.mediaPool=[];
   this.mediaPoolIndex=0;
   this.mediaPoolReady=false;
@@ -113,31 +102,14 @@ class PokerAudio{
    return ctx;
   }catch{return null}
  }
- ensureMediaPrime(){
-  if(!this.preferMedia||typeof Audio==='undefined')return null;
-  if(this.mediaPrime)return this.mediaPrime;
-  const url=silentWavUrl();
-  if(!url)return null;
-  const el=new Audio(url);
-  el.loop=true;
-  el.preload='auto';
-  el.volume=0.001;
-  el.setAttribute('playsinline','');
-  this.mediaPrime=el;
-  this.mediaPrimeUrl=url;
-  return el;
- }
  ensureMediaPool(){
   if(!this.preferMedia||typeof Audio==='undefined')return[];
   if(this.mediaPool.length)return this.mediaPool;
-  const url=this.mediaPrimeUrl||silentWavUrl();
-  if(!url)return[];
-  if(!this.mediaPrimeUrl)this.mediaPrimeUrl=url;
   for(let i=0;i<8;i++){
-   const el=new Audio(url);
+   const el=new Audio(MEDIA_PRIME_URL);
    el.preload='auto';
-   el.loop=true;
-   el.volume=0.001;
+   el.loop=false;
+   el.volume=0.0001;
    el.setAttribute('playsinline','');
    this.mediaPool.push(el);
   }
@@ -146,17 +118,18 @@ class PokerAudio{
  async primeMediaPoolFromGesture(){
   const pool=this.ensureMediaPool();
   if(!pool.length)return false;
-  const starts=[];
-  let started=0;
-  for(const el of pool){
+  const starts=pool.map(el=>{
    try{
+    el.src=MEDIA_PRIME_URL;
+    el.loop=false;
+    el.volume=0.0001;
+    el.currentTime=0;
     const p=el.play();
-    started++;
-    if(p&&typeof p.then==='function')starts.push(p.catch(()=>null));
-   }catch{}
-  }
-  if(starts.length)await Promise.allSettled(starts);
-  this.mediaPoolReady=started>0;
+    return p&&typeof p.then==='function'?p.then(()=>true).catch(()=>false):Promise.resolve(true);
+   }catch{return Promise.resolve(false)}
+  });
+  const results=await Promise.all(starts);
+  this.mediaPoolReady=results.some(Boolean);
   return this.mediaPoolReady;
  }
  nextMediaChannel(){
@@ -181,16 +154,15 @@ class PokerAudio{
  async unlockFromGesture(){
   setPlaybackAudioSession();
   if(this.preferMedia){
-   const prime=this.ensureMediaPrime();
    try{
-    const primePlay=prime?.paused?prime.play():null;
-    const poolPromise=this.primeMediaPoolFromGesture();
-    if(primePlay&&typeof primePlay.then==='function')await primePlay;
-    await poolPromise;
-    this.unlocked=true;
-    this.preloadMedia();
-    this.flushPending();
-    return true;
+    const ready=await this.primeMediaPoolFromGesture();
+    if(ready){
+     this.unlocked=true;
+     this.preloadMedia();
+     this.flushPending();
+     return true;
+    }
+    this.unlocked=false;
    }catch{
     this.unlocked=false;
    }
@@ -228,9 +200,6 @@ class PokerAudio{
  }
  resume(){
   setPlaybackAudioSession();
-  if(this.preferMedia&&this.mediaPrime?.paused){
-   this.mediaPrime.play().then(()=>this.flushPending()).catch(()=>{});
-  }
   const ctx=this.context;
   if(!this.unlocked||!ctx||ctx.state!=='suspended')return;
   ctx.resume().then(()=>{

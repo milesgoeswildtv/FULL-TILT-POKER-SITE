@@ -43,6 +43,35 @@ function audioSupport(){
  };
 }
 const SUPPORT=audioSupport();
+const IS_APPLE_TOUCH=typeof navigator!=='undefined'&&(
+ /iPhone|iPad|iPod/i.test(navigator.userAgent||'')||
+ ((navigator.platform==='MacIntel'||/Macintosh/i.test(navigator.userAgent||''))&&Number(navigator.maxTouchPoints||0)>1)
+);
+
+function setPlaybackAudioSession(){
+ try{
+  if(navigator?.audioSession&&'type'in navigator.audioSession)navigator.audioSession.type='playback';
+ }catch{}
+}
+
+function silentWavUrl(){
+ if(typeof Blob==='undefined'||typeof URL==='undefined')return'';
+ const sampleRate=8000,samples=sampleRate,bytes=44+samples*2,buffer=new ArrayBuffer(bytes),view=new DataView(buffer);
+ const write=(offset,text)=>{for(let i=0;i<text.length;i++)view.setUint8(offset+i,text.charCodeAt(i))};
+ write(0,'RIFF');view.setUint32(4,bytes-8,true);write(8,'WAVE');write(12,'fmt ');
+ view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sampleRate,true);
+ view.setUint32(28,sampleRate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);write(36,'data');view.setUint32(40,samples*2,true);
+ return URL.createObjectURL(new Blob([buffer],{type:'audio/wav'}));
+}
+
+function mediaUrlsFor(base){
+ const urls=[];
+ if(SUPPORT.mp3)urls.push(`${ROOT}${base}.mp3`);
+ if(!MP3_ONLY.has(base)&&SUPPORT.ogg)urls.push(`${ROOT}${base}.ogg`);
+ if(!urls.some(x=>x.endsWith('.mp3')))urls.push(`${ROOT}${base}.mp3`);
+ if(!MP3_ONLY.has(base)&&!urls.some(x=>x.endsWith('.ogg')))urls.push(`${ROOT}${base}.ogg`);
+ return urls;
+}
 
 function urlsFor(base){
  const urls=[];
@@ -61,6 +90,10 @@ class PokerAudio{
   this.loading=new Map();
   this.lastPick=new Map();
   this.pending=[];
+  this.mediaPreloads=new Map();
+  this.mediaPrime=null;
+  this.mediaPrimeUrl='';
+  this.preferMedia=IS_APPLE_TOUCH;
   this.unlocked=false;
   this.unlocking=null;
   this.muted=storageGet('crashout_sfx_muted','0')==='1';
@@ -81,7 +114,47 @@ class PokerAudio{
    return ctx;
   }catch{return null}
  }
+ ensureMediaPrime(){
+  if(!this.preferMedia||typeof Audio==='undefined')return null;
+  if(this.mediaPrime)return this.mediaPrime;
+  const url=silentWavUrl();
+  if(!url)return null;
+  const el=new Audio(url);
+  el.loop=true;
+  el.preload='auto';
+  el.volume=0.001;
+  el.setAttribute('playsinline','');
+  this.mediaPrime=el;
+  this.mediaPrimeUrl=url;
+  return el;
+ }
+ preloadMedia(){
+  if(typeof Audio==='undefined')return;
+  for(const base of PRELOAD){
+   if(this.mediaPreloads.has(base))continue;
+   const url=mediaUrlsFor(base)[0];
+   if(!url)continue;
+   const el=new Audio(url);
+   el.preload='auto';
+   el.setAttribute('playsinline','');
+   this.mediaPreloads.set(base,el);
+   try{el.load()}catch{}
+  }
+ }
  async unlockFromGesture(){
+  setPlaybackAudioSession();
+  if(this.preferMedia){
+   const prime=this.ensureMediaPrime();
+   try{
+    if(prime?.paused)await prime.play();
+    this.unlocked=true;
+    this.preloadMedia();
+    this.flushPending();
+    return true;
+   }catch{
+    this.unlocked=false;
+   }
+  }
   if(this.unlocked&&(!this.context||this.context.state==='running')){
    this.flushPending();
    return true;
@@ -114,6 +187,10 @@ class PokerAudio{
   return this.unlocking;
  }
  resume(){
+  setPlaybackAudioSession();
+  if(this.preferMedia&&this.mediaPrime?.paused){
+   this.mediaPrime.play().then(()=>this.flushPending()).catch(()=>{});
+  }
   const ctx=this.context;
   if(!this.unlocked||!ctx||ctx.state!=='suspended')return;
   ctx.resume().then(()=>{
@@ -199,6 +276,10 @@ class PokerAudio{
  }
  async playBase(base,{volume=1,delay=0}={}){
   if(this.muted)return;
+  if(this.preferMedia){
+   this.playHtml(base,volume,delay);
+   return;
+  }
   const ctx=this.context;
   if(!ctx){
    this.playHtml(base,volume,delay);
@@ -222,7 +303,7 @@ class PokerAudio{
  }
  playHtml(base,volume=1,delay=0){
   if(typeof Audio==='undefined'||this.muted)return;
-  const urls=urlsFor(base);
+  const urls=this.preferMedia?mediaUrlsFor(base):urlsFor(base);
   const attempt=index=>{
    if(index>=urls.length)return;
    const el=new Audio(urls[index]);

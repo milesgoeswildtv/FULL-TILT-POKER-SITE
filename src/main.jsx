@@ -4,9 +4,12 @@ import App from'./App.jsx';
 import TournamentConfig from'./TournamentConfig.jsx';
 import{installSessionRouting}from'./session.js';
 import{bootstrapPlatform}from'./platform.js';
+import{installPokerAudioUnlock}from'./poker-audio.js';
 import'./tournament-config.css';
 import'./global-royal-grade.css';
 import'./telegram.css';
+
+installPokerAudioUnlock();
 
 const root=createRoot(document.getElementById('root'));
 

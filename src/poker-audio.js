@@ -42,6 +42,7 @@ const IS_APPLE_TOUCH=typeof navigator!=='undefined'&&(
  /iPhone|iPad|iPod/i.test(navigator.userAgent||'')||
  ((navigator.platform==='MacIntel'||/Macintosh/i.test(navigator.userAgent||''))&&Number(navigator.maxTouchPoints||0)>1)
 );
+const IS_TELEGRAM_WEBVIEW=typeof window!=='undefined'&&!!window.Telegram?.WebApp;
 
 function setPlaybackAudioSession(){
  try{
@@ -88,7 +89,10 @@ class PokerAudio{
   this.mediaPreloads=new Map();
   this.mediaPrime=null;
   this.mediaPrimeUrl='';
-  this.preferMedia=IS_APPLE_TOUCH;
+  this.mediaPool=[];
+  this.mediaPoolIndex=0;
+  this.mediaPoolReady=false;
+  this.preferMedia=IS_APPLE_TOUCH||IS_TELEGRAM_WEBVIEW;
   this.unlocked=false;
   this.unlocking=null;
   this.muted=storageGet('crashout_sfx_muted','0')==='1';
@@ -123,6 +127,44 @@ class PokerAudio{
   this.mediaPrimeUrl=url;
   return el;
  }
+ ensureMediaPool(){
+  if(!this.preferMedia||typeof Audio==='undefined')return[];
+  if(this.mediaPool.length)return this.mediaPool;
+  const url=this.mediaPrimeUrl||silentWavUrl();
+  if(!url)return[];
+  if(!this.mediaPrimeUrl)this.mediaPrimeUrl=url;
+  for(let i=0;i<8;i++){
+   const el=new Audio(url);
+   el.preload='auto';
+   el.loop=true;
+   el.volume=0.001;
+   el.setAttribute('playsinline','');
+   this.mediaPool.push(el);
+  }
+  return this.mediaPool;
+ }
+ async primeMediaPoolFromGesture(){
+  const pool=this.ensureMediaPool();
+  if(!pool.length)return false;
+  const starts=[];
+  let started=0;
+  for(const el of pool){
+   try{
+    const p=el.play();
+    started++;
+    if(p&&typeof p.then==='function')starts.push(p.catch(()=>null));
+   }catch{}
+  }
+  if(starts.length)await Promise.allSettled(starts);
+  this.mediaPoolReady=started>0;
+  return this.mediaPoolReady;
+ }
+ nextMediaChannel(){
+  if(!this.mediaPoolReady||!this.mediaPool.length)return null;
+  const el=this.mediaPool[this.mediaPoolIndex%this.mediaPool.length];
+  this.mediaPoolIndex=(this.mediaPoolIndex+1)%this.mediaPool.length;
+  return el;
+ }
  preloadMedia(){
   if(typeof Audio==='undefined')return;
   for(const base of PRELOAD){
@@ -141,7 +183,10 @@ class PokerAudio{
   if(this.preferMedia){
    const prime=this.ensureMediaPrime();
    try{
-    if(prime?.paused)await prime.play();
+    const primePlay=prime?.paused?prime.play():null;
+    const poolPromise=this.primeMediaPoolFromGesture();
+    if(primePlay&&typeof primePlay.then==='function')await primePlay;
+    await poolPromise;
     this.unlocked=true;
     this.preloadMedia();
     this.flushPending();
@@ -299,13 +344,23 @@ class PokerAudio{
  playHtml(base,volume=1,delay=0){
   if(typeof Audio==='undefined'||this.muted)return;
   const urls=this.preferMedia?mediaUrlsFor(base):urlsFor(base);
-  const attempt=index=>{
+  const pooled=this.preferMedia?this.nextMediaChannel():null;
+  const attempt=(index,el=pooled)=>{
    if(index>=urls.length)return;
-   const el=new Audio(urls[index]);
-   el.preload='auto';
-   el.volume=clamp(this.volume*volume,0,1);
-   el.addEventListener('error',()=>attempt(index+1),{once:true});
-   const go=()=>el.play().catch(()=>attempt(index+1));
+   const channel=el||new Audio();
+   try{channel.pause()}catch{}
+   channel.loop=false;
+   channel.preload='auto';
+   channel.src=urls[index];
+   channel.volume=clamp(this.volume*volume,0,1);
+   channel.setAttribute?.('playsinline','');
+   const go=()=>{
+    try{channel.currentTime=0}catch{}
+    channel.play().catch(()=>{
+     if(index+1<urls.length)attempt(index+1,channel);
+     else if(this.preferMedia)this.mediaPoolReady=false;
+    });
+   };
    if(delay>0)setTimeout(go,delay);else go();
   };
   attempt(0);
@@ -337,6 +392,11 @@ export function installPokerAudioUnlock(){
  document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible')pokerAudio.resume();
  });
+ const tg=window.Telegram?.WebApp;
+ try{
+  tg?.onEvent?.('activated',()=>pokerAudio.resume());
+  tg?.onEvent?.('deactivated',()=>{});
+ }catch{}
 }
 
 function mapAction(entry){

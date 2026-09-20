@@ -1,0 +1,25 @@
+.ftp3ThrowTarget{position:absolute;inset:0;z-index:4;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:12px;background:transparent;cursor:pointer;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.ftp3ThrowTarget:focus-visible{outline:2px solid #efc664;outline-offset:3px}
+.ftp3SeatKick{z-index:8!important}
+@media(hover:hover) and (pointer:fine){.ftp3ThrowTarget:hover{box-shadow:0 0 0 2px rgba(239,198,100,.55),0 0 18px rgba(143,43,255,.42)}}
+
+.throwablePicker{position:absolute;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:145;width:min(calc(100% - 16px),430px);padding:10px;border:1px solid rgba(239,198,100,.48);border-radius:16px;background:linear-gradient(180deg,rgba(25,15,32,.985),rgba(10,7,14,.99));box-shadow:0 18px 48px rgba(0,0,0,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.throwablePicker header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 8px}
+.throwablePicker header>div{min-width:0;display:flex;align-items:baseline;gap:7px}.throwablePicker header small{color:#9e90a5;font-size:8px;font-weight:900;letter-spacing:.14em}.throwablePicker header strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f1cf78;font-size:13px}
+.throwableClose{flex:0 0 38px;width:38px;height:38px;padding:0;border:1px solid #51375d;border-radius:10px;background:#15101a;color:#eee3f1;font-size:24px;line-height:1;cursor:pointer}
+.throwableGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.throwableGrid>button{min-width:0;min-height:62px;padding:5px 2px;border:1px solid rgba(133,91,151,.48);border-radius:11px;background:linear-gradient(180deg,#211529,#120d17);color:#d9cddb;display:grid;place-items:center;align-content:center;gap:3px;cursor:pointer;touch-action:manipulation}
+.throwableGrid>button:active,.throwableGrid>button.sending{transform:scale(.96);border-color:#c79b50}.throwableGrid>button:disabled{cursor:default}.throwableGrid>button span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:7px;font-weight:900;letter-spacing:.02em}
+.throwablePickerArt{display:block;font-size:30px;line-height:1}.throwablePicker img.throwablePickerArt{width:34px;height:34px;object-fit:contain}
+
+.throwableFxLayer{position:absolute;inset:0;z-index:138;overflow:hidden;pointer-events:none}
+.throwableProjectile,.throwableImpact{position:absolute;display:block;width:max-content;height:max-content;line-height:1;transform:translate(-50%,-50%);filter:drop-shadow(0 7px 8px rgba(0,0,0,.66));will-change:transform,opacity}
+.throwableProjectile{z-index:1;font-size:clamp(34px,9vw,58px)}.throwableImpact{z-index:2;font-size:clamp(46px,13vw,82px)}
+.throwableProjectile img,.throwableImpact img{display:block;width:1.15em;height:1.15em;object-fit:contain}
+.throwableImpact.effect-splat{filter:drop-shadow(0 8px 8px rgba(0,0,0,.72)) saturate(1.2)}
+.throwableImpact.effect-crack{filter:drop-shadow(0 5px 7px rgba(0,0,0,.68)) contrast(1.08)}
+.throwableImpact.effect-burst{filter:drop-shadow(0 0 12px rgba(239,198,100,.42)) drop-shadow(0 7px 8px rgba(0,0,0,.66))}
+.throwableImpact.effect-smack{filter:drop-shadow(5px 6px 5px rgba(0,0,0,.68))}
+
+@media(max-width:360px){.throwablePicker{padding:8px}.throwableGrid{gap:5px}.throwableGrid>button{min-height:56px}.throwablePickerArt{font-size:27px}}
+@media(prefers-reduced-motion:reduce){.throwableGrid>button:active,.throwableGrid>button.sending{transform:none}}

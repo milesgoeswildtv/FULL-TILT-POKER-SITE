@@ -13,7 +13,7 @@ async function read(response){const body=await response.json().catch(()=>({}));r
 function forward(stub,path,req,body){return stub.fetch(new Request(`https://tournament${path}`,{method:req.method,headers:req.headers,body:req.method==='GET'?undefined:body,duplex:body?'half':undefined}))}
 async function sessionFor(stub,token){const{response,body}=await read(await stub.fetch(new Request(`https://tournament/session?token=${encodeURIComponent(token||'')}`)));if(!response.ok)throw Object.assign(Error(body.error||'Invalid tournament session.'),{status:response.status});return body}
 async function requestBody(req){if(req.method==='GET'||req.method==='HEAD')return{raw:undefined,json:{}};const raw=await req.clone().text();let parsed={};if(raw)try{parsed=JSON.parse(raw)}catch{throw Object.assign(Error('Invalid JSON body.'),{status:400})}return{raw,json:parsed}}
-function tableProxyMethod(route){if(route==='action'||route==='chat')return'POST';if(route==='ws'||route==='')return'GET';return null}
+function tableProxyMethod(route){if(route==='action'||route==='chat'||route==='throwable')return'POST';if(route==='ws'||route==='')return'GET';return null}
 function childRequest(req,{path,token,parsed}){
  const target=new URL(`https://table/${path}`),headers=new Headers(req.headers);headers.delete('content-length');
  if(req.method==='GET'){for(const[key,value]of new URL(req.url).searchParams)if(key!=='token')target.searchParams.append(key,value);target.searchParams.set('token',token);return new Request(target,{method:'GET',headers})}
@@ -32,7 +32,7 @@ export async function handleTournamentApi(req,env){
   }
   return json({error:'Could not allocate a unique tournament code. Try again.'},503);
  }
- const match=u.pathname.match(/^\/api\/tournaments\/([A-Z0-9]{6})(?:\/(join|session|recover|start|pause|resume|end|chat|table)(?:\/(action|ws|chat))?)?$/);if(!match)return null;
+ const match=u.pathname.match(/^\/api\/tournaments\/([A-Z0-9]{6})(?:\/(join|session|recover|start|pause|resume|end|chat|table)(?:\/(action|ws|chat|throwable))?)?$/);if(!match)return null;
  const tournamentCode=match[1],route=match[2]||'state',tableRoute=match[3]||'',stub=coordinator(env,tournamentCode);
  if(route==='state'&&req.method==='GET')return stub.fetch(new Request('https://tournament/state'));
  if(route==='join'&&req.method==='POST'){const{raw}=await requestBody(req);return forward(stub,'/join',req,raw)}

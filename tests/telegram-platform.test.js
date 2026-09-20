@@ -11,9 +11,9 @@ test('Telegram startapp routes only supported six-character Crashout targets',()
 });
 
 test('Telegram chrome treats table and tournament hashes as protected game routes',()=>{
- assert.deepEqual(telegramRouteState(''),{game:false,lobby:true,showBack:false,showSettings:true,confirmClose:false});
- assert.deepEqual(telegramRouteState('#/table/ABC123'),{game:true,lobby:false,showBack:true,showSettings:false,confirmClose:true});
- assert.deepEqual(telegramRouteState('#/tournament/FT7K2Q?token=x'),{game:true,lobby:false,showBack:true,showSettings:false,confirmClose:true});
+ assert.deepEqual(telegramRouteState(''),{game:false,lobby:true,showBack:false,confirmClose:false});
+ assert.deepEqual(telegramRouteState('#/table/ABC123'),{game:true,lobby:false,showBack:true,confirmClose:true});
+ assert.deepEqual(telegramRouteState('#/tournament/FT7K2Q?token=x'),{game:true,lobby:false,showBack:true,confirmClose:true});
  assert.equal(telegramRouteState('#/layout-lab').game,false);
 });
 

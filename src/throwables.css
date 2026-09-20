@@ -1,7 +1,7 @@
-.ftp3ThrowTarget{position:absolute;inset:0;z-index:7;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:12px;background:transparent;cursor:pointer;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.ftp3ThrowTarget:focus-visible{outline:2px solid #efc664;outline-offset:3px}
-.ftp3SeatKick{z-index:9!important}
-@media(hover:hover) and (pointer:fine){.ftp3ThrowTarget:hover{box-shadow:0 0 0 2px rgba(239,198,100,.55),0 0 18px rgba(143,43,255,.42)}}
+.ftp3SeatPlaque.throwableTarget{pointer-events:auto;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.ftp3SeatPlaque.throwableTarget:focus-visible{outline:2px solid #efc664;outline-offset:3px}
+.ftp3SeatKick{z-index:9!important;pointer-events:auto}
+@media(hover:hover) and (pointer:fine){.ftp3SeatPlaque.throwableTarget:hover{filter:brightness(1.08);box-shadow:0 0 0 2px rgba(239,198,100,.55),0 0 18px rgba(143,43,255,.42),0 8px 18px #0009}}
 
 .throwablePicker{position:absolute;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:145;width:min(calc(100% - 16px),430px);padding:10px;border:1px solid rgba(239,198,100,.48);border-radius:16px;background:linear-gradient(180deg,rgba(25,15,32,.985),rgba(10,7,14,.99));box-shadow:0 18px 48px rgba(0,0,0,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .throwablePicker header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 8px}

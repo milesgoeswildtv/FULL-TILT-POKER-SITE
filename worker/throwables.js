@@ -4,9 +4,9 @@ export const THROWABLE_COOLDOWN_MS=900;
 
 function fail(message,status){throw Object.assign(Error(message),{status})}
 
-export function createThrowableEvent({sender,players=[],started=false,street='',targetId,throwableId,lastThrownAt=0,now=Date.now(),eventId}={}){
+export function createThrowableEvent({sender,players=[],street='',targetId,throwableId,lastThrownAt=0,now=Date.now(),eventId}={}){
  if(!sender||sender.testBot)fail('Player session required.',403);
- if(!started||street==='finished')fail('Throwables are only available during a live game.',409);
+ if(street==='finished')fail('Throwables are not available after the game closes.',409);
  const id=normalizeThrowableId(throwableId);if(!id)fail('Unknown throwable.',400);
  const target=players.find(player=>player.id===String(targetId||''));if(!target)fail('Target player not found.',404);
  if(target.id===sender.id)fail('Choose another player.',400);

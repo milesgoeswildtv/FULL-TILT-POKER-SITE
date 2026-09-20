@@ -304,7 +304,7 @@
 
   /* The complete player plaque is anchored below the table instead of overlapping the felt. */
   .pregameTablePage .ftp3Hero{
-    top:calc(var(--pg-table-top) + var(--pg-table-height) + 2px)!important;
+    top:calc(var(--pg-table-top) + var(--pg-table-height) - 4px)!important;
     bottom:auto!important;
     width:min(38vw,194px)!important;
   }

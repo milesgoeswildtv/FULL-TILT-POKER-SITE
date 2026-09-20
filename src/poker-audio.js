@@ -52,8 +52,109 @@ class PokerAudio{
   this.unlocked=false;
   this.unlocking=null;
   this.fallback=null;
+  this.telegramMedia=null;
+  this.telegramQueue=[];
+  this.telegramBusy=false;
+  this.telegramPrimed=false;
   this.muted=storageGet('crashout_sfx_muted','0')==='1';
   this.volume=clamp(Number(storageGet('crashout_sfx_volume','0.82'))||0.82,0,1);
+ }
+ ensureTelegramMedia(){
+  if(!IS_TELEGRAM||typeof Audio==='undefined')return null;
+  if(this.telegramMedia)return this.telegramMedia;
+  const el=new Audio();
+  el.preload='metadata';
+  el.setAttribute('playsinline','');
+  el.crossOrigin='anonymous';
+  el.addEventListener('ended',()=>{
+   this.telegramBusy=false;
+   this.drainTelegramQueue();
+  });
+  el.addEventListener('error',()=>{
+   this.telegramBusy=false;
+   this.drainTelegramQueue(true);
+  });
+  this.telegramMedia=el;
+  return el;
+ }
+ async primeTelegramFromGesture(){
+  const el=this.ensureTelegramMedia();
+  if(!el)return false;
+  try{
+   el.src=`${ROOT}table/check_tap_01.ogg`;
+   el.volume=0.0001;
+   el.currentTime=0;
+   await el.play();
+   el.pause();
+   try{el.currentTime=0}catch{}
+   this.telegramPrimed=true;
+   return true;
+  }catch{
+   try{
+    el.src=`${ROOT}table/check_tap_01.mp3`;
+    el.volume=0.0001;
+    el.currentTime=0;
+    await el.play();
+    el.pause();
+    try{el.currentTime=0}catch{}
+    this.telegramPrimed=true;
+    return true;
+   }catch{
+    this.telegramPrimed=false;
+    return false;
+   }
+  }
+ }
+ enqueueTelegram(base,volume=1,delay=0){
+  const now=Date.now();
+  this.telegramQueue.push({base,volume,delay,queuedAt:now,formatIndex:0});
+  if(this.telegramQueue.length>6)this.telegramQueue=this.telegramQueue.slice(-6);
+  this.drainTelegramQueue();
+ }
+ drainTelegramQueue(retryCurrent=false){
+  if(!IS_TELEGRAM||this.muted||!this.telegramPrimed||this.telegramBusy)return;
+  const el=this.ensureTelegramMedia();
+  if(!el)return;
+  const item=this.telegramQueue.shift();
+  if(!item)return;
+
+  const urls=formatUrls(item.base);
+  const playAt=index=>{
+   if(index>=urls.length){
+    this.telegramBusy=false;
+    this.drainTelegramQueue();
+    return;
+   }
+   const age=Date.now()-item.queuedAt;
+   if(age>1800){
+    this.telegramBusy=false;
+    this.drainTelegramQueue();
+    return;
+   }
+   this.telegramBusy=true;
+   try{
+    el.pause();
+    el.src=urls[index];
+    el.preload='auto';
+    el.volume=clamp(this.volume*item.volume,0,1);
+    const go=()=>{
+     try{el.currentTime=0}catch{}
+     const p=el.play();
+     if(p&&typeof p.catch==='function'){
+      p.catch(()=>{
+       this.telegramBusy=false;
+       playAt(index+1);
+      });
+     }
+    };
+    const remaining=Math.max(0,(Number(item.delay)||0)-age);
+    if(remaining>0)setTimeout(go,remaining);else go();
+   }catch{
+    this.telegramBusy=false;
+    playAt(index+1);
+   }
+  };
+  playAt(retryCurrent?1:0);
  }
  createContext(){
   if(this.context)return this.context;
@@ -73,6 +174,17 @@ class PokerAudio{
  }
  async unlockFromGesture(){
   setPlaybackAudioSession();
+  if(IS_TELEGRAM){
+   if(this.telegramPrimed){
+    this.unlocked=true;
+    this.drainTelegramQueue();
+    return true;
+   }
+   const ok=await this.primeTelegramFromGesture();
+   this.unlocked=ok;
+   if(ok)this.drainTelegramQueue();
+   return ok;
+  }
   if(this.unlocked){
    this.resume();
    this.flushPending();
@@ -106,6 +218,10 @@ class PokerAudio{
  }
  resume(){
   setPlaybackAudioSession();
+  if(IS_TELEGRAM){
+   if(this.telegramPrimed)this.drainTelegramQueue();
+   return;
+  }
   const ctx=this.context;
   if(!this.unlocked||!ctx||ctx.state!=='suspended')return;
   ctx.resume().then(()=>this.flushPending()).catch(()=>{});
@@ -167,15 +283,27 @@ class PokerAudio{
   for(const item of items){
    const age=now-item.queuedAt;
    if(age>MAX_PENDING_AGE_MS)continue;
-   this.playBase(item.base,{
-    volume:item.volume,
-    delay:Math.max(0,(Number(item.delay)||0)-age)
-   });
+   if(IS_TELEGRAM){
+    this.enqueueTelegram(item.base,item.volume,Math.max(0,(Number(item.delay)||0)-age));
+   }else{
+    this.playBase(item.base,{
+     volume:item.volume,
+     delay:Math.max(0,(Number(item.delay)||0)-age)
+    });
+   }
   }
  }
  play(group,{volume=1,delay=0}={}){
   const base=this.pick(group);
   if(!base||this.muted)return;
+  if(IS_TELEGRAM){
+   if(!this.unlocked||!this.telegramPrimed){
+    this.queue(base,volume,delay);
+    return;
+   }
+   this.enqueueTelegram(base,volume,delay);
+   return;
+  }
   const ctx=this.context;
   if(!this.unlocked||(ctx&&ctx.state!=='running')){
    this.queue(base,volume,delay);
@@ -254,6 +382,9 @@ class PokerAudio{
   if(this.muted){
    for(const item of this.active){try{item.source.stop()}catch{}}
    this.active=[];
+   this.telegramQueue=[];
+   this.telegramBusy=false;
+   try{this.telegramMedia?.pause()}catch{}
   }else this.flushPending();
  }
  setVolume(value){

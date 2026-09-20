@@ -1,8 +1,6 @@
 import{useEffect,useRef}from'react';
 
 const ROOT='/assets/sfx/';
-const MP3_ONLY=new Set();
-
 const GROUPS={
  handStart:['table/hand_start'],
  deal:['cards/hole_cards_01','cards/hole_cards_02','cards/hole_cards_03'],
@@ -22,51 +20,24 @@ const GROUPS={
  bust:['results/player_bust']
 };
 
-const PRELOAD=[...new Set(Object.values(GROUPS).flat())];
-const MAX_PENDING_AGE_MS=1800;
-const MEDIA_PRIME_URL='/assets/sfx/table/check_tap_01.mp3';
+const IS_TELEGRAM=typeof window!=='undefined'&&!!window.Telegram?.WebApp;
+const MAX_PENDING_AGE_MS=1200;
+const MAX_ACTIVE_SOURCES=6;
 
 function storageGet(key,fallback){
  try{const value=localStorage.getItem(key);return value==null?fallback:value}catch{return fallback}
 }
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
-function audioSupport(){
- if(typeof document==='undefined')return{ogg:false,mp3:true};
- const el=document.createElement('audio');
- return{
-  ogg:!!el.canPlayType?.('audio/ogg; codecs="vorbis"'),
-  mp3:!!el.canPlayType?.('audio/mpeg')
- };
-}
-const SUPPORT=audioSupport();
-const IS_APPLE_TOUCH=typeof navigator!=='undefined'&&(
- /iPhone|iPad|iPod/i.test(navigator.userAgent||'')||
- ((navigator.platform==='MacIntel'||/Macintosh/i.test(navigator.userAgent||''))&&Number(navigator.maxTouchPoints||0)>1)
-);
-const IS_TELEGRAM_WEBVIEW=typeof window!=='undefined'&&!!window.Telegram?.WebApp;
-
 function setPlaybackAudioSession(){
  try{
   if(navigator?.audioSession&&'type'in navigator.audioSession)navigator.audioSession.type='playback';
  }catch{}
 }
-
-function mediaUrlsFor(base){
- const urls=[];
- if(!MP3_ONLY.has(base)&&SUPPORT.ogg)urls.push(`${ROOT}${base}.ogg`);
- if(SUPPORT.mp3)urls.push(`${ROOT}${base}.mp3`);
- if(!MP3_ONLY.has(base)&&!urls.some(x=>x.endsWith('.ogg')))urls.push(`${ROOT}${base}.ogg`);
- if(!urls.some(x=>x.endsWith('.mp3')))urls.push(`${ROOT}${base}.mp3`);
- return urls;
-}
-
-function urlsFor(base){
- const urls=[];
- if(!MP3_ONLY.has(base)&&SUPPORT.ogg)urls.push(`${ROOT}${base}.ogg`);
- if(SUPPORT.mp3)urls.push(`${ROOT}${base}.mp3`);
- if(!MP3_ONLY.has(base)&&!urls.some(x=>x.endsWith('.ogg')))urls.push(`${ROOT}${base}.ogg`);
- if(!urls.some(x=>x.endsWith('.mp3')))urls.push(`${ROOT}${base}.mp3`);
- return urls;
+function formatUrls(base){
+ return[
+  `${ROOT}${base}.ogg`,
+  `${ROOT}${base}.mp3`
+ ];
 }
 
 class PokerAudio{
@@ -77,13 +48,10 @@ class PokerAudio{
   this.loading=new Map();
   this.lastPick=new Map();
   this.pending=[];
-  this.mediaPreloads=new Map();
-  this.mediaPool=[];
-  this.mediaPoolIndex=0;
-  this.mediaPoolReady=false;
-  this.preferMedia=IS_APPLE_TOUCH||IS_TELEGRAM_WEBVIEW;
+  this.active=[];
   this.unlocked=false;
   this.unlocking=null;
+  this.fallback=null;
   this.muted=storageGet('crashout_sfx_muted','0')==='1';
   this.volume=clamp(Number(storageGet('crashout_sfx_volume','0.82'))||0.82,0,1);
  }
@@ -93,7 +61,8 @@ class PokerAudio{
   const Ctx=window.AudioContext||window.webkitAudioContext;
   if(!Ctx)return null;
   try{
-   const ctx=new Ctx();
+   setPlaybackAudioSession();
+   const ctx=new Ctx({latencyHint:'interactive'});
    const master=ctx.createGain();
    master.gain.value=this.muted?0:this.volume;
    master.connect(ctx.destination);
@@ -102,72 +71,10 @@ class PokerAudio{
    return ctx;
   }catch{return null}
  }
- ensureMediaPool(){
-  if(!this.preferMedia||typeof Audio==='undefined')return[];
-  if(this.mediaPool.length)return this.mediaPool;
-  for(let i=0;i<8;i++){
-   const el=new Audio(MEDIA_PRIME_URL);
-   el.preload='auto';
-   el.loop=false;
-   el.volume=0.0001;
-   el.setAttribute('playsinline','');
-   this.mediaPool.push(el);
-  }
-  return this.mediaPool;
- }
- async primeMediaPoolFromGesture(){
-  const pool=this.ensureMediaPool();
-  if(!pool.length)return false;
-  const starts=pool.map(el=>{
-   try{
-    el.src=MEDIA_PRIME_URL;
-    el.loop=false;
-    el.volume=0.0001;
-    el.currentTime=0;
-    const p=el.play();
-    return p&&typeof p.then==='function'?p.then(()=>true).catch(()=>false):Promise.resolve(true);
-   }catch{return Promise.resolve(false)}
-  });
-  const results=await Promise.all(starts);
-  this.mediaPoolReady=results.some(Boolean);
-  return this.mediaPoolReady;
- }
- nextMediaChannel(){
-  if(!this.mediaPoolReady||!this.mediaPool.length)return null;
-  const el=this.mediaPool[this.mediaPoolIndex%this.mediaPool.length];
-  this.mediaPoolIndex=(this.mediaPoolIndex+1)%this.mediaPool.length;
-  return el;
- }
- preloadMedia(){
-  if(typeof Audio==='undefined')return;
-  for(const base of PRELOAD){
-   if(this.mediaPreloads.has(base))continue;
-   const url=mediaUrlsFor(base)[0];
-   if(!url)continue;
-   const el=new Audio(url);
-   el.preload='auto';
-   el.setAttribute('playsinline','');
-   this.mediaPreloads.set(base,el);
-   try{el.load()}catch{}
-  }
- }
  async unlockFromGesture(){
   setPlaybackAudioSession();
-  if(this.preferMedia){
-   try{
-    const ready=await this.primeMediaPoolFromGesture();
-    if(ready){
-     this.unlocked=true;
-     this.preloadMedia();
-     this.flushPending();
-     return true;
-    }
-    this.unlocked=false;
-   }catch{
-    this.unlocked=false;
-   }
-  }
-  if(this.unlocked&&(!this.context||this.context.state==='running')){
+  if(this.unlocked){
+   this.resume();
    this.flushPending();
    return true;
   }
@@ -176,19 +83,18 @@ class PokerAudio{
    const ctx=this.createContext();
    if(!ctx){
     this.unlocked=true;
+    this.ensureFallback();
     this.flushPending();
     return true;
    }
    try{
     if(ctx.state!=='running')await ctx.resume();
     if(ctx.state!=='running')return false;
-    const silent=ctx.createBuffer(1,1,ctx.sampleRate);
     const source=ctx.createBufferSource();
-    source.buffer=silent;
+    source.buffer=ctx.createBuffer(1,1,ctx.sampleRate);
     source.connect(this.master);
-    source.start(0);
+    source.start();
     this.unlocked=true;
-    this.preload();
     this.flushPending();
     return true;
    }catch{
@@ -202,45 +108,38 @@ class PokerAudio{
   setPlaybackAudioSession();
   const ctx=this.context;
   if(!this.unlocked||!ctx||ctx.state!=='suspended')return;
-  ctx.resume().then(()=>{
-   if(ctx.state==='running')this.flushPending();
-  }).catch(()=>{});
+  ctx.resume().then(()=>this.flushPending()).catch(()=>{});
  }
- async decode(data){
+ async decode(arrayBuffer){
   const ctx=this.context;
   if(!ctx)return null;
-  if(typeof ctx.decodeAudioData!=='function')return null;
   try{
-   const copy=data.slice(0);
-   const decoded=ctx.decodeAudioData(copy);
-   if(decoded&&typeof decoded.then==='function')return await decoded;
-   return await new Promise((resolve,reject)=>ctx.decodeAudioData(copy,resolve,reject));
+   return await ctx.decodeAudioData(arrayBuffer.slice(0));
   }catch{return null}
  }
  async load(base){
   if(this.buffers.has(base))return this.buffers.get(base);
   if(this.loading.has(base))return this.loading.get(base);
-  if(!this.context)return null;
+  const ctx=this.context;
+  if(!ctx)return null;
+
   const promise=(async()=>{
-   for(const url of urlsFor(base)){
+   for(const url of formatUrls(base)){
     try{
      const response=await fetch(url,{cache:'force-cache'});
      if(!response.ok)continue;
-     const buffer=await this.decode(await response.arrayBuffer());
-     if(buffer){
-      this.buffers.set(base,buffer);
-      return buffer;
+     const decoded=await this.decode(await response.arrayBuffer());
+     if(decoded){
+      this.buffers.set(base,decoded);
+      return decoded;
      }
     }catch{}
    }
    return null;
   })().finally(()=>this.loading.delete(base));
+
   this.loading.set(base,promise);
   return promise;
- }
- preload(){
-  if(!this.unlocked||!this.context)return;
-  for(const base of PRELOAD)this.load(base).catch(()=>{});
  }
  pick(group){
   const choices=GROUPS[group]||[];
@@ -249,8 +148,8 @@ class PokerAudio{
   const previous=this.lastPick.get(group);
   let choice=choices[Math.floor(Math.random()*choices.length)];
   if(choice===previous){
-   const others=choices.filter(item=>item!==previous);
-   choice=others[Math.floor(Math.random()*others.length)];
+   const alternatives=choices.filter(item=>item!==previous);
+   choice=alternatives[Math.floor(Math.random()*alternatives.length)];
   }
   this.lastPick.set(group,choice);
   return choice;
@@ -259,7 +158,7 @@ class PokerAudio{
   const now=Date.now();
   this.pending=this.pending.filter(item=>now-item.queuedAt<=MAX_PENDING_AGE_MS);
   this.pending.push({base,volume,delay,queuedAt:now});
-  if(this.pending.length>10)this.pending=this.pending.slice(-10);
+  if(this.pending.length>8)this.pending=this.pending.slice(-8);
  }
  flushPending(){
   if(!this.unlocked||this.muted)return;
@@ -277,60 +176,74 @@ class PokerAudio{
  play(group,{volume=1,delay=0}={}){
   const base=this.pick(group);
   if(!base||this.muted)return;
-  if(!this.unlocked||(this.context&&this.context.state!=='running')){
+  const ctx=this.context;
+  if(!this.unlocked||(ctx&&ctx.state!=='running')){
    this.queue(base,volume,delay);
    return;
   }
   this.playBase(base,{volume,delay});
  }
+ trimActive(){
+  this.active=this.active.filter(item=>!item.ended);
+  while(this.active.length>=MAX_ACTIVE_SOURCES){
+   const oldest=this.active.shift();
+   try{oldest?.source?.stop()}catch{}
+  }
+ }
  async playBase(base,{volume=1,delay=0}={}){
   if(this.muted)return;
-  if(this.preferMedia){
-   this.playHtml(base,volume,delay);
-   return;
-  }
   const ctx=this.context;
   if(!ctx){
-   this.playHtml(base,volume,delay);
+   this.playFallback(base,volume,delay);
    return;
   }
   if(ctx.state!=='running'){
    this.queue(base,volume,delay);
    return;
   }
+
   const buffer=await this.load(base);
   if(!buffer||this.muted||ctx.state!=='running')return;
+
   try{
+   this.trimActive();
    const source=ctx.createBufferSource();
    const gain=ctx.createGain();
+   const entry={source,ended:false};
    source.buffer=buffer;
-   gain.gain.value=clamp(Number(volume)||0,0,1.5);
+   gain.gain.value=clamp(Number(volume)||0,0,1.25);
    source.connect(gain);
    gain.connect(this.master);
+   source.onended=()=>{
+    entry.ended=true;
+    try{source.disconnect();gain.disconnect()}catch{}
+   };
+   this.active.push(entry);
    source.start(ctx.currentTime+Math.max(0,Number(delay)||0)/1000);
   }catch{}
  }
- playHtml(base,volume=1,delay=0){
-  if(typeof Audio==='undefined'||this.muted)return;
-  const urls=this.preferMedia?mediaUrlsFor(base):urlsFor(base);
-  const pooled=this.preferMedia?this.nextMediaChannel():null;
-  const attempt=(index,el=pooled)=>{
+ ensureFallback(){
+  if(this.fallback||typeof Audio==='undefined')return this.fallback;
+  const el=new Audio();
+  el.preload='none';
+  el.setAttribute('playsinline','');
+  this.fallback=el;
+  return el;
+ }
+ playFallback(base,volume=1,delay=0){
+  const el=this.ensureFallback();
+  if(!el||this.muted)return;
+  const urls=formatUrls(base);
+  const attempt=index=>{
    if(index>=urls.length)return;
-   const channel=el||new Audio();
-   try{channel.pause()}catch{}
-   channel.loop=false;
-   channel.preload='auto';
-   channel.src=urls[index];
-   channel.volume=clamp(this.volume*volume,0,1);
-   channel.setAttribute?.('playsinline','');
-   const go=()=>{
-    try{channel.currentTime=0}catch{}
-    channel.play().catch(()=>{
-     if(index+1<urls.length)attempt(index+1,channel);
-     else if(this.preferMedia)this.mediaPoolReady=false;
-    });
-   };
-   if(delay>0)setTimeout(go,delay);else go();
+   try{
+    el.pause();
+    el.src=urls[index];
+    el.volume=clamp(this.volume*volume,0,1);
+    el.currentTime=0;
+    const go=()=>el.play().catch(()=>attempt(index+1));
+    if(delay>0)setTimeout(go,delay);else go();
+   }catch{attempt(index+1)}
   };
   attempt(0);
  }
@@ -338,7 +251,10 @@ class PokerAudio{
   this.muted=!!value;
   try{localStorage.setItem('crashout_sfx_muted',this.muted?'1':'0')}catch{}
   if(this.master)this.master.gain.value=this.muted?0:this.volume;
-  if(!this.muted)this.flushPending();
+  if(this.muted){
+   for(const item of this.active){try{item.source.stop()}catch{}}
+   this.active=[];
+  }else this.flushPending();
  }
  setVolume(value){
   this.volume=clamp(Number(value)||0,0,1);
@@ -353,36 +269,39 @@ let unlockInstalled=false;
 export function installPokerAudioUnlock(){
  if(unlockInstalled||typeof window==='undefined'||typeof document==='undefined')return;
  unlockInstalled=true;
+
  const activate=()=>{pokerAudio.unlockFromGesture().catch(()=>{})};
  window.addEventListener('pointerdown',activate,{capture:true,passive:true});
  window.addEventListener('touchend',activate,{capture:true,passive:true});
  window.addEventListener('click',activate,{capture:true,passive:true});
  window.addEventListener('keydown',activate,{capture:true});
+
  document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible')pokerAudio.resume();
  });
- const tg=window.Telegram?.WebApp;
- try{
-  tg?.onEvent?.('activated',()=>pokerAudio.resume());
-  tg?.onEvent?.('deactivated',()=>{});
- }catch{}
+
+ if(IS_TELEGRAM){
+  try{window.Telegram?.WebApp?.onEvent?.('activated',()=>pokerAudio.resume())}catch{}
+ }
 }
 
 function mapAction(entry){
  const type=String(entry?.type||'').toLowerCase();
  const text=String(entry?.text||'').toLowerCase();
- if(type==='hand')return[{group:'handStart',volume:.78,delay:0},{group:'deal',volume:.94,delay:110}];
- if(type==='fold'||type==='muck')return[{group:'fold',volume:.92,delay:0}];
- if(type==='check')return[{group:'check',volume:.86,delay:0}];
- if(type==='call')return[{group:'call',volume:.92,delay:0}];
- if(type==='raise')return[{group:'raise',volume:.96,delay:0}];
- if(type==='allin')return[{group:'allin',volume:1,delay:0}];
- if(type==='showhand')return[{group:'show',volume:.9,delay:0}];
+
+ if(type==='hand')return[{group:'handStart',volume:.74,delay:0},{group:'deal',volume:.88,delay:140}];
+ if(type==='fold'||type==='muck')return[{group:'fold',volume:.86,delay:0}];
+ if(type==='check')return[{group:'check',volume:.76,delay:0}];
+ if(type==='call')return[{group:'call',volume:.84,delay:0}];
+ if(type==='raise')return[{group:'raise',volume:.88,delay:0}];
+ if(type==='allin')return[{group:'allin',volume:.92,delay:0}];
+ if(type==='showhand')return[{group:'show',volume:.82,delay:0}];
+
  if(type==='timeout'){
-  if(text.includes('fold'))return[{group:'fold',volume:.86,delay:0}];
-  if(text.includes('check'))return[{group:'check',volume:.8,delay:0}];
+  if(text.includes('fold'))return[{group:'fold',volume:.8,delay:0}];
+  if(text.includes('check'))return[{group:'check',volume:.72,delay:0}];
  }
- if(type==='sitout'&&text.includes('fold'))return[{group:'fold',volume:.82,delay:0}];
+ if(type==='sitout'&&text.includes('fold'))return[{group:'fold',volume:.78,delay:0}];
  return[];
 }
 
@@ -402,9 +321,11 @@ function boardEvents(previousLength,nextLength,startDelay=0){
  const from=Math.max(0,Number(previousLength)||0);
  const to=Math.max(0,Number(nextLength)||0);
  let delay=startDelay;
- if(from<3&&to>=3){events.push({group:'flop',volume:.98,delay});delay+=230}
- if(from<4&&to>=4){events.push({group:'turn',volume:.96,delay});delay+=190}
- if(from<5&&to>=5){events.push({group:'river',volume:.98,delay});delay+=230}
+
+ if(from<3&&to>=3){events.push({group:'flop',volume:.9,delay});delay+=240}
+ if(from<4&&to>=4){events.push({group:'turn',volume:.86,delay});delay+=200}
+ if(from<5&&to>=5){events.push({group:'river',volume:.88,delay});delay+=220}
+
  return{events,endDelay:delay};
 }
 
@@ -449,7 +370,7 @@ export function usePokerTableSfx(tableKey,state){
    for(const event of mapAction(entry)){
     events.push({...event,delay:(event.delay||0)+actionDelay});
    }
-   actionDelay+=95;
+   actionDelay+=110;
   }
 
   const hand=Number(state.handNumber)||0;
@@ -474,20 +395,21 @@ export function usePokerTableSfx(tableKey,state){
    const revealed=Array.isArray(result.revealed)?result.revealed.length:0;
 
    if(revealed){
-    events.push({group:'showdown',volume:.94,delay:timeline+90});
-    timeline+=300;
+    events.push({group:'showdown',volume:.86,delay:timeline+100});
+    timeline+=320;
    }else{
-    timeline+=100;
+    timeline+=120;
    }
 
    const winners=resultWinnerIds(result);
    const settled=Math.max(0,Number(result.settledPot)||0);
    const bb=Math.max(1,Number(state.bigBlind)||1);
    const resultGroup=winners.length>1?'splitPot':settled>=bb*20?'bigPot':'pot';
-   events.push({group:resultGroup,volume:.98,delay:timeline+120});
+
+   events.push({group:resultGroup,volume:.9,delay:timeline+140});
 
    if(Array.isArray(result.knockouts)&&result.knockouts.length){
-    events.push({group:'bust',volume:.86,delay:timeline+430});
+    events.push({group:'bust',volume:.8,delay:timeline+480});
    }
   }
 

@@ -228,28 +228,30 @@
   color:#cdbfd2!important;
 }
 
-/* Dedicated pregame back control: not a child of the gameplay top bar. */
+/* Dedicated pregame Back control: text-only, lightweight, and always tappable. */
 .pregameBack{
   position:fixed;
-  left:12px;
-  top:max(12px,env(safe-area-inset-top));
+  left:10px;
+  top:max(8px,env(safe-area-inset-top));
   z-index:220;
-  width:96px;
-  height:42px;
-  padding:0 16px 0 12px;
-  border:1px solid rgba(205,155,226,.42);
-  border-radius:999px;
-  background:linear-gradient(180deg,#2a1831,#17101d);
+  width:auto;
+  min-width:0;
+  height:auto;
+  min-height:30px;
+  margin:0;
+  padding:4px 6px;
+  border:0;
+  border-radius:0;
+  background:transparent;
   color:#f6eef8;
   display:flex;
   align-items:center;
-  justify-content:center;
-  gap:7px;
+  justify-content:flex-start;
   font:inherit;
-  font-size:16px;
+  font-size:13px;
   font-weight:800;
   line-height:1;
-  box-shadow:0 8px 22px #0008;
+  box-shadow:none;
   cursor:pointer;
 }
 
@@ -261,7 +263,6 @@
     --pg-table-height:min(71dvh,122vw);
   }
 
-  /* Header artwork and every text/control inside it move together. */
   .pregameRoom{
     position:absolute;
     left:3px;
@@ -270,6 +271,8 @@
     width:auto;
     height:var(--pg-header-height);
     margin:0;
+    transform:scale(1.14);
+    transform-origin:top center;
   }
 
   .pregameHeaderLeft{left:18%;top:26%;width:38%;height:40%}
@@ -285,7 +288,6 @@
   .pregameCode{font-size:7.2px}
   .pregameBlindBadge{top:77%;width:23%;font-size:8.5px}
 
-  /* Position changes only. The established table size remains exactly 71dvh / 122vw. */
   .pregameTablePage .ftp3Stage{
     left:50%!important;
     top:var(--pg-table-top)!important;
@@ -294,20 +296,18 @@
     transform:translateX(-50%)!important;
   }
 
-  /* Keep the player plaque tied to the table's lower edge so the table moves as one composition. */
   .pregameTablePage .ftp3Hero{
     top:auto!important;
-    bottom:calc(100dvh - var(--pg-table-top) - var(--pg-table-height) + min(12.5dvh,22vw))!important;
+    bottom:max(18px,env(safe-area-inset-bottom))!important;
     width:min(38vw,194px)!important;
   }
 
-  /* START GAME is compact and anchored to the header/table transition. */
   .pregameTablePage .ftp3ActionDock{
     left:auto!important;
     right:10px!important;
     top:calc(var(--pg-table-top) + 10px)!important;
     bottom:auto!important;
-    width:108px!important;
+    width:92px!important;
   }
 
   .pregameTablePage .ftp3PregameControls{
@@ -316,14 +316,13 @@
   }
 
   .pregameTablePage .ftp3Start{
-    width:108px!important;
-    height:32px!important;
-    min-height:32px!important;
-    padding:3px 7px!important;
-    font-size:10px!important;
+    width:92px!important;
+    height:28px!important;
+    min-height:28px!important;
+    padding:2px 6px!important;
+    font-size:9px!important;
   }
 
-  /* Temporary development control: separate from START GAME and intentionally quiet. */
   .pregameTablePage .ftp3OwnerBotControl{
     position:fixed!important;
     left:10px!important;
@@ -345,10 +344,4 @@
   .pregameInviteButton{width:54px;height:16px;font-size:4.5px}
   .pregameCode{font-size:6.8px}
   .pregameBlindBadge{font-size:8px}
-}
-
-@media(max-height:700px) and (max-width:760px){
-  .pregameTablePage{
-    --pg-header-top:58px;
-  }
 }

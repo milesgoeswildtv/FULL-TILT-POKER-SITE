@@ -4,7 +4,7 @@ html.telegramMiniApp body{padding-top:max(var(--telegram-safe-top,0px),env(safe-
 .telegramMiniApp .globalLegal{display:none!important}
 .telegramMiniApp .homeShell,.telegramMiniApp .tablePage{min-height:var(--telegram-viewport-stable-height,100dvh)}
 .telegramMiniApp .homeFrame{width:min(1180px,calc(100% - 20px));padding-top:8px;padding-bottom:max(24px,var(--telegram-safe-bottom,0px))}
-.telegramMiniApp .homeTop{position:sticky;top:0;z-index:80;margin:0 -10px;padding:6px 10px;min-height:58px;background:linear-gradient(180deg,color-mix(in srgb,var(--telegram-bg,#09060d) 94%,transparent),color-mix(in srgb,var(--telegram-bg,#09060d) 78%,transparent) 72%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.telegramMiniApp .homeTop{position:relative;top:auto;z-index:80;margin:0;padding:6px 0;min-height:0;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .telegramMiniApp .homeEntry,.telegramMiniApp .homeGamePanel,.telegramMiniApp .profileDrawer{background:linear-gradient(180deg,color-mix(in srgb,var(--telegram-secondary-bg,#120b18) 88%,#09060d 12%),color-mix(in srgb,var(--telegram-bg,#09060d) 94%,#09060d 6%));border-color:color-mix(in srgb,var(--telegram-hint,#97899e) 28%,transparent)}
 .telegramMiniApp .profileShade{padding-top:var(--telegram-safe-top,0px);padding-bottom:var(--telegram-safe-bottom,0px)}
 .telegramMiniApp .profileDrawer{padding-bottom:max(18px,var(--telegram-safe-bottom,0px))}
@@ -20,7 +20,7 @@ html.telegramMiniApp body{padding-top:max(var(--telegram-safe-top,0px),env(safe-
 .telegramMiniApp.telegramGameRoute .ftp3Back{visibility:hidden!important;pointer-events:none!important}
 @media(max-width:620px){
  html.telegramMiniApp .homeFrame{width:min(100% - 12px,1180px)}
- .telegramMiniApp .homeTop{margin:0 -6px;padding-left:8px;padding-right:8px}
+ .telegramMiniApp .homeTop{margin:0;padding-left:0;padding-right:0}
  .telegramMiniApp .miniBrand img{width:46px;height:46px}
  .telegramMiniApp .miniBrand span{display:none}
  .telegramMiniApp .accountChip{max-width:72vw}

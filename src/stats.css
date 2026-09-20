@@ -2,26 +2,26 @@
 .statsOverlay{width:100%;height:100%;display:grid;place-items:center}
 .statsPanel{position:relative;width:min(94vw,680px,44dvh);max-width:100%;margin:0;border:0;background:transparent;box-shadow:none;overflow:hidden;isolation:isolate;container-type:inline-size}
 .statsPanelArt{position:relative;z-index:0;display:block;width:100%;height:auto;pointer-events:none;user-select:none}
-.statsHead{position:absolute;z-index:2;left:4.1%;top:3.45%;width:91.4%;height:9.1%;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:0;border:0;background:transparent;box-sizing:border-box}
+.statsHead{position:absolute;z-index:2;left:4.1%;top:5.95%;width:91.4%;height:6.8%;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:0;border:0;background:transparent;box-sizing:border-box}
 .statsHead>div{display:grid;align-content:start;gap:.65cqw;min-width:0}
 .statsHead b{font-size:clamp(10px,2.65cqw,16px);letter-spacing:.14em;color:#e1bd63;text-shadow:0 0 14px #b6832c22;line-height:1}
 .statsHead span,.statsHead small{font-size:clamp(7px,1.55cqw,10px);color:#8d7f94;line-height:1.1}
 .statsHead small{max-width:42%;text-align:right}
 .statsLabels{position:absolute;z-index:2;inset:0;color:#8b7d91;font-size:clamp(7px,1.65cqw,10px);font-weight:900;letter-spacing:.055em;text-transform:uppercase;pointer-events:none}
 .statsLabels span{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;transform:translate(-50%,-50%);line-height:1.02;white-space:nowrap}
-.statsLabels .labelPlayer{left:26.9%;top:16.2%}
-.statsLabels .labelStack{left:59.25%;top:16.2%}
-.statsLabels .labelHands{left:70.25%;top:16.2%}
-.statsLabels .labelWins{left:92.6%;top:16.2%}
-.statsLabels .labelVpip{left:59.25%;top:24.0%}
-.statsLabels .labelPfr{left:70.25%;top:24.0%}
-.statsLabels .labelPot{left:81.5%;top:24.0%;white-space:normal;width:14%;line-height:.95}
-.statsLabels .labelKo{left:92.6%;top:24.0%}
+.statsLabels .labelPlayer{left:26.9%;top:18.45%}
+.statsLabels .labelStack{left:59.25%;top:18.45%}
+.statsLabels .labelHands{left:70.25%;top:18.45%}
+.statsLabels .labelWins{left:92.6%;top:18.45%}
+.statsLabels .labelVpip{left:59.25%;top:26.15%}
+.statsLabels .labelPfr{left:70.25%;top:26.15%}
+.statsLabels .labelPot{left:81.5%;top:26.15%;white-space:normal;width:14%;line-height:.95}
+.statsLabels .labelKo{left:92.6%;top:26.15%}
 .statsRows{position:absolute;z-index:2;left:0;top:28.72%;width:100%;height:65.30%;display:flex;flex-direction:column;min-height:0;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
 .statsRows::-webkit-scrollbar{display:none}
-.statsPlayerSlot{position:relative;flex:0 0 38.09%;width:100%;min-height:0;color:#d0c3d5;scroll-snap-align:start;scroll-snap-stop:always}
+.statsPlayerSlot{position:relative;flex:0 0 34.4%;width:100%;min-height:0;color:#d0c3d5;scroll-snap-align:start;scroll-snap-stop:always}
 .statsPlayerSlot>*{position:absolute;z-index:1;box-sizing:border-box;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1;min-width:0}
-.statRank{left:6.8%;top:47.7%;width:8.2%;height:20%;border:1px solid #493452;border-radius:999px;color:#9b8ca3;font-size:clamp(7px,1.75cqw,10px);font-style:normal}
+.statRank{left:6.8%;top:47.7%;width:8.2%;height:20%;border:0;border-radius:0;background:transparent;color:#9b8ca3;font-size:clamp(7px,1.75cqw,10px);font-style:normal}
 .statPlayerName{left:26.9%;top:47.7%;width:29.2%;height:20%;justify-content:flex-start!important;padding:0 1.4%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2d7e6;font-size:clamp(9px,2.45cqw,14px);font-weight:900}
 .statValue{width:9.4%;height:23%;flex-direction:column;color:#d0c3d5;font-size:clamp(8px,2.15cqw,12px)}
 .statValue:before{content:attr(data-label);display:block;margin-bottom:.45cqw;color:#76687d;font-size:clamp(5px,1.22cqw,7px);font-weight:900;letter-spacing:.06em;text-transform:uppercase;line-height:1}
@@ -33,7 +33,7 @@
 .statBigPot{left:81.5%;top:81.0%;width:10.5%}
 .statBigPot:before{white-space:normal;line-height:.92}
 .statKo{left:92.6%;top:81.0%}
-.champRow .statRank{border-color:#a9832e;background:#2a210d;color:#f3cc66}
+.champRow .statRank{color:#f3cc66}
 .finalStandings .statsHead b{color:#f0cc73}
 .finalBanner{border-color:#c6a149!important;background:#181108e8!important}
 .knockoutLine{padding:7px 9px;border:1px solid #592c3a;border-radius:8px;background:#210e15;color:#e68ca0;font-size:10px;font-weight:800;letter-spacing:.04em}

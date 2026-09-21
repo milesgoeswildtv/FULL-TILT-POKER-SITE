@@ -220,6 +220,10 @@
   border-color:#d1a249!important;
   background:linear-gradient(180deg,#6d4a18,#2d1c0a)!important;
   color:#f7d57f!important;
+  letter-spacing:.06em!important;
+  text-transform:uppercase;
+  text-shadow:0 1px 5px #000;
+  box-shadow:inset 0 0 0 1px rgba(255,222,137,.13),0 0 18px rgba(180,119,35,.18),0 6px 16px #0008!important;
 }
 
 .pregameTablePage .ftp3OwnerBotControl{
@@ -258,9 +262,9 @@
 @media(max-width:760px){
   .pregameTablePage{
     /* Header moves upward; table keeps its approved Y position. */
-    --pg-header-top:clamp(40px,5.1dvh,56px);
+    --pg-header-top:max(clamp(40px,5.1dvh,56px),calc(var(--ftp-safe-top) + 6px));
     --pg-header-height:clamp(116px,28vw,144px);
-    --pg-table-top:calc(clamp(62px,7.5dvh,84px) + var(--pg-header-height) - 26px);
+    --pg-table-top:calc(var(--pg-header-top) + var(--pg-header-height) - 26px);
 
     /* Micro-scale only: equivalent to roughly 82% -> 80%. */
     --pg-table-height:min(69.3dvh,119vw);
@@ -283,13 +287,13 @@
   .pregameHeaderLeft{left:18%;top:26%;width:38%;height:40%}
   .pregameHeaderLeft>span{font-size:4.6px;letter-spacing:.14em}
   .pregameHeaderLeft h2{margin:2px 0;font-size:10.5px}
-  .pregameHeaderLeft p{max-width:96%;font-size:5.2px;line-height:1.18}
+  .pregameHeaderLeft p{max-width:96%;font-size:6.2px;line-height:1.22;color:#c8bacd}
   .pregameHeaderRight{left:57%;top:26%;width:27%;height:41%;grid-template-columns:40% 60%}
   .pregameCount{height:86%}
   .pregameCount b{font-size:17px}
   .pregameCount span{margin-top:4px;font-size:4.2px}
   .pregameInviteCluster{gap:3px}
-  .pregameInviteButton{width:58px;height:17px;padding:0 4px;border-radius:5px;font-size:4.8px}
+  .pregameInviteButton{width:58px;height:18px;padding:0 4px;border-radius:5px;font-size:6px}
   .pregameCode{font-size:7.2px}
   .pregameBlindBadge{top:77%;width:23%;font-size:8.5px}
 

@@ -6,7 +6,7 @@ import BoosterShop from'./BoosterShop.jsx';
 import PurchaseHistory from'./PurchaseHistory.jsx';
 import EngineProofModal from'./EngineProofModal.jsx';
 import AccessHome from'./AccessHome.jsx';
-import{selectedBlindStructure}from'./TournamentConfig.jsx';
+import{selectedBlindStructure}from'./blind-structure.js';
 import{sessionToken,rememberPlayerSession,rememberTournamentSession}from'./session.js';
 import{assets,cosmeticOptions}from'./assets.js';
 import{accountIdentity,isTelegramMiniApp,platformState}from'./platform.js';

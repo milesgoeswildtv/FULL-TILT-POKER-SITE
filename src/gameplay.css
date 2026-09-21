@@ -13,7 +13,7 @@
   --ftp-safe-left:max(0px,env(safe-area-inset-left),var(--telegram-safe-left,0px));
   --ftp-frame-half:50vw;
   --ftp-seat-left-clearance:clamp(54px,14vw,68px);
-  --ftp-seat-right-clearance:clamp(48px,13vw,62px);
+  --ftp-seat-right-clearance:clamp(58px,14vw,68px);
   --ftp-bet-clearance:24px;
 }
 html,body,#root{min-height:100%}

@@ -113,6 +113,18 @@ Before live mode:
 6. Set `STRIPE_MODE=live`.
 7. Run one controlled low-cost live transaction and verify purchase, equip, purchase history, and refund behavior before opening the shop broadly.
 
+## Test bot QA toggle
+
+The pregame **+ Test Bot** control is intended for launch QA and can be switched without editing the React layout.
+
+```text
+CRASHOUT_TEST_BOTS=on
+```
+
+- `on` (default in `wrangler.jsonc`) shows the control to the configured Crashout owner. If `CRASHOUT_OWNER_ACCOUNT_ID` is not configured yet, the table host can use it for QA.
+- `off` hides the control and rejects `addbot` actions server-side.
+- Set `CRASHOUT_TEST_BOTS` to `off` before public launch when test seating is no longer needed.
+
 ## Verification
 
 Every push to `main` runs GitHub Actions on Node 22:

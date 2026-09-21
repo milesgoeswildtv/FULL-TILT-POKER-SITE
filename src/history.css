@@ -16,9 +16,9 @@
 .lastHandDetails{position:absolute;left:18.8%;top:2.2%;width:78.4%;height:95.3%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:1.5% 1.8%;box-sizing:border-box;display:grid;align-content:start;gap:2.2cqw}
 .lastHandDetails::-webkit-scrollbar{display:none}
 .lastHandDetailLead{display:grid;gap:.7cqw;padding-bottom:1.7cqw;border-bottom:1px solid #3b2944}
-.lastHandDetails small{font-size:clamp(6px,1.35cqw,8px);font-weight:900;letter-spacing:.11em;color:#8f8097}
+.lastHandDetails small{font-size:clamp(7px,1.45cqw,9px);font-weight:900;letter-spacing:.11em;color:#a99bab}
 .lastHandDetailLead strong{font-size:clamp(10px,2.4cqw,15px);line-height:1.15;color:#e7dbe9}
-.lastHandPots{display:grid;gap:1.1cqw}.lastHandPots>div{display:grid;grid-template-columns:25% 20% minmax(0,1fr);gap:2%;align-items:center;padding:1.3cqw 1.5cqw;border:1px solid #33243b;border-radius:1.7cqw;background:#0b0810a8}.lastHandPots span{font-size:clamp(6px,1.25cqw,8px);font-weight:900;letter-spacing:.07em;color:#807287}.lastHandPots b{font-size:clamp(8px,1.8cqw,11px);text-align:right;color:#e4c36b}.lastHandPots em{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(7px,1.55cqw,10px);font-style:normal;color:#c8bacd}.lastHandPots .returned b{color:#7bc49e}
+.lastHandPots{display:grid;gap:1.1cqw}.lastHandPots>div{display:grid;grid-template-columns:25% 20% minmax(0,1fr);gap:2%;align-items:center;padding:1.3cqw 1.5cqw;border:1px solid #33243b;border-radius:1.7cqw;background:#0b0810a8}.lastHandPots span{font-size:clamp(7px,1.4cqw,9px);font-weight:900;letter-spacing:.07em;color:#9f91a5}.lastHandPots b{font-size:clamp(8px,1.8cqw,11px);text-align:right;color:#e4c36b}.lastHandPots em{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(7px,1.55cqw,10px);font-style:normal;color:#c8bacd}.lastHandPots .returned b{color:#7bc49e}
 .lastHandReveal,.lastHandMucked,.lastHandKnockouts,.lastHandRabbit,.lastHandFairness{display:grid;grid-template-columns:24% minmax(0,1fr);gap:3%;align-items:start;padding-top:1cqw;border-top:1px solid #2c2033}.lastHandReveal{grid-template-columns:24% minmax(0,1fr)}.lastHandReveal>span,.lastHandMucked>span,.lastHandKnockouts>span,.lastHandRabbit>span{font-size:clamp(7px,1.55cqw,10px);line-height:1.3;color:#c5b8ca}.lastHandFairness code{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(6px,1.2cqw,8px);color:#8b7e90}
 .lastHandRecent{position:absolute;z-index:3;left:8.15%;top:53.55%;width:83.7%;height:12.8%;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
 .lastHandRecent::-webkit-scrollbar{display:none}
@@ -28,14 +28,14 @@
 .lastHandRecent button.active span,.lastHandRecent button.active b{color:#efcb70}
 .lastHandActions{position:absolute;z-index:3;left:8.2%;top:67.55%;width:83.5%;height:24.7%;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
 .lastHandActions::-webkit-scrollbar{display:none}
-.lastHandAction{position:relative;flex:0 0 14.2857%;display:grid;grid-template-columns:23% minmax(0,1fr);align-items:center;gap:2.5%;padding:0 1.6%;box-sizing:border-box;color:#c9bdce;scroll-snap-align:start}
+.lastHandAction{position:relative;flex:0 0 16.6667%;display:grid;grid-template-columns:23% minmax(0,1fr);align-items:center;gap:2.5%;padding:0 1.6%;box-sizing:border-box;color:#c9bdce;scroll-snap-align:start}
 .lastHandAction>span{min-width:0;display:grid;grid-template-columns:1fr auto;align-items:center;gap:5%;padding-right:4%}
-.lastHandAction>span b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(6px,1.3cqw,8px);letter-spacing:.07em;color:#8d7e95}
-.lastHandAction time{font-size:clamp(5px,1.05cqw,7px);color:#675d6d}
-.lastHandAction p{min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(7px,1.55cqw,10px);color:#d2c6d6}
+.lastHandAction>span b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(7px,1.45cqw,9px);letter-spacing:.07em;color:#a092a7}
+.lastHandAction time{font-size:clamp(6px,1.25cqw,8px);color:#897b90}
+.lastHandAction p{min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(8px,1.7cqw,10px);color:#d8cddd}
 .lastHandAction.type-raise p,.lastHandAction.type-allin p,.lastHandAction.type-timebank p,.lastHandAction.type-showhand p{color:#e6c66e;font-weight:800}
 .lastHandAction.type-fold p,.lastHandAction.type-muck p{color:#95899a}
 .lastHandAction.type-timeout p{color:#d99090;font-style:italic}
-.lastHandActionEmpty{height:14.2857%;display:grid;place-items:center;color:#776b7e;font-size:clamp(7px,1.5cqw,9px)}
+.lastHandActionEmpty{height:16.6667%;display:grid;place-items:center;color:#776b7e;font-size:clamp(7px,1.5cqw,9px)}
 .lastHandReplayButton:focus-visible,.lastHandRecent button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
-@media(max-width:760px){.lastHandPanel{width:min(94vw,620px,calc(70dvh * .6667))}.lastHandHeader b{font-size:clamp(10px,3.25cqw,15px)}.lastHandSummary b{font-size:clamp(8px,2.35cqw,11px)}.lastHandReplayButton{font-size:clamp(9px,2.55cqw,12px)}.lastHandRecent button b{font-size:clamp(8px,2.05cqw,10px)}.lastHandAction p{font-size:clamp(7px,1.8cqw,9px)}}
+@media(max-width:760px){.lastHandPanel{width:min(94vw,620px,calc(70dvh * .6667))}.lastHandHeader b{font-size:clamp(10px,3.25cqw,15px)}.lastHandSummary b{font-size:clamp(8px,2.35cqw,11px)}.lastHandReplayButton{font-size:clamp(9px,2.55cqw,12px)}.lastHandRecent button b{font-size:clamp(8px,2.05cqw,10px)}.lastHandAction>span b{font-size:clamp(7px,1.6cqw,9px)}.lastHandAction time{font-size:clamp(7px,1.45cqw,8px)}.lastHandAction p{font-size:clamp(8px,2cqw,10px)}}
